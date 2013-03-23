@@ -28,7 +28,7 @@
 #define TK_IDENTIFIER 280
 #define LIT_INTEGER   281
 #define LIT_FALSE     283
-#define LIT_TRUE	    284
+#define LIT_TRUE	  284
 #define LIT_CHAR      285
 #define LIT_STRING    286
 
