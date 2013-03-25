@@ -4,11 +4,10 @@
 	#include <stdio.h>
 	#include "tokens.h"
 	#include "hash.h"
+	#include "main.c"
 
 	int open_input(char* file_path);
 	int getLineNumber(void);
-
-	#include "main.c"
 
 	int running = 1;
 	int line_number = 1;
