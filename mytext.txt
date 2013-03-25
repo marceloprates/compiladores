@@ -1,14 +1,1 @@
-
-word x = 6;
-word y = 7;
-
-word z = x*y;
-
-if(z == 42)
-{
-	return TRUE;
-}
-else
-{
-	return FALSE;
-}
+"""" """" 'a'
