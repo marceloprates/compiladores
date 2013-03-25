@@ -11,48 +11,57 @@
 	int running = 1;
 	int token;
 
-	#include "main.c"
-
 	int line_number = 1;
+
+	#include "main.c"
 
 %}
 
+%x COMM
+
 %%
 
-"word"					{ return KW_WORD; 			}
-"bool"					{ return KW_BOOL; 			}
-"byte"					{ return KW_BYTE; 			}
-"if"					{ return KW_IF; 			}	
-"then"					{ return KW_THEN; 			}
-"else"					{ return KW_ELSE; 			}
-"loop"					{ return KW_LOOP; 			}
-"input"					{ return KW_INPUT; 			}
-"output"				{ return KW_OUTPUT; 		}
-"return"				{ return KW_RETURN; 		}
+"word"							{ return KW_WORD; 											}
+"bool"							{ return KW_BOOL; 											}
+"byte"							{ return KW_BYTE; 											}
+"if"							{ return KW_IF; 											}	
+"then"							{ return KW_THEN; 											}
+"else"							{ return KW_ELSE; 											}
+"loop"							{ return KW_LOOP; 											}
+"input"							{ return KW_INPUT; 											}
+"output"						{ return KW_OUTPUT; 										}
+"return"						{ return KW_RETURN; 										}
 
-[-,;:(){}*+/<>=!&$]			{ printf("%c\n", yytext[0]); return (int)yytext[0]; 	}
-"["					{ printf("%c\n", yytext[0]); return (int)yytext[0]; 	}
-"]"					{ printf("%c\n", yytext[0]); return (int)yytext[0]; 	}
-	
-"<="					{ return OPERATOR_LE; 		}
-">="					{ return OPERATOR_GE; 		}
-"=="					{ return OPERATOR_EQ; 		}
-"!="					{ return OPERATOR_NE; 		}
-"&&"					{ return OPERATOR_AND; 		}
-"||"					{ return OPERATOR_OR; 		}
+"/*"							{ BEGIN(COMM);												}
 
-"FALSE"					{ return LIT_FALSE; 		}
-"TRUE"					{ return LIT_TRUE; 			}
-[0-9][0-9A-Fa-f]*			{ printf("%s\n", yytext); addSymbol(yytext, LIT_INTEGER); return LIT_INTEGER; 	}
-['][^'][']				{ printf("%s\n", yytext); addSymbol(yytext, LIT_CHAR); return LIT_CHAR; 	} 	// REVER
-["][^"]*["]				{ printf("%s\n", yytext); addSymbol(yytext, LIT_STRING); return LIT_STRING; 	}	// REVER
- 
-[a-zA-Z][a-zA-Z0-9_]*			{ printf("%s\n", yytext); addSymbol(yytext, TK_IDENTIFIER); return TK_IDENTIFIER; }
+[-,;:(){}*+/<>=!&$\]\[]			{ return (int)yytext[0]; 									}
 
-"\n"					{ printf("line %d\n", line_number); line_number++; 			}
-" "|"	"				{ 							}
+"<="							{ return OPERATOR_LE; 										}
+">="							{ return OPERATOR_GE; 										}
+"=="							{ return OPERATOR_EQ; 										}
+"!="							{ return OPERATOR_NE; 										}
+"&&"							{ return OPERATOR_AND; 										}
+"||"							{ return OPERATOR_OR; 										}
 
-.						{ return TOKEN_ERROR; 		}
+"FALSE"							{ return LIT_FALSE; 										}
+"TRUE"							{ return LIT_TRUE; 											}
+[0-9][0-9A-Fa-f]*				{ addSymbol(yytext, LIT_INTEGER	); return LIT_INTEGER; 		}
+\'[^']\'						{ addSymbol(yytext, LIT_CHAR	); return LIT_CHAR; 		}
+\"[^"]*\"						{ addSymbol(yytext, LIT_STRING	); return LIT_STRING; 		}
+
+[a-zA-Z][a-zA-Z0-9_]*			{ addSymbol(yytext, TK_IDENTIFIER); return TK_IDENTIFIER; 	}
+
+"\n"							{ line_number++; 											}
+" "|"	"						{ 															}
+
+.								{ return TOKEN_ERROR; 										}
+
+<COMM>
+"*/"							{ BEGIN(INITIAL);											}
+<COMM>
+"\n"							{ line_number++;											}	
+<COMM>
+. 								{ 															}
 
 %%
 
