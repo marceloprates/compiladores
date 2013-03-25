@@ -1,4 +1,4 @@
-#define SYMBOL_TABLE_SIZE 20
+#define SYMBOL_TABLE_SIZE 23
 
 typedef char* symbol_ref;
 typedef int type_t;
