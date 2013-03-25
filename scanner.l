@@ -43,7 +43,7 @@
 
 "FALSE"					{ return LIT_FALSE; 		}
 "TRUE"					{ return LIT_TRUE; 			}
-[0-9][0-9ABCDE]*			{ printf("%s\n", yytext); addSymbol(yytext, LIT_INTEGER); return LIT_INTEGER; 	}
+[0-9][0-9A-Fa-f]*			{ printf("%s\n", yytext); addSymbol(yytext, LIT_INTEGER); return LIT_INTEGER; 	}
 ['][^'][']				{ printf("%s\n", yytext); addSymbol(yytext, LIT_CHAR); return LIT_CHAR; 	} 	// REVER
 ["][^"]*["]				{ printf("%s\n", yytext); addSymbol(yytext, LIT_STRING); return LIT_STRING; 	}	// REVER
  
