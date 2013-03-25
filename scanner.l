@@ -32,7 +32,8 @@
 "output"						{ return KW_OUTPUT; 										}
 "return"						{ return KW_RETURN; 										}
 
-"/*"							{ BEGIN(COMM);												}
+"/*"							{ BEGIN(COMM);									}
+"//"[^"\n"]*							{ 							}
 
 [-,;:(){}*+/<>=!&$\]\[]			{ return (int)yytext[0]; 									}
 
@@ -51,17 +52,17 @@
 
 [a-zA-Z][a-zA-Z0-9_]*			{ addSymbol(yytext, TK_IDENTIFIER); return TK_IDENTIFIER; 	}
 
-"\n"							{ line_number++; 											}
-" "|"	"						{ 															}
+"\n"							{ line_number++; 						}
+" "|"	"						{ 								}
 
-.								{ return TOKEN_ERROR; 										}
+.								{ printf("%s\n", yytext); return TOKEN_ERROR; 					}
 
 <COMM>
-"*/"							{ BEGIN(INITIAL);											}
+"*/"							{ BEGIN(INITIAL);						}
 <COMM>
-"\n"							{ line_number++;											}	
+"\n"							{ line_number++;						}	
 <COMM>
-. 								{ 															}
+. 								{ 							}
 
 %%
 
