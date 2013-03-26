@@ -57,7 +57,7 @@
 "\n"							{ line_number++; 						}
 " "|"	"						{ 								}
 
-.								{ printf("%s\n", yytext); return TOKEN_ERROR; 					}
+.								{ return TOKEN_ERROR; 					}
 
 <COMM>
 "*/"							{ BEGIN(INITIAL);						}

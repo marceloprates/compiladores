@@ -1,6 +1,6 @@
 // Lucas Martinelli Tabajara, Marcelo de Oliveira Rosa Prates
 
-#define SYMBOL_TABLE_SIZE 23
+#define SYMBOL_TABLE_SIZE 997
 
 typedef char* symbol_ref;
 typedef int type_t;

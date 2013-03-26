@@ -1,0 +1,31 @@
+// Lucas Martinelli Tabajara, Marcelo de Oliveira Rosa Prates
+
+"/*" byte x = /* 1234 */ 5678;
+
+hello_world:
+	output "hello world!";*/
+
+'a' '1' 'word'
+
+word ffff = (0ffff + [7d7e7f - 4ABCg1h7j]);
+
+bool false = TRUE;
+bool true = FALSE;
+
+if(false) then
+{
+	loop (true)
+		return x > y;
+}
+else
+{
+	return x <= y;
+}
+
+// ^.*$
+
+input [-,;}:({*+/<>=!)&$] //
+
+word bool return output input then else loop if byte
+
+> <= == != && || |

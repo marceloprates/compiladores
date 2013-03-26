@@ -1,3 +1,5 @@
+// Lucas Martinelli Tabajara, Marcelo de Oliveira Rosa Prates
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -18,12 +20,12 @@ int main(int argc, char** argv)
 		if(!running)
 			break;
 		
-		printf("token: %d\n", token);
+		printf("token: %d (line %d)\n", token, getLineNumber());
 	}
 
 	printf("Your program has %d lines\n", getLineNumber());
 
-	printSymbolTable();
+	//printSymbolTable();
 
 	return 1;
 }
