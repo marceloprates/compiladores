@@ -32,7 +32,7 @@
 "output"						{ return KW_OUTPUT; 										}
 "return"						{ return KW_RETURN; 										}
 
-"\*"							{ BEGIN(COMM);												}
+"/*"							{ BEGIN(COMM);												}
 
 [-,;:(){}*+/<>=!&$\]\[]			{ return (int)yytext[0]; 									}
 
