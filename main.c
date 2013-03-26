@@ -14,12 +14,16 @@ int main(int argc, char** argv)
 	while(running)
 	{
 		token = yylex();
+		
 		if(!running)
 			break;
+		
 		printf("token: %d\n", token);
 	}
 
 	printf("Your program has %d lines\n", getLineNumber());
+
+	printSymbolTable();
 
 	return 1;
 }
