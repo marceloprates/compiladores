@@ -40,17 +40,40 @@
 		;
 
 	item:
-		global_dec ';' |
+		global_type_dec ';' |
 		fun_def
 		;
 
+	global_type_dec:
+		type global_dec
+		;
+
 	global_dec:
-		unary_dec |
-		array_dec
+		TK_IDENTIFIER value_init |
+		'$' TK_IDENTIFIER scalar_init
+		;
+
+	value_init:
+		scalar_init |
+		'[' LIT_INTEGER ']' array_init
+		;
+
+	scalar_init:
+		':' literal
+		;
+
+	array_init:
+		':' literal_list |
+		/* empty */
+		;
+
+	local_type_dec:
+		type local_dec
 		;
 
 	local_dec:
-		unary_dec
+		TK_IDENTIFIER scalar_init |
+		'$' TK_IDENTIFIER scalar_init
 		;
 
 	type:
@@ -66,15 +89,6 @@
 		LIT_CHAR
 		;
 
-	unary_dec:
-		type 	 TK_IDENTIFIER ':' literal ';' |
-		type '$' TK_IDENTIFIER ':' literal ';'
-		;
-
-	array_dec:
-		type TK_IDENTIFIER '[' ']' ':' literal_list
-		;
-
 	literal_list:
 		literal literal_list_tail
 		;
@@ -85,7 +99,7 @@
 		;
 
 	fun_def:
-		header local_dec block
+		header local_type_dec block
 		;
 
 	header:
@@ -120,14 +134,22 @@
 		;
 
 	atr:
-		TK_IDENTIFIER '=' expr
-		TK_IDENTIFIER '[' expr ']' '=' expr
+		TK_IDENTIFIER ass
+		;
+
+	ass:
+		'=' expr |
+		'[' expr ']' '=' expr
 		;
 
 	flow_control:
-		KW_IF '(' expr ')' KW_THEN command |
-		KW_IF '(' expr ')' KW_THEN command KW_ELSE command |
+		KW_IF '(' expr ')' KW_THEN command else_block |
 		KW_LOOP '(' expr ')' command
+		;
+
+	else_block:
+		KW_ELSE command |
+		/* empty */
 		;
 
 	input:
@@ -157,13 +179,17 @@
 		;
 
 	expr:
-		TK_IDENTIFIER 				|
-		TK_IDENTIFIER '[' expr ']' 	|
+		TK_IDENTIFIER access		|
 		literal 					|
 		'(' expr ')'				|
 		expr op expr 				|
 		'&' expr					|
 		'*' expr
+		;
+
+	access:
+		'[' expr ']' |
+		/* empty */
 		;
 
 	op:
