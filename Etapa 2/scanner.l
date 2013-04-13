@@ -5,6 +5,7 @@
 
 	#include <stdio.h>
 	#include "hash.h"
+	#include "y.tab.h"
 
 	int open_input(char* file_path);
 	int getLineNumber(void);
@@ -31,8 +32,8 @@
 "output"						{ return KW_OUTPUT; 										}
 "return"						{ return KW_RETURN; 										}
 
-"/*"							{ BEGIN(COMM);									}
-"//"[^"\n"]*							{ 							}
+"/*"							{ BEGIN(COMM);												}
+"//"[^"\n"]*					{ 															}
 
 [-,;:(){}*+/<>=!&$\]\[]			{ return (int)yytext[0]; 									}
 
@@ -45,23 +46,23 @@
 
 "FALSE"							{ return LIT_FALSE; 										}
 "TRUE"							{ return LIT_TRUE; 											}
-[0-9][0-9A-Fa-f]*				{ addSymbol(yytext, LIT_INTEGER	); return LIT_INTEGER; 		}
+[0-9][0-9A-Fa-f]*				{ yylval.ivar = atoi(yytext); addSymbol(yytext, LIT_INTEGER	); return LIT_INTEGER; 		}
 \'[^']\'						{ addSymbol(yytext, LIT_CHAR	); return LIT_CHAR; 		}
 \"[^"]*\"						{ addSymbol(yytext, LIT_STRING	); return LIT_STRING; 		}
 
 [a-zA-Z][a-zA-Z0-9_]*			{ addSymbol(yytext, TK_IDENTIFIER); return TK_IDENTIFIER; 	}
 
-"\n"							{ line_number++; 						}
-" "|"	"						{ 								}
+"\n"							{ line_number++; 											}
+" "|"	"						{ 															}
 
-.								{ return TOKEN_ERROR; 					}
+.								{ return TOKEN_ERROR; 										}
 
 <COMM>
-"*/"							{ BEGIN(INITIAL);						}
+"*/"							{ BEGIN(INITIAL);											}
 <COMM>
-"\n"							{ line_number++;						}	
+"\n"							{ line_number++;											}	
 <COMM>
-. 								{ 							}
+. 								{ 															}
 
 %%
 
@@ -87,6 +88,13 @@ int open_input(char* file_path)
 
 		return 1;
 	}
+}
+
+int close_input()
+{
+	fclose(yyin);
+
+	return 1;
 }
 
 int getLineNumber()

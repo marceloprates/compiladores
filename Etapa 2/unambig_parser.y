@@ -3,10 +3,12 @@
 	#include <stdlib.h>
 	#include <stdio.h>
 	#include <string.h>
-	#include <yy.lex.c>	
+	#include "lex.yy.h"
 %}
 
-%union{int ivar, char cvar, char* svar}
+%start program
+
+%union{int ivar; char cvar; char* svar;}
 
 %token 			KW_WORD
 %token 			KW_BOOL
@@ -33,6 +35,10 @@
 %token 			TOKEN_ERROR
 
 %%
+
+	errorz:
+		TOKEN_ERROR
+		;
 
 	program:
 		item program |
@@ -94,12 +100,17 @@
 		;
 
 	literal_list_tail:
-		literal_list_tail ' ' literal_list |
+		' ' literal literal_list_tail |
 		/* empty */
 		;
 
 	fun_def:
-		header local_type_dec block
+		header local_type_decs block
+		;
+
+	local_type_decs:
+		local_type_decs local_dec ';' |
+		/* empty */
 		;
 
 	header:
@@ -107,11 +118,12 @@
 		;
 
 	parameter_list:
-		type TK_IDENTIFIER parameter_list_tail
+		type TK_IDENTIFIER parameter_list_tail |
+		/* empty */
 		;
 
 	parameter_list_tail:
-		parameter_list_tail ',' parameter_list |
+		',' type TK_IDENTIFIER parameter_list_tail |
 		/* empty */
 		;
 
@@ -207,7 +219,8 @@
 
 %%
 
-int main(int argc, char** argv)
+yyerror(s)
+char *s;
 {
-
+  fprintf(stderr, "%s in line %d\n",s,getLineNumber());
 }
