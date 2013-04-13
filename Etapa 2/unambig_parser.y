@@ -35,11 +35,6 @@
 %token 			TOKEN_ERROR
 
 %%
-
-	errorz:
-		TOKEN_ERROR
-		;
-
 	program:
 		item program |
 		/* empty */
@@ -109,21 +104,36 @@
 		;
 
 	local_type_decs:
-		local_type_decs local_dec ';' |
+		local_type_decs local_type_dec ';' |
 		/* empty */
 		;
 
 	header:
-		type TK_IDENTIFIER '(' parameter_list ')'
+		type TK_IDENTIFIER '(' type_parameter_list ')'
+		;
+
+	parameter:
+		TK_IDENTIFIER |
+		literal
+		;	
+
+	type_parameter_list:
+		type TK_IDENTIFIER type_parameter_list_tail |
+		/* empty */
+		;
+
+	type_parameter_list_tail:
+		',' type TK_IDENTIFIER type_parameter_list_tail |
+		/* empty */
 		;
 
 	parameter_list:
-		type TK_IDENTIFIER parameter_list_tail |
+		parameter parameter_list_tail |
 		/* empty */
 		;
 
 	parameter_list_tail:
-		',' type TK_IDENTIFIER parameter_list_tail |
+		',' parameter parameter_list_tail |
 		/* empty */
 		;
 
@@ -191,11 +201,12 @@
 		;
 
 	expr:
-		TK_IDENTIFIER access		|
-		literal 					|
-		'(' expr ')'				|
-		expr op expr 				|
-		'&' expr					|
+		TK_IDENTIFIER access		  |
+		TK_IDENTIFIER '(' parameter_list ')'|
+		literal 					  |
+		'(' expr ')'				  |
+		expr op expr 				  |
+		'&' expr					  |
 		'*' expr
 		;
 
@@ -209,6 +220,8 @@
 		'-' 			|
 		'*'				|
 		'/'				|
+		'<'				|
+		'>'				|
 		OPERATOR_LE  	|
 		OPERATOR_GE  	|
 		OPERATOR_EQ  	|
