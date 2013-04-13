@@ -44,11 +44,11 @@
 "&&"							{ return OPERATOR_AND; 										}
 "||"							{ return OPERATOR_OR; 										}
 
-"FALSE"							{ return LIT_FALSE; 										}
-"TRUE"							{ return LIT_TRUE; 											}
+"FALSE"							{ yylval.ivar = 0; return LIT_FALSE; 										}
+"TRUE"							{ yylval.ivar = 1; return LIT_TRUE; 											}
 [0-9][0-9A-Fa-f]*				{ yylval.ivar = atoi(yytext); addSymbol(yytext, LIT_INTEGER	); return LIT_INTEGER; 		}
-\'[^']\'						{ addSymbol(yytext, LIT_CHAR	); return LIT_CHAR; 		}
-\"[^"]*\"						{ addSymbol(yytext, LIT_STRING	); return LIT_STRING; 		}
+\'[^']\'						{ yylval.cvar = yytext[0]; addSymbol(yytext, LIT_CHAR	); return LIT_CHAR; 		}
+\"[^"]*\"						{ yylval.svar = yytext;addSymbol(yytext, LIT_STRING	); return LIT_STRING; 		}
 
 [a-zA-Z][a-zA-Z0-9_]*			{ addSymbol(yytext, TK_IDENTIFIER); return TK_IDENTIFIER; 	}
 

@@ -201,12 +201,12 @@
 		;
 
 	expr:
-		TK_IDENTIFIER access		  |
-		TK_IDENTIFIER '(' parameter_list ')'|
-		literal 					  |
-		'(' expr ')'				  |
-		expr op expr 				  |
-		'&' expr					  |
+		TK_IDENTIFIER access		  		 |
+		TK_IDENTIFIER '(' parameter_list ')' |
+		literal 					  		 |
+		'(' expr ')'				  		 |
+		expr op expr 				  		 |
+		'&' expr					  		 |
 		'*' expr
 		;
 
@@ -236,4 +236,6 @@ yyerror(s)
 char *s;
 {
   fprintf(stderr, "%s in line %d\n",s,getLineNumber());
+
+  exit(3);
 }
