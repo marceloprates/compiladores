@@ -3,7 +3,6 @@
 	#include <stdlib.h>
 	#include <stdio.h>
 	#include <string.h>
-	#include "lex.yy.h"
 %}
 
 %start program
@@ -188,7 +187,7 @@
 		;
 
 	element_list_tail:
-		element_list_tail ',' element_list |
+		',' element_list |
 		/* empty */
 		;
 
