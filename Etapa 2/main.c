@@ -1,6 +1,8 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include "hash.h"
+#include "y.tab.h"
 
 int main(int argc, char** argv)
 {
@@ -16,6 +18,8 @@ int main(int argc, char** argv)
 	yyparse();
 
 	close_input();
+
+	printSymbolTable();
 
 	return 1;
 }

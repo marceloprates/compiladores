@@ -18,7 +18,33 @@ void printSymbol(symbol_ref symbol)
 
 void printType(type_t type)
 {
-	printf("%d", type);
+	switch(type)
+	{
+		case SYMBOL_UNDEFINED:
+			printf("undefined");
+			break;
+		case SYMBOL_LIT_INTEGER:
+			printf("int");
+			break;
+		case SYMBOL_LIT_FLOATING:
+			printf("float");
+			break;
+		case SYMBOL_LIT_TRUE:
+			printf("true");
+			break;
+		case SYMBOL_LIT_FALSE:
+			printf("false");
+			break;
+		case SYMBOL_LIT_CHAR:
+			printf("char");
+			break;
+		case SYMBOL_LIT_STRING:
+			printf("string");
+			break;
+		case SYMBOL_IDENTIFIER:
+			printf("id");
+			break;
+	}
 }
 
 // LinkedList module
