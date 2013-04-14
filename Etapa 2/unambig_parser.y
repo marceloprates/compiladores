@@ -91,11 +91,7 @@
 		;
 
 	literal_list:
-		literal literal_list_tail
-		;
-
-	literal_list_tail:
-		' ' literal literal_list_tail |
+		literal literal_list |
 		/* empty */
 		;
 
