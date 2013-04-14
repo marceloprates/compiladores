@@ -3,11 +3,12 @@
 	#include <stdlib.h>
 	#include <stdio.h>
 	#include <string.h>
+	#include "hash.h"
 %}
 
 %start program
 
-%union{int ivar; char cvar; char* svar;}
+%union{ linkedList_t* symbol; }
 
 %token 			KW_WORD
 %token 			KW_BOOL
@@ -26,11 +27,11 @@
 %token 			OPERATOR_AND
 %token 			OPERATOR_OR
 %token 			TK_IDENTIFIER
-%token <ivar>	LIT_INTEGER
-%token <ivar>	LIT_FALSE
-%token <ivar>	LIT_TRUE
-%token <cvar>	LIT_CHAR
-%token <svar>	LIT_STRING
+%token <symbol>	LIT_INTEGER
+%token <symbol>	LIT_FALSE
+%token <symbol>	LIT_TRUE
+%token <symbol>	LIT_CHAR
+%token <symbol>	LIT_STRING
 %token 			TOKEN_ERROR
 
 %%
@@ -83,10 +84,10 @@
 		;
 
 	literal:
-		LIT_INTEGER |
-		LIT_FALSE 	|
-		LIT_TRUE 	|
-		LIT_CHAR
+		LIT_INTEGER		{ printf("Found integer: %d\n", $1->symbol.value.intLit); }		|
+		LIT_FALSE		{ printf("Found false: %d\n", $1->symbol.value.boolLit); }		|
+		LIT_TRUE		{ printf("Found true: %d\n", $1->symbol.value.boolLit); }			|
+		LIT_CHAR		{ printf("Found character: %c\n", $1->symbol.value.charLit); }
 		;
 
 	literal_list:
@@ -178,7 +179,7 @@
 		;
 
 	element:
-		LIT_STRING |
+		LIT_STRING	{ printf("Found string: %s\n", $1->symbol.value.stringLit); }		|
 		expr
 		;
 

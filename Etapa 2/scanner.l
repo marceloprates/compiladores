@@ -4,6 +4,8 @@
 	// Lucas Martinelli Tabajara, Marcelo de Oliveira Rosa Prates
 
 	#include <stdio.h>
+	#include <stdlib.h>
+	#include <string.h>
 	#include "hash.h"
 	#include "y.tab.h"
 
@@ -14,7 +16,6 @@
 	int token;
 
 	int line_number = 1;
-
 %}
 
 %x COMM
@@ -44,13 +45,13 @@
 "&&"							{ 																return OPERATOR_AND; 	}
 "||"							{ 																return OPERATOR_OR; 	}
 
-"FALSE"							{ yylval.ivar = 0; 			  addSymbol(yytext, SYMBOL_LIT_FALSE  );	return LIT_FALSE;		}
-"TRUE"							{ yylval.ivar = 1; 			  addSymbol(yytext, SYMBOL_LIT_TRUE   );	return LIT_TRUE; 		}
-[0-9][0-9A-Fa-f]*				{ yylval.ivar = atoi(yytext); addSymbol(yytext, SYMBOL_LIT_INTEGER);	return LIT_INTEGER;		}
-\'[^']\'						{ yylval.cvar = yytext[0];    addSymbol(yytext, SYMBOL_LIT_CHAR   );	return LIT_CHAR;		}
-\"[^"]*\"						{ yylval.svar = yytext;       addSymbol(yytext, SYMBOL_LIT_STRING );	return LIT_STRING;		}
+"FALSE"							{ yylval.symbol = addSymbol(yytext, SYMBOL_LIT_FALSE  );	return LIT_FALSE;		}
+"TRUE"							{ yylval.symbol = addSymbol(yytext, SYMBOL_LIT_TRUE   );	return LIT_TRUE; 		}
+[0-9][0-9A-Fa-f]*				{ yylval.symbol = addSymbol(yytext, SYMBOL_LIT_INTEGER);	return LIT_INTEGER;		}
+\'[^']\'						{ yylval.symbol = addSymbol(yytext, SYMBOL_LIT_CHAR   );	return LIT_CHAR;		}
+\"[^"]*\"						{ yylval.symbol = addSymbol(yytext, SYMBOL_LIT_STRING );	return LIT_STRING;		}
 
-[a-zA-Z][a-zA-Z0-9_]*			{							  addSymbol(yytext, SYMBOL_IDENTIFIER);		return TK_IDENTIFIER;	}
+[a-zA-Z][a-zA-Z0-9_]*			{ yylval.symbol = addSymbol(yytext, SYMBOL_IDENTIFIER);		return TK_IDENTIFIER;	}
 							
 "\n"							{ line_number++; 																		}
 " "|"	"						{ 																						}

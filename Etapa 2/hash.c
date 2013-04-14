@@ -9,9 +9,18 @@ hashTable_ref symbolTable;
 
 // Symbol module
 
-void printSymbol(symbol_ref symbol)
+int equal(symbol_t symbol1, symbol_t symbol2)
 {
-	printf("%s", symbol);
+	return (symbol1.type == symbol2.type) && (strcmp(symbol1.text, symbol2.text) == 0);
+}
+
+void printSymbol(symbol_t symbol)
+{
+	printf("(");
+	printf(symbol.text);
+	printf(" : ");
+	printType(symbol.type);
+	printf(")");
 }
 
 // Type module
@@ -20,14 +29,8 @@ void printType(type_t type)
 {
 	switch(type)
 	{
-		case SYMBOL_UNDEFINED:
-			printf("undefined");
-			break;
 		case SYMBOL_LIT_INTEGER:
 			printf("int");
-			break;
-		case SYMBOL_LIT_FLOATING:
-			printf("float");
 			break;
 		case SYMBOL_LIT_TRUE:
 			printf("true");
@@ -51,46 +54,31 @@ void printType(type_t type)
 
 linkedList_t* nil(void)
 {
-	linkedList_t* list = (linkedList_t*) malloc( sizeof(linkedList_t) );
-
-	list->symbol = NULL;
-	list->tail = NULL;
-
-	return list;
+	return NULL;
 }
 
-int isEmpty(linkedList_t list)
+int isEmpty(linkedList_t* list)
 {
-	return list.symbol == NULL;
+	return list == NULL;
 }
 
-linkedList_t* cons(symbol_ref symbol, type_t type, linkedList_t* list)
+linkedList_t* cons(symbol_t symbol, linkedList_t* list)
 {
-	if(list == NULL)
-	{
-		return NULL;
-	}
-	else
-	{
-		linkedList_t* newList = (linkedList_t*) malloc( sizeof(linkedList_t) );
+	linkedList_t* newList = (linkedList_t*) malloc( sizeof(linkedList_t) );
 
-		newList->symbol = (symbol_ref) malloc( strlen(symbol) );
-		strcpy(newList->symbol, symbol);
-		newList->type = type;
+	newList->symbol = symbol;
+	newList->tail = list;
 
-		newList->tail = list;
-
-		return newList;
-	}
+	return newList;
 }
 
-linkedList_t* find(symbol_ref symbol, linkedList_t list)
+linkedList_t* find(symbol_t symbol, linkedList_t* list)
 {
-	linkedList_t* aux = &list;
+	linkedList_t* aux = list;
 
-	while( !isEmpty(*aux) )
+	while( !isEmpty(aux) )
 	{
-		if(strcmp(aux->symbol, symbol) == 0)
+		if(equal(aux->symbol, symbol))
 		{
 			return aux;
 		}
@@ -107,13 +95,9 @@ void printList(linkedList_t list)
 {
 	linkedList_t* aux = &list;
 
-	while( !isEmpty(*aux) )
+	while( !isEmpty(aux) )
 	{
-		printf("(");
 		printSymbol(aux->symbol);
-		printf(" : ");
-		printType(aux->type);
-		printf(")");
 		
 		printf(" :: ");
 		
@@ -125,14 +109,14 @@ void printList(linkedList_t list)
 
 // HashTable module
 
-int hashFunction(symbol_ref symbol, int tableSize)
+int hashFunction(char* text, int tableSize)
 {
 	int index = 1;
 	int i;
 
-	for(i = 0; i < strlen(symbol); i++)
+	for(i = 0; i < strlen(text); i++)
 	{
-		index = ( (index * symbol[i]) % tableSize ) + 1;
+		index = ( (index * text[i]) % tableSize ) + 1;
 	}	
 
 	return index - 1;
@@ -151,11 +135,11 @@ hashTable_ref newHashTable(int size)
 	return table;
 }
 
-linkedList_t* addToTable(symbol_ref symbol, type_t type, hashTable_ref table, int tableSize)
+linkedList_t* addToTable(symbol_t symbol, hashTable_ref table, int tableSize)
 {
-	int index = hashFunction(symbol, tableSize);
+	int index = hashFunction(symbol.text, tableSize);
 
-	linkedList_t* pointer = find(symbol, *(table[index]));
+	linkedList_t* pointer = find(symbol, table[index]);
 
 	if(pointer != NULL)
 	{
@@ -163,17 +147,17 @@ linkedList_t* addToTable(symbol_ref symbol, type_t type, hashTable_ref table, in
 	}
 	else
 	{
-		table[index] = cons(symbol, type, table[index]);
+		table[index] = cons(symbol, table[index]);
 
 		return table[index];
 	}
 }
 
-linkedList_t* findInTable(symbol_ref symbol, hashTable_ref table, int tableSize)
+linkedList_t* findInTable(symbol_t symbol, hashTable_ref table, int tableSize)
 {
-	int index = hashFunction(symbol, tableSize);
+	int index = hashFunction(symbol.text, tableSize);
 
-	return find(symbol, *(table[index]));
+	return find(symbol, table[index]);
 }
 
 void printTable(hashTable_ref table, int tableSize)
@@ -199,12 +183,47 @@ void initMe(void)
 	symbolTable = newHashTable(SYMBOL_TABLE_SIZE);
 }
 
-linkedList_t* addSymbol(symbol_ref symbol, type_t type)
+char* removeQuotes(char* s)
 {
-	return addToTable(symbol, type, symbolTable, SYMBOL_TABLE_SIZE);
+	int newLength = strlen(s) - 2;
+	char* s2 = (char*) calloc(newLength + 1, sizeof(char));
+	strncpy(s2, s + 1, newLength);
+
+	return s2;
 }
 
-linkedList_t* findSymbol(symbol_ref symbol)
+linkedList_t* addSymbol(char* text, type_t type)
+{
+	symbol_t symbol;
+	symbol.text = text;
+	symbol.type = type;
+
+	switch(type)
+	{
+		case SYMBOL_LIT_INTEGER:
+			symbol.value.intLit = atoi(text);
+			break;
+		case SYMBOL_LIT_TRUE:
+			symbol.value.boolLit = 1;
+			break;
+		case SYMBOL_LIT_FALSE:
+			symbol.value.boolLit = 0;
+			break;
+		case SYMBOL_LIT_CHAR:
+			symbol.value.charLit = removeQuotes(text)[0];
+			break;
+		case SYMBOL_LIT_STRING:
+			symbol.value.stringLit = removeQuotes(text);
+			break;
+		case SYMBOL_IDENTIFIER:
+			symbol.value.identifier = text;
+			break;
+	}
+
+	return addToTable(symbol, symbolTable, SYMBOL_TABLE_SIZE);
+}
+
+linkedList_t* findSymbol(symbol_t symbol)
 {
 	return findInTable(symbol, symbolTable, SYMBOL_TABLE_SIZE);
 }
