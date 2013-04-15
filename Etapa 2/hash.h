@@ -61,7 +61,7 @@ linkedList_t* cons(symbol_t symbol, linkedList_t* list);
 
 linkedList_t* find(symbol_t symbol, linkedList_t* list);
 
-void printList(linkedList_t list);
+void printList(linkedList_t* list);
 
 // HashTable module
 

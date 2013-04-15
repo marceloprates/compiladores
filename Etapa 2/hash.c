@@ -91,9 +91,9 @@ linkedList_t* find(symbol_t symbol, linkedList_t* list)
 	return NULL;
 }
 
-void printList(linkedList_t list)
+void printList(linkedList_t* list)
 {
-	linkedList_t* aux = &list;
+	linkedList_t* aux = list;
 
 	while( !isEmpty(aux) )
 	{
@@ -169,7 +169,7 @@ void printTable(hashTable_ref table, int tableSize)
 	for(i = 0; i < tableSize; i++)
 	{
 		printf("\t");
-		printList( *(table[i]) );
+		printList(table[i]);
 		printf("\n");
 	}
 
@@ -195,7 +195,8 @@ char* removeQuotes(char* s)
 linkedList_t* addSymbol(char* text, type_t type)
 {
 	symbol_t symbol;
-	symbol.text = text;
+	symbol.text = (char*) calloc(strlen(text) + 1, sizeof(char));
+	strcpy(symbol.text, text);
 	symbol.type = type;
 
 	switch(type)
