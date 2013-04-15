@@ -16,11 +16,11 @@ int equal(symbol_t symbol1, symbol_t symbol2)
 
 void printSymbol(symbol_t symbol)
 {
-	printf("(");
-	printf(symbol.text);
-	printf(" : ");
+	fprintf(stderr,"(");
+	fprintf(stderr,"%s",symbol.text);
+	fprintf(stderr," : ");
 	printType(symbol.type);
-	printf(")");
+	fprintf(stderr,")");
 }
 
 // Type module
@@ -30,22 +30,22 @@ void printType(type_t type)
 	switch(type)
 	{
 		case SYMBOL_LIT_INTEGER:
-			printf("int");
+			fprintf(stderr,"int");
 			break;
 		case SYMBOL_LIT_TRUE:
-			printf("true");
+			fprintf(stderr,"true");
 			break;
 		case SYMBOL_LIT_FALSE:
-			printf("false");
+			fprintf(stderr,"false");
 			break;
 		case SYMBOL_LIT_CHAR:
-			printf("char");
+			fprintf(stderr,"char");
 			break;
 		case SYMBOL_LIT_STRING:
-			printf("string");
+			fprintf(stderr,"string");
 			break;
 		case SYMBOL_IDENTIFIER:
-			printf("id");
+			fprintf(stderr,"id");
 			break;
 	}
 }
@@ -99,12 +99,12 @@ void printList(linkedList_t* list)
 	{
 		printSymbol(aux->symbol);
 		
-		printf(" :: ");
+		fprintf(stderr," :: ");
 		
 		aux = aux->tail;
 	}
 
-	printf("[]");
+	fprintf(stderr,"[]");
 }
 
 // HashTable module
@@ -164,16 +164,16 @@ void printTable(hashTable_ref table, int tableSize)
 {
 	int i;
 
-	printf("{\n");
+	fprintf(stderr,"{\n");
 
 	for(i = 0; i < tableSize; i++)
 	{
-		printf("\t");
+		fprintf(stderr,"\t");
 		printList(table[i]);
-		printf("\n");
+		fprintf(stderr,"\n");
 	}
 
-	printf("}");
+	fprintf(stderr,"}\n");
 }
 
 // SymbolTable module
@@ -239,22 +239,22 @@ int main()
 {
 	linkedList_t list = *cons("4", 1, cons("1", 1, cons("7", 1, nil())));
 	printList(list);
-	printf("\n");
+	fprintf(stderr,"\n");
 	hashTable_ref table = newHashTable(10);
 	printSymbol(addToTable("666", 1, table, 10)->symbol);
-	printf("\n");
+	fprintf(stderr,"\n");
 	printSymbol(addToTable("42", 1, table, 10)->symbol);
-	printf("\n");
+	fprintf(stderr,"\n");
 	printSymbol(addToTable("1984", 1, table, 10)->symbol);
-	printf("\n");
+	fprintf(stderr,"\n");
 	printSymbol(addToTable("666", 2, table, 10)->symbol);
-	printf("\n");
+	fprintf(stderr,"\n");
 	printSymbol(addToTable("banana", 2, table, 10)->symbol);
-	printf("\n");
+	fprintf(stderr,"\n");
 	printSymbol(addToTable("e", 2, table, 10)->symbol);
-	printf("\n");
+	fprintf(stderr,"\n");
 	printSymbol(addToTable("coentro", 2, table, 10)->symbol);
-	printf("\n");
+	fprintf(stderr,"\n");
 
 	printTable(table, 10);
 	initMe();
@@ -270,7 +270,7 @@ int main()
 	addSymbol("dog", 11);
 
 	printSymbolTable();
-	printf("\n");
+	fprintf(stderr,"\n");
 }
 */
 

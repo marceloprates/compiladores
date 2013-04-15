@@ -1,6 +1,5 @@
 
 %{
-
 	// Lucas Martinelli Tabajara, Marcelo de Oliveira Rosa Prates
 
 	#include <stdio.h>

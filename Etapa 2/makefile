@@ -1,5 +1,4 @@
 
-
 etapa2: y.tab.o lex.yy.o hash.o main.o
 	gcc -o etapa2 y.tab.o lex.yy.o hash.o main.o
 
@@ -12,8 +11,8 @@ hash.o: hash.c
 y.tab.o: y.tab.c lex.yy.h
 	gcc -c y.tab.c
 
-y.tab.c: unambig_parser.y
-	yacc -d unambig_parser.y
+y.tab.c: parser.y
+	yacc -d parser.y
 
 lex.yy.o: lex.yy.c
 	gcc -c lex.yy.c
