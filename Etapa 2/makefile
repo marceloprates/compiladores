@@ -17,10 +17,10 @@ y.tab.c: parser.y
 lex.yy.o: lex.yy.c
 	gcc -c lex.yy.c
 
-lex.yy.h:
+lex.yy.h: scanner.l
 	flex --header-file=lex.yy.h scanner.l
 
-lex.yy.c:
+lex.yy.c: scanner.l
 	flex --header-file=lex.yy.h scanner.l
 
 clean:

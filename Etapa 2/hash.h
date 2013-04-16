@@ -1,6 +1,6 @@
 // Lucas Martinelli Tabajara, Marcelo de Oliveira Rosa Prates
 
-#define SYMBOL_TABLE_SIZE 10//997
+#define SYMBOL_TABLE_SIZE 997
 
 //#define SYMBOL_UNDEFINED 0
 #define SYMBOL_LIT_INTEGER 1
