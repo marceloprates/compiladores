@@ -23,11 +23,15 @@ int main(int argc, char** argv)
 
 	close_input();
 
+	/*
 	fprintf(stderr,"Literals found:\n");
-	PrintFoundLiterals();
-
+	PrintFoundLiterals()
 	fprintf(stderr,"\nSymbol Table:\n");
 	printSymbolTable();
+	*/
+
+	// If computation reached this point, no yyparse() errors ocurred. The input code is syntactically correct
+	fprintf(stderr,"The input code is syntactically correct!\n");
 
 	return 1;
 }
