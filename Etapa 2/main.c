@@ -33,5 +33,5 @@ int main(int argc, char** argv)
 	// If computation reached this point, no yyparse() errors ocurred. The input code is syntactically correct
 	fprintf(stderr,"The input code is syntactically correct!\n");
 
-	return 1;
+	exit(0);
 }
