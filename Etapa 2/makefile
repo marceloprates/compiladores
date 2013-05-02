@@ -12,7 +12,7 @@ y.tab.o: y.tab.c lex.yy.h
 	gcc -c y.tab.c
 
 y.tab.c: parser.y
-	yacc -d parser.y
+	yacc -d -v parser.y
 
 lex.yy.o: lex.yy.c
 	gcc -c lex.yy.c

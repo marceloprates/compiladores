@@ -5,8 +5,6 @@
 	#include <stdio.h>
 	#include <string.h>
 	#include "hash.h"
-
-	char found_literals[65536];
 %}
 
 %start program
@@ -36,6 +34,11 @@
 %token <symbol>	LIT_CHAR
 %token <symbol>	LIT_STRING
 %token 			TOKEN_ERROR
+
+%left '<' '>' OPERATOR_LE OPERATOR_GE OPERATOR_EQ OPERATOR_NE
+%left '+' '-'
+%left '*' '/'
+%left OPERATOR_AND OPERATOR_OR
 
 %%
 	program:
@@ -87,10 +90,10 @@
 		;
 
 	literal:
-		LIT_INTEGER		{ char aux[1024]; sprintf(aux,"Found integer: %d\n", $1->symbol.value.intLit); strcat(found_literals,aux);  /*fprintf(stderr,"Found integer: %d\n", $1->symbol.value.intLit); 		*/}		|
-		LIT_FALSE		{ char aux[1024]; sprintf(aux,"Found false: %d\n", $1->symbol.value.boolLit); strcat(found_literals,aux);	/*fprintf(stderr,"Found false: %d\n", $1->symbol.value.boolLit); 		*/}		|
-		LIT_TRUE		{ char aux[1024]; sprintf(aux,"Found true: %d\n", $1->symbol.value.boolLit); strcat(found_literals,aux);	/*fprintf(stderr,"Found true: %d\n", $1->symbol.value.boolLit); 		*/}		|
-		LIT_CHAR		{ char aux[1024]; sprintf(aux,"Found char: %c\n", $1->symbol.value.charLit); strcat(found_literals,aux);	/*fprintf(stderr,"Found character: %c\n", $1->symbol.value.charLit); 	*/}
+		LIT_INTEGER		
+		LIT_FALSE		
+		LIT_TRUE		
+		LIT_CHAR		
 		;
 
 	literal_list:
@@ -164,15 +167,17 @@
 		;
 
 	flow_control:
-		KW_IF '(' expr ')' KW_THEN command else_block |
+		if_then |
+		if_then_else |
 		KW_LOOP '(' expr ')' command
 		;
 
-	else_block:
-		KW_ELSE command |
-		/* empty */
-		;
+	if_then:
+		KW_IF '(' expr ')' KW_THEN command
 
+	if_then_else:
+		KW_IF '(' expr ')' KW_THEN command KW_ELSE command
+		
 	input:
 		KW_INPUT TK_IDENTIFIER
 		;
@@ -237,9 +242,4 @@ char *s;
   fprintf(stderr, "%s in line %d\n",s,getLineNumber());
 
   exit(3);
-}
-
-int PrintFoundLiterals()
-{
-	fprintf(stderr,"\n%s",found_literals);
 }
