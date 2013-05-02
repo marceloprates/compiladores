@@ -115,7 +115,8 @@
 		;
 
 	parameter:
-		TK_IDENTIFIER |
+		TK_IDENTIFIER 			|
+		TK_IDENTIFIER '[' expr ']' 	|
 		literal
 		;	
 
