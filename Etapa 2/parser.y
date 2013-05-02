@@ -188,7 +188,7 @@
 		;
 
 	element:
-		LIT_STRING	{ char aux[1024]; sprintf(aux,"Found string: %s\n", $1->symbol.value.stringLit); strcat(found_literals,aux); /*fprintf(stderr,"Found string: %s\n", $1->symbol.value.stringLit);*/ }		|
+		LIT_STRING		|
 		expr
 		;
 
