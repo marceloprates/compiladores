@@ -35,10 +35,13 @@
 %token <symbol>	LIT_STRING
 %token 			TOKEN_ERROR
 
+%left OPERATOR_AND OPERATOR_OR
 %left '<' '>' OPERATOR_LE OPERATOR_GE OPERATOR_EQ OPERATOR_NE
 %left '+' '-'
 %left '*' '/'
-%left OPERATOR_AND OPERATOR_OR
+
+%nonassoc IFX
+%nonassoc KW_ELSE
 
 %%
 	program:
@@ -174,7 +177,7 @@
 		;
 
 	if_then:
-		KW_IF '(' expr ')' KW_THEN command
+		KW_IF '(' expr ')' KW_THEN command %prec IFX
 
 	if_then_else:
 		KW_IF '(' expr ')' KW_THEN command KW_ELSE command
@@ -210,29 +213,25 @@
 		TK_IDENTIFIER '(' parameter_list ')' |
 		literal 					  		 |
 		'(' expr ')'				  		 |
-		expr op expr 				  		 |
-		'&' expr					  		 |
-		'*' expr
+		expr '+' expr						 |
+		expr '-' expr						 |
+		expr '*' expr						 |
+		expr '/' expr						 |
+		expr '<' expr 						 |
+		expr '>' expr						 |
+		expr OPERATOR_LE expr				 |
+		expr OPERATOR_GE expr				 |
+		expr OPERATOR_EQ expr				 |
+		expr OPERATOR_NE expr				 |
+		expr OPERATOR_AND expr				 |
+		expr OPERATOR_OR expr				 |
+		'&' expr %prec '*'			 		 |
+		'*' expr %prec '*'
 		;
 
 	access:
 		'[' expr ']' |
 		/* empty */
-		;
-
-	op:
-		'+' 			|
-		'-' 			|
-		'*'				|
-		'/'				|
-		'<'				|
-		'>'				|
-		OPERATOR_LE  	|
-		OPERATOR_GE  	|
-		OPERATOR_EQ  	|
-		OPERATOR_NE  	|
-		OPERATOR_AND 	|
-		OPERATOR_OR
 		;
 
 %%

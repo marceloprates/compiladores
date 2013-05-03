@@ -6,10 +6,10 @@
 
 #include "ast.h"
 
-void CreateNode(AST* ast, char* node_type, int value, AST* child_0, AST* child_1, AST* child_2, AST* child_3)
+void CreateNode(AST* ast, char* node_type, symbol_t* symbol, AST* child_0, AST* child_1, AST* child_2, AST* child_3)
 {
 	ast->node_type = node_type;
-	ast->value = value;
+	ast->symbol = symbol;
 
 	ast->child[0] = child_0;
 	ast->child[1] = child_1;
@@ -22,14 +22,6 @@ void CreateNode(AST* ast, char* node_type, int value, AST* child_0, AST* child_1
 		if(ast->child[i] != NULL)
 			ast->numChildren++;
 	}
-}
-
-int HasAssociatedValue(char* node_type)
-{
-	if((strcmp(node_type,"integer") == 0) | (strcmp(node_type,"char") == 0) | (strcmp(node_type,"byte") == 0) )
-		return 1;
-	else
-		return 0;
 }
 
 char* toString(AST* ast)
@@ -61,9 +53,32 @@ char* toString(AST* ast)
 		switch(ast->numChildren)
 		{
 			case 0:
-				if(HasAssociatedValue(ast->node_type))
+				if(strcmp(ast->node_type,"integer") == 0)
 				{
-					sprintf(fatherString,"(%s %d)",ast->node_type, ast->value);
+					sprintf(fatherString,"(%s %d)",ast->node_type, ast->symbol->value.intLit);
+				}
+				else if (strcmp(ast->node_type,"boolean") == 0)
+				{
+					if(ast->symbol->value.boolLit)
+					{
+						sprintf(fatherString,"(%s %s)",ast->node_type, "TRUE");
+					}
+					else
+					{
+						sprintf(fatherString,"(%s %s)",ast->node_type, "FALSE");
+					}					
+				}
+				else if (strcmp(ast->node_type,"char") == 0)
+				{
+					sprintf(fatherString,"(%s %d)",ast->node_type, ast->symbol->value.charLit);
+				}
+				else if (strcmp(ast->node_type,"string") == 0)
+				{
+					sprintf(fatherString,"(%s %s)",ast->node_type, ast->symbol->value.stringLit);
+				}
+				else if (strcmp(ast->node_type,"identifier") == 0)
+				{
+					sprintf(fatherString,"(%s %s)",ast->node_type, ast->symbol->value.identifier);
 				}
 				else
 				{
@@ -90,7 +105,46 @@ char* toString(AST* ast)
 
 void PrintNode(AST* ast)
 {
-	fprintf(stderr,"(node_type: %s, value: %d)\n", ast->node_type, ast->value);
+	if(strcmp(ast->node_type,"integer") == 0)
+	{
+		fprintf(stderr,"(node_type: %s, value: %d)\n", ast->node_type, ast->symbol->value.intLit);
+		return;
+	}
+	
+	if(strcmp(ast->node_type,"boolean") == 0)
+	{
+		if(ast->symbol->value.boolLit)
+		{
+			fprintf(stderr,"(node_type: %s, value: %s)\n", ast->node_type, "TRUE");
+		}
+		else
+		{
+			fprintf(stderr,"(node_type: %s, value: %s)\n", ast->node_type, "FALSE");
+		}
+
+		return;
+	}
+	
+	if(strcmp(ast->node_type,"char") == 0)
+	{
+		fprintf(stderr,"(node_type: %s, value: %c)\n", ast->node_type, ast->symbol->value.charLit);
+		return;
+	}
+	
+	if(strcmp(ast->node_type,"string") == 0)
+	{
+		fprintf(stderr,"(node_type: %s, value: %s)\n", ast->node_type, ast->symbol->value.stringLit);
+		return;
+	}
+
+	if(strcmp(ast->node_type,"identifier") == 0)
+	{
+		fprintf(stderr, "(node_type: %s, value: %s)\n", ast->node_type, ast->symbol->value.identifier );
+		return;
+	}
+
+	fprintf(stderr, "(node_type: %s)\n", ast->node_type);
+	return;
 }
 
 void PrintTree(AST* ast)
@@ -98,20 +152,242 @@ void PrintTree(AST* ast)
 	fprintf(stderr,"%s\n",toString(ast));
 }
 
-int main(int argc, char** argv)
+/*char* toSource(AST* ast)
 {
-	AST* t1 = (AST*)calloc(1,sizeof(AST)); t1->child = (AST**)calloc(4,sizeof(AST));
-	AST* t2 = (AST*)calloc(1,sizeof(AST)); t2->child = (AST**)calloc(4,sizeof(AST));
-	AST* t3 = (AST*)calloc(1,sizeof(AST)); t3->child = (AST**)calloc(4,sizeof(AST));
-	AST* t4 = (AST*)calloc(1,sizeof(AST)); t4->child = (AST**)calloc(4,sizeof(AST));
-	AST* t5 = (AST*)calloc(1,sizeof(AST)); t5->child = (AST**)calloc(4,sizeof(AST));
+	if(strcmp(ast->node_type,"seq") == 0)
+	{
+		char* e0_string = toSource(ast->child[0]);
+		char* e1_string = toSource(ast->child[1]);
 
-	CreateNode(t1,"integer",42,NULL,NULL,NULL,NULL);
-	CreateNode(t2,"integer",3,NULL,NULL,NULL,NULL);
-	CreateNode(t3,"sum",0,t1,t2,NULL,NULL);
-	CreateNode(t4,"TRUE",0,NULL,NULL,NULL,NULL);
-	CreateNode(t5,"if-then-else",0,t4,t3,t1,NULL);
+		int fatherStringLength = strlen(e0_string) + strlen(e1_string) + 1;
+		char* fatherString = (char*)calloc(fatherStringLength,sizeof(char));
 
-	PrintNode(t5);
-	PrintTree(t5);
-}
+		sprintf(fatherString,"%s;%s",e0_string,e1_string);
+
+		return fatherString;
+	}
+
+	if(strcmp(ast->node_type,"add") == 0)
+	{
+		char* e0_string = toSource(ast->child[0]);
+		char* e1_string = toSource(ast->child[1]);
+
+		int fatherStringLength = strlen(e0_string) + strlen(e1_string) + 1;
+		char* fatherString = (char*)calloc(fatherStringLength,sizeof(char));
+
+		sprintf(fatherString,"%s+%s",e0_string,e1_string);
+
+		return fatherString;
+	}
+
+	if(strcmp(ast->node_type,"sub") == 0)
+	{
+		char* e0_string = toSource(ast->child[0]);
+		char* e1_string = toSource(ast->child[1]);
+
+		int fatherStringLength = strlen(e0_string) + strlen(e1_string) + 1;
+		char* fatherString = (char*)calloc(fatherStringLength,sizeof(char));
+
+		sprintf(fatherString,"%s-%s",e0_string,e1_string);
+
+		return fatherString;
+	}
+
+	if(strcmp(ast->node_type,"mul") == 0)
+	{
+		char* e0_string = toSource(ast->child[0]);
+		char* e1_string = toSource(ast->child[1]);
+
+		int fatherStringLength = strlen(e0_string) + strlen(e1_string) + 1;
+		char* fatherString = (char*)calloc(fatherStringLength,sizeof(char));
+
+		sprintf(fatherString,"%s*%s",e0_string,e1_string);
+
+		return fatherString;
+	}
+
+	if(strcmp(ast->node_type,"div") == 0)
+	{
+		char* e0_string = toSource(ast->child[0]);
+		char* e1_string = toSource(ast->child[1]);
+
+		int fatherStringLength = strlen(e0_string) + strlen(e1_string) + 1;
+		char* fatherString = (char*)calloc(fatherStringLength,sizeof(char));
+
+		sprintf(fatherString,"%s/%s",e0_string,e1_string);
+
+		return fatherString;
+	}
+
+	if(strcmp(ast->node_type,"<") == 0)
+	{
+		char* e0_string = toSource(ast->child[0]);
+		char* e1_string = toSource(ast->child[1]);
+
+		int fatherStringLength = strlen(e0_string) + strlen(e1_string) + 1;
+		char* fatherString = (char*)calloc(fatherStringLength,sizeof(char));
+
+		sprintf(fatherString,"%s<%s",e0_string,e1_string);
+
+		return fatherString;
+	}
+
+	if(strcmp(ast->node_type,">") == 0)
+	{
+		char* e0_string = toSource(ast->child[0]);
+		char* e1_string = toSource(ast->child[1]);
+
+		int fatherStringLength = strlen(e0_string) + strlen(e1_string) + 1;
+		char* fatherString = (char*)calloc(fatherStringLength,sizeof(char));
+
+		sprintf(fatherString,"%s<%s",e0_string,e1_string);
+
+		return fatherString;
+	}
+
+	if(strcmp(ast->node_type,"<=") == 0)
+	{
+		char* e0_string = toSource(ast->child[0]);
+		char* e1_string = toSource(ast->child[1]);
+
+		int fatherStringLength = strlen(e0_string) + strlen(e1_string) + 1;
+		char* fatherString = (char*)calloc(fatherStringLength,sizeof(char));
+
+		sprintf(fatherString,"%s<=%s",e0_string,e1_string);
+
+		return fatherString;
+	}
+
+	if(strcmp(ast->node_type,">=") == 0)
+	{
+		char* e0_string = toSource(ast->child[0]);
+		char* e1_string = toSource(ast->child[1]);
+
+		int fatherStringLength = strlen(e0_string) + strlen(e1_string) + 1;
+		char* fatherString = (char*)calloc(fatherStringLength,sizeof(char));
+
+		sprintf(fatherString,"%s>=%s",e0_string,e1_string);
+
+		return fatherString;
+	}
+
+	if(strcmp(ast->node_type,"==") == 0)
+	{
+		char* e0_string = toSource(ast->child[0]);
+		char* e1_string = toSource(ast->child[1]);
+
+		int fatherStringLength = strlen(e0_string) + strlen(e1_string) + 1;
+		char* fatherString = (char*)calloc(fatherStringLength,sizeof(char));
+
+		sprintf(fatherString,"%s==%s",e0_string,e1_string);
+
+		return fatherString;
+	}
+
+	if(strcmp(ast->node_type,"!=") == 0)
+	{
+		char* e0_string = toSource(ast->child[0]);
+		char* e1_string = toSource(ast->child[1]);
+
+		int fatherStringLength = strlen(e0_string) + strlen(e1_string) + 1;
+		char* fatherString = (char*)calloc(fatherStringLength,sizeof(char));
+
+		sprintf(fatherString,"%s!=%s",e0_string,e1_string);
+
+		return fatherString;
+	}
+
+	if(strcmp(ast->node_type,"ref") == 0)
+	{
+		char* e0_string = toSource(ast->child[0]);
+
+		int fatherStringLength = strlen(e0_string) + 1;
+		char* fatherString = (char*)calloc(fatherStringLength,sizeof(char));
+
+		sprintf(fatherString,"&%s",e0_string);
+
+		return fatherString;
+	}
+
+	if(strcmp(ast->node_type,"deref") == 0)
+	{
+		char* e0_string = toSource(ast->child[0]);
+
+		int fatherStringLength = strlen(e0_string) + 1;
+		char* fatherString = (char*)calloc(fatherStringLength,sizeof(char));
+
+		sprintf(fatherString,"*%s",e0_string);
+
+		return fatherString;
+	}
+
+	if(strcmp(ast->node_type,"parenthesis") == 0)
+	{
+		char* e0_string = toSource(ast->child[0]);
+
+		int fatherStringLength = strlen(e0_string) + 1;
+		char* fatherString = (char*)calloc(fatherStringLength,sizeof(char));
+
+		sprintf(fatherString,"(%s)",e0_string);
+
+		return fatherString;
+	}
+
+	if(strcmp(ast->node_type,"access") == 0)
+	{
+		char* e0_string = toSource(ast->child[0]);
+		char* e1_string = toSource(ast->child[1]);
+
+		int fatherStringLength = strlen(e0_string) + strlen(e1_string) + 2;
+		char* fatherString = (char*)calloc(fatherStringLength,sizeof(char));
+
+		sprintf(fatherString,"%s[%s]",e0_string,e1_string);
+
+		return fatherString;
+	}
+
+	if(strcmp(ast->node_type,"function_call") == 0)
+	{
+		char* e0_string = toSource(ast->child[0]);
+		char* e1_string = toSource(ast->child[1]);
+
+		int fatherStringLength = strlen(e0_string) + strlen(e1_string) + 2;
+		char* fatherString = (char*)calloc(fatherStringLength,sizeof(char));
+
+		sprintf(fatherString,"%s(%s)",e0_string,e1_string);
+
+		return fatherString;
+	}
+
+	if(strcmp(ast->node_type,"integer") == 0)
+	{
+		char* value_string = (char*)calloc((int)ceil(log10(ast->int_value)),sizeof(char));
+
+		sprintf(value_string,"%d",ast->value);
+
+		int fatherStringLength = strlen(value_string);
+		char* fatherString = (char*)calloc(fatherStringLength,sizeof(char));
+
+		sprintf(fatherString,"%s",value_string);
+
+		return fatherString;
+	}
+
+	if(strcmp(ast->node_type,"identifier") == 0)
+	{
+		//?
+	}
+
+	if(strcmp(ast->node_type,"if-then") == 0)
+	{
+		char* e0_string = toSource(ast->child[0]);
+		char* e1_string = toSource(ast->child[1]);
+
+		int fatherStringLength = strlen(e0_string) + strlen(e1_string) + 2;
+		char* fatherString = (char*)calloc(fatherStringLength,sizeof(char));
+
+		sprintf(fatherString,"if(%s)then%s",e0_string,e1_string);
+
+		return fatherString;
+	}
+}*/

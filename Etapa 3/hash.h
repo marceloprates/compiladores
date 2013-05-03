@@ -1,5 +1,8 @@
 // Lucas Martinelli Tabajara, Marcelo de Oliveira Rosa Prates
 
+#ifndef HASH_H
+#define HASH_H
+
 #define SYMBOL_TABLE_SIZE 997
 
 //#define SYMBOL_UNDEFINED 0
@@ -86,3 +89,5 @@ linkedList_t* addSymbol(char* text, type_t type);
 linkedList_t* findSymbol(symbol_t symbol);
 
 void printSymbolTable(void);
+
+#endif

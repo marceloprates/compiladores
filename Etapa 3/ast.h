@@ -1,9 +1,14 @@
 // Lucas Martinelli Tabajara, Marcelo de Oliveira Rosa Prates
 
+#include <stdlib.h>
+#include <stdio.h>
+
+#include "hash.h"
+
 struct AST_struct
 {
 	char* node_type;
-	int value;
+	symbol_t* symbol;
 
 	int numChildren;
 	struct AST_struct** child;
@@ -11,6 +16,6 @@ struct AST_struct
 
 typedef struct AST_struct AST;
 
-void CreateNode(AST* ast, char* node_type, int value, AST* child_0, AST* child_1, AST* child_2, AST* child_3);
+void CreateNode(AST* ast, char* node_type, symbol_t* symbol, AST* child_0, AST* child_1, AST* child_2, AST* child_3);
 int HasAssociatedValue(char* node_type);
 char* toString(AST* ast);
