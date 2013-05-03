@@ -45,18 +45,11 @@ linkedList_t* createNode(char* text, type_t type)
 
 int main(int argc, char** argv)
 {
-
-	AST* t1 = (AST*)calloc(1,sizeof(AST)); t1->child = (AST**)calloc(4,sizeof(AST));
-	AST* t2 = (AST*)calloc(1,sizeof(AST)); t2->child = (AST**)calloc(4,sizeof(AST));
-	AST* t3 = (AST*)calloc(1,sizeof(AST)); t3->child = (AST**)calloc(4,sizeof(AST));
-	AST* t4 = (AST*)calloc(1,sizeof(AST)); t4->child = (AST**)calloc(4,sizeof(AST));
-	AST* t5 = (AST*)calloc(1,sizeof(AST)); t5->child = (AST**)calloc(4,sizeof(AST));
-
-	CreateNode(t1,"integer",createNode("42",SYMBOL_LIT_INTEGER),NULL,NULL,NULL,NULL);
-	CreateNode(t2,"integer",createNode("6",SYMBOL_LIT_INTEGER),NULL,NULL,NULL,NULL);
-	CreateNode(t3,"sum",NULL,t1,t2,NULL,NULL);
-	CreateNode(t4,"boolean",createNode("TRUE",SYMBOL_LIT_TRUE),NULL,NULL,NULL,NULL);
-	CreateNode(t5,"if-then-else",NULL,t4,t3,t1,NULL);
+	AST* t1 = CreateAST("integer",createNode("42",SYMBOL_LIT_INTEGER),NULL,NULL,NULL,NULL);
+	AST* t2 = CreateAST("integer",createNode("6",SYMBOL_LIT_INTEGER),NULL,NULL,NULL,NULL);
+	AST* t3 = CreateAST("sum",NULL,t1,t2,NULL,NULL);
+	AST* t4 = CreateAST("boolean",createNode("TRUE",SYMBOL_LIT_TRUE),NULL,NULL,NULL,NULL);
+	AST* t5 = CreateAST("if-then-else",NULL,t4,t3,t1,NULL);
 
 	PrintTree(t5);
 

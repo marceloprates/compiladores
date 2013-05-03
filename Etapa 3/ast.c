@@ -6,8 +6,11 @@
 
 #include "ast.h"
 
-void CreateNode(AST* ast, char* node_type, linkedList_t* node, AST* child_0, AST* child_1, AST* child_2, AST* child_3)
+AST* CreateAST(char* node_type, linkedList_t* node, AST* child_0, AST* child_1, AST* child_2, AST* child_3)
 {
+	AST* ast = (AST*)calloc(1,sizeof(AST));
+	ast->child = (AST**)calloc(4,sizeof(AST));
+
 	ast->node_type = node_type;
 	ast->node = node;
 
@@ -22,6 +25,8 @@ void CreateNode(AST* ast, char* node_type, linkedList_t* node, AST* child_0, AST
 		if(ast->child[i] != NULL)
 			ast->numChildren++;
 	}
+
+	return ast;
 }
 
 char* toString(AST* ast)
