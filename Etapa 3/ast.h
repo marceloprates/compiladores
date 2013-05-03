@@ -8,7 +8,7 @@
 struct AST_struct
 {
 	char* node_type;
-	symbol_t* symbol;
+	linkedList_t* node;
 
 	int numChildren;
 	struct AST_struct** child;
@@ -16,6 +16,7 @@ struct AST_struct
 
 typedef struct AST_struct AST;
 
-void CreateNode(AST* ast, char* node_type, symbol_t* symbol, AST* child_0, AST* child_1, AST* child_2, AST* child_3);
+void CreateNode(AST* ast, char* node_type, linkedList_t* node, AST* child_0, AST* child_1, AST* child_2, AST* child_3);
 int HasAssociatedValue(char* node_type);
 char* toString(AST* ast);
+void PrintTree(AST* ast);

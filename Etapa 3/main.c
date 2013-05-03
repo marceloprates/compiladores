@@ -7,7 +7,7 @@
 #include "y.tab.h"
 #include "ast.h"
 
-symbol_t* createSymbol(char* text, type_t type)
+linkedList_t* createNode(char* text, type_t type)
 {
 	symbol_t* symbol = (symbol_t*)calloc(1,sizeof(symbol_t));
 	symbol->text = (char*) calloc(strlen(text) + 1, sizeof(char));
@@ -36,7 +36,11 @@ symbol_t* createSymbol(char* text, type_t type)
 			break;
 	}
 
-	return symbol;
+	linkedList_t* node = (linkedList_t*)calloc(1,sizeof(linkedList_t));
+	node->symbol = *symbol;
+	node->tail = nil();
+
+	return node;
 }
 
 int main(int argc, char** argv)
@@ -48,13 +52,12 @@ int main(int argc, char** argv)
 	AST* t4 = (AST*)calloc(1,sizeof(AST)); t4->child = (AST**)calloc(4,sizeof(AST));
 	AST* t5 = (AST*)calloc(1,sizeof(AST)); t5->child = (AST**)calloc(4,sizeof(AST));
 
-	CreateNode(t1,"integer",createSymbol("42",SYMBOL_LIT_INTEGER),NULL,NULL,NULL,NULL);
-	CreateNode(t2,"integer",createSymbol("6",SYMBOL_LIT_INTEGER),NULL,NULL,NULL,NULL);
+	CreateNode(t1,"integer",createNode("42",SYMBOL_LIT_INTEGER),NULL,NULL,NULL,NULL);
+	CreateNode(t2,"integer",createNode("6",SYMBOL_LIT_INTEGER),NULL,NULL,NULL,NULL);
 	CreateNode(t3,"sum",NULL,t1,t2,NULL,NULL);
-	CreateNode(t4,"boolean",createSymbol("TRUE",SYMBOL_LIT_TRUE),NULL,NULL,NULL,NULL);
+	CreateNode(t4,"boolean",createNode("TRUE",SYMBOL_LIT_TRUE),NULL,NULL,NULL,NULL);
 	CreateNode(t5,"if-then-else",NULL,t4,t3,t1,NULL);
 
-	PrintNode(t5);
 	PrintTree(t5);
 
 	/*
