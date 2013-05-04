@@ -46,7 +46,7 @@ enum nodeType_e
 	DECLARATIONLIST,
 	FUNCTIONDEFINITION,
 	PROGRAM
-};
+}
 
 typedef enum nodeType_e nodeType_t;
 
