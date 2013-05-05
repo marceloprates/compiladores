@@ -6,7 +6,7 @@
 
 #include "ast.h"
 
-AST* CreateAST(char* node_type, linkedList_t* node, AST* child_0, AST* child_1, AST* child_2, AST* child_3)
+AST* CreateAST(nodeType_t node_type, linkedList_t* node, AST* child_0, AST* child_1, AST* child_2, AST* child_3)
 {
 	AST* ast = (AST*)calloc(1,sizeof(AST));
 	ast->child = (AST**)calloc(4,sizeof(AST));
@@ -29,22 +29,22 @@ AST* CreateAST(char* node_type, linkedList_t* node, AST* child_0, AST* child_1, 
 	return ast;
 }
 
-AST* CreateAST0(char* node_type, linkedList_t* node)
+AST* CreateAST0(nodeType_t node_type, linkedList_t* node)
 {
 	return CreateAST(node_type, node, NULL, NULL, NULL, NULL);
 }
 
-AST* CreateAST1(char* node_type, linkedList_t* node, AST* child_0)
+AST* CreateAST1(nodeType_t node_type, linkedList_t* node, AST* child_0)
 {
 	return CreateAST(node_type, node, child_0, NULL, NULL, NULL);
 }
 
-AST* CreateAST2(char* node_type, linkedList_t* node, AST* child_0, AST* child_1)
+AST* CreateAST2(nodeType_t node_type, linkedList_t* node, AST* child_0, AST* child_1)
 {
 	return CreateAST(node_type, node, child_0, child_1, NULL, NULL);
 }
 
-AST* CreateAST3(char* node_type, linkedList_t* node, AST* child_0, AST* child_1, AST* child_2)
+AST* CreateAST3(nodeType_t node_type, linkedList_t* node, AST* child_0, AST* child_1, AST* child_2)
 {
 	return CreateAST(node_type, node, child_0, child_1, child_2, NULL);
 }
@@ -132,3 +132,4 @@ void PrintTree(AST* ast)
 {
 	fprintf(stderr,"%s\n",toString(ast));
 }
+

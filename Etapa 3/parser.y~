@@ -45,8 +45,12 @@
 
 %%
 	program:
-		item program |
+		item program	|
 		/* empty */
+		;
+
+	identifier:
+		TK_IDENTIFIER	{ $$ = CreateAST0(IDENTIFIER, $1); }
 		;
 
 	item:
@@ -59,21 +63,17 @@
 		;
 
 	global_dec:
-		TK_IDENTIFIER value_init |
-		'$' TK_IDENTIFIER scalar_init
-		;
-
-	value_init:
-		scalar_init |
-		'[' LIT_INTEGER ']' array_init
+		identifier scalar_init						{ $$ = |
+		identifier '[' LIT_INTEGER ']' array_init |
+		'$' identifier scalar_init
 		;
 
 	scalar_init:
-		':' literal
+		':' literal	{ $$ = $1; }
 		;
 
 	array_init:
-		':' literal_list	|
+		':' literal_list	{ $$ = CreateAST1(LITERALLIST, NULL, $1); }	|
 		/* empty */
 		;
 
@@ -82,8 +82,8 @@
 		;
 
 	local_dec:
-		TK_IDENTIFIER scalar_init |
-		'$' TK_IDENTIFIER scalar_init
+		identifier scalar_init |
+		'$' identifier scalar_init
 		;
 
 	type:
@@ -114,22 +114,26 @@
 		;
 
 	header:
-		type TK_IDENTIFIER '(' type_parameter_list ')'	{ $$ = CreateAST3(FUNCTIONHEADER, NULL, $1, $2, $3); }
+		type identifier '(' type_parameter_list ')'	{ $$ = CreateAST3(FUNCTIONHEADER, NULL, $1, $2, $3); }
+		;
+
+	variable:
+		identifier	|
+		identifier '[' expr ']'	{ $$ = CreateAST2(ARRAYACCESS, NULL, $1, $3); }
 		;
 
 	parameter:
-		TK_IDENTIFIER 			|
-		TK_IDENTIFIER '[' expr ']' 	|
+		variable 	|
 		literal
 		;	
 
 	type_parameter_list:
-		type TK_IDENTIFIER type_parameter_list_tail |
+		type identifier type_parameter_list_tail |
 		/* empty */
 		;
 
 	type_parameter_list_tail:
-		',' type TK_IDENTIFIER type_parameter_list_tail |
+		',' type identifier type_parameter_list_tail |
 		/* empty */
 		;
 
@@ -162,30 +166,25 @@
 		;
 
 	atr:
-		TK_IDENTIFIER ass
-		;
-
-	ass:
-		'=' expr |
-		'[' expr ']' '=' expr
+		variable '=' expr	{ $$ = CreateAST2(ASSIGNMENT, NULL, $1, $3); }
 		;
 
 	flow_control:
-		KW_IF '(' expr ')' KW_THEN command %prec IFX		{ $$ = CreateAST(IFTHEN, NULL, $3, $6, NULL, NULL); } |
-		KW_IF '(' expr ')' KW_THEN command KW_ELSE command	{ $$ = CreateAST(IFTHENELSE, NULL, $3, $6, $8, NULL); } |
-		KW_LOOP '(' expr ')' command						{ $$ = CreateAST(LOOP, NULL, $3, $5, NULL, NULL); }
+		KW_IF '(' expr ')' KW_THEN command %prec IFX		{ $$ = CreateAST2(IFTHEN, NULL, $3, $6); } |
+		KW_IF '(' expr ')' KW_THEN command KW_ELSE command	{ $$ = CreateAST3(IFTHENELSE, NULL, $3, $6, $8); } |
+		KW_LOOP '(' expr ')' command						{ $$ = CreateAST2(LOOP, NULL, $3, $5); }
 		;
 		
 	input:
-		KW_INPUT TK_IDENTIFIER	{ $$ = CreateAST(INPUT, NULL, $2, NULL, NULL, NULL); }
+		KW_INPUT identifier	{ $$ = CreateAST1(INPUT, NULL, $2); }
 		;
 
 	output:
-		KW_OUTPUT element_list
+		KW_OUTPUT element_list	{ $$ = CreateAST1(OUTPUT, NULL, $2); }
 		;
 
 	element:
-		LIT_STRING	{ $$ = CreateAST(LITERAL, $1, NULL, NULL, NULL, NULL); }		|
+		LIT_STRING	{ $$ = CreateAST0(LITERAL, $1); }		|
 		expr
 		;
 
@@ -199,29 +198,28 @@
 		;
 
 	return:
-		KW_RETURN expr	{ $$ = CreateAST(RETURN, NULL, $2, NULL, NULL, NULL); }
+		KW_RETURN expr	{ $$ = CreateAST1(RETURN, NULL, $2); }
 		;
 
 	expr:
-		TK_IDENTIFIER							{ $$ = CreateAST(IDENTIFIER, $1, NULL, NULL, NULL, NULL); }	|
-		TK_IDENTIFIER '[' expr ']'				{ $$ = CreateAST(ARRAYACCESS, NULL, _, $3, NULL, NULL); }			  		 |
-		TK_IDENTIFIER '(' parameter_list ')'	{ $$ = CreateAST(FUNCTIONCALL, NULL, _, $3, NULL, NULL); }	 |
+		variable						  		 |
+		identifier '(' parameter_list ')'	{ $$ = CreateAST2(FUNCTIONCALL, NULL, $1, $3); }	 |
 		literal 					  		 |
 		'(' expr ')'							{ $$ = $2; }				  		 |
-		expr '+' expr				 	{ $$ = CreateAST(ADDITION, NULL, $1, $3, NULL, NULL); }						 |
-		expr '-' expr				 	{ $$ = CreateAST(SUBTRACTION, NULL, $1, $3, NULL, NULL); }						 |
-		expr '*' expr				 	{ $$ = CreateAST(MULTIPLICATION, NULL, $1, $3, NULL, NULL); }						 |
-		expr '/' expr				 	{ $$ = CreateAST(DIVISION, NULL, $1, $3, NULL, NULL); }						 |
-		expr '<' expr				 	{ $$ = CreateAST(LESSERTHAN, NULL, $1, $3, NULL, NULL); } 						 |
-		expr '>' expr				 	{ $$ = CreateAST(GREATERTHAN, NULL, $1, $3, NULL, NULL); }						 |
-		expr OPERATOR_LE expr				 	{ $$ = CreateAST(LESSEREQUAL, NULL, $1, $3, NULL, NULL); }				 |
-		expr OPERATOR_GE expr				 	{ $$ = CreateAST(GREATEREQUAL, NULL, $1, $3, NULL, NULL); }				 |
-		expr OPERATOR_EQ expr				 	{ $$ = CreateAST(EQUAL, NULL, $1, $3, NULL, NULL); }				 |
-		expr OPERATOR_NE expr				 	{ $$ = CreateAST(NOTEQUAL, NULL, $1, $3, NULL, NULL); }				 |
-		expr OPERATOR_AND expr				 	{ $$ = CreateAST(AND, NULL, $1, $3, NULL, NULL); }				 |
-		expr OPERATOR_OR expr				 	{ $$ = CreateAST(OR, NULL, $1, $3, NULL, NULL); }	|
-		'&' expr %prec '*'			 		 	{ $$ = CreateAST(REF, NULL, $2, NULL, NULL, NULL); }	|
-		'*' expr %prec '*'						{ $$ = CreateAST(DEREF, NULL, $2, NULL, NULL, NULL); }
+		expr '+' expr				 	{ $$ = CreateAST2(ADDITION, NULL, $1, $3); }						 |
+		expr '-' expr				 	{ $$ = CreateAST2(SUBTRACTION, NULL, $1, $3); }						 |
+		expr '*' expr				 	{ $$ = CreateAST2(MULTIPLICATION, NULL, $1, $3); }						 |
+		expr '/' expr				 	{ $$ = CreateAST2(DIVISION, NULL, $1, $3); }						 |
+		expr '<' expr				 	{ $$ = CreateAST2(LESSERTHAN, NULL, $1, $3); } 						 |
+		expr '>' expr				 	{ $$ = CreateAST2(GREATERTHAN, NULL, $1, $3); }						 |
+		expr OPERATOR_LE expr				 	{ $$ = CreateAST2(LESSEREQUAL, NULL, $1, $3); }				 |
+		expr OPERATOR_GE expr				 	{ $$ = CreateAST2(GREATEREQUAL, NULL, $1, $3); }				 |
+		expr OPERATOR_EQ expr				 	{ $$ = CreateAST2(EQUAL, NULL, $1, $3); }				 |
+		expr OPERATOR_NE expr				 	{ $$ = CreateAST2(NOTEQUAL, NULL, $1, $3); }				 |
+		expr OPERATOR_AND expr				 	{ $$ = CreateAST2(AND, NULL, $1, $3); }				 |
+		expr OPERATOR_OR expr				 	{ $$ = CreateAST2(OR, NULL, $1, $3); }	|
+		'&' expr %prec '*'			 		 	{ $$ = CreateAST1(REF, NULL, $2); }	|
+		'*' expr %prec '*'						{ $$ = CreateAST1(DEREF, NULL, $2); }
 		;
 
 %%

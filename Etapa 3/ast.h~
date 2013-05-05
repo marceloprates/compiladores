@@ -62,6 +62,10 @@ struct AST_struct
 typedef struct AST_struct AST;
 
 AST* CreateAST(char* node_type, linkedList_t* node, AST* child_0, AST* child_1, AST* child_2, AST* child_3);
+AST* CreateAST0(char* node_type, linkedList_t* node);
+AST* CreateAST1(char* node_type, linkedList_t* node, AST* child_0);
+AST* CreateAST2(char* node_type, linkedList_t* node, AST* child_0, AST* child_1);
+AST* CreateAST3(char* node_type, linkedList_t* node, AST* child_0, AST* child_1, AST* child_2);
 int HasAssociatedValue(char* node_type);
 char* toString(AST* ast);
 void PrintTree(AST* ast);

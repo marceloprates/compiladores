@@ -45,8 +45,12 @@
 
 %%
 	program:
-		item program |
+		item program	|
 		/* empty */
+		;
+
+	identifier:
+		TK_IDENTIFIER	{ $$ = CreateAST0(IDENTIFIER, $1); }
 		;
 
 	item:
@@ -59,21 +63,17 @@
 		;
 
 	global_dec:
-		TK_IDENTIFIER value_init |
-		'$' TK_IDENTIFIER scalar_init
-		;
-
-	value_init:
-		scalar_init |
-		'[' LIT_INTEGER ']' array_init
+		identifier scalar_init	|
+		identifier '[' LIT_INTEGER ']' array_init |
+		'$' identifier scalar_init
 		;
 
 	scalar_init:
-		':' literal
+		':' literal	{ $$ = $1; }
 		;
 
 	array_init:
-		':' literal_list	|
+		':' literal_list	{ $$ = CreateAST1(LITERALLIST, NULL, $1); }	|
 		/* empty */
 		;
 
@@ -82,8 +82,8 @@
 		;
 
 	local_dec:
-		TK_IDENTIFIER scalar_init |
-		'$' TK_IDENTIFIER scalar_init
+		identifier scalar_init |
+		'$' identifier scalar_init
 		;
 
 	type:
@@ -114,22 +114,26 @@
 		;
 
 	header:
-		type TK_IDENTIFIER '(' type_parameter_list ')'	{ $$ = CreateAST3(FUNCTIONHEADER, NULL, $1, $2, $3); }
+		type identifier '(' type_parameter_list ')'	{ $$ = CreateAST3(FUNCTIONHEADER, NULL, $1, $2, $3); }
+		;
+
+	variable:
+		identifier	|
+		identifier '[' expr ']'	{ $$ = CreateAST2(ARRAYACCESS, NULL, $1, $3); }
 		;
 
 	parameter:
-		TK_IDENTIFIER 			|
-		TK_IDENTIFIER '[' expr ']' 	|
+		variable 	|
 		literal
 		;	
 
 	type_parameter_list:
-		type TK_IDENTIFIER type_parameter_list_tail |
+		type identifier type_parameter_list_tail |
 		/* empty */
 		;
 
 	type_parameter_list_tail:
-		',' type TK_IDENTIFIER type_parameter_list_tail |
+		',' type identifier type_parameter_list_tail |
 		/* empty */
 		;
 
@@ -162,12 +166,7 @@
 		;
 
 	atr:
-		TK_IDENTIFIER ass
-		;
-
-	ass:
-		'=' expr |
-		'[' expr ']' '=' expr
+		variable '=' expr	{ $$ = CreateAST2(ASSIGNMENT, NULL, $1, $3); }
 		;
 
 	flow_control:
@@ -177,11 +176,11 @@
 		;
 		
 	input:
-		KW_INPUT TK_IDENTIFIER	{ $$ = CreateAST1(INPUT, NULL, $2); }
+		KW_INPUT identifier	{ $$ = CreateAST1(INPUT, NULL, $2); }
 		;
 
 	output:
-		KW_OUTPUT element_list
+		KW_OUTPUT element_list	{ $$ = CreateAST1(OUTPUT, NULL, $2); }
 		;
 
 	element:
@@ -203,9 +202,8 @@
 		;
 
 	expr:
-		TK_IDENTIFIER							{ $$ = CreateAST0(IDENTIFIER, $1); }	|
-		TK_IDENTIFIER '[' expr ']'				{ $$ = CreateAST2(ARRAYACCESS, NULL, _, $3); }			  		 |
-		TK_IDENTIFIER '(' parameter_list ')'	{ $$ = CreateAST2(FUNCTIONCALL, NULL, _, $3); }	 |
+		variable						  		 |
+		identifier '(' parameter_list ')'	{ $$ = CreateAST2(FUNCTIONCALL, NULL, $1, $3); }	 |
 		literal 					  		 |
 		'(' expr ')'							{ $$ = $2; }				  		 |
 		expr '+' expr				 	{ $$ = CreateAST2(ADDITION, NULL, $1, $3); }						 |
