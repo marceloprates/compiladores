@@ -4,8 +4,10 @@
 #include <stdio.h>
 #include <string.h>
 #include "hash.h"
-#include "y.tab.h"
 #include "ast.h"
+#include "y.tab.h"
+
+extern AST* root;
 
 linkedList_t* createNode(char* text, type_t type)
 {
@@ -45,15 +47,6 @@ linkedList_t* createNode(char* text, type_t type)
 
 int main(int argc, char** argv)
 {
-	AST* t1 = CreateAST("integer",createNode("42",SYMBOL_LIT_INTEGER),NULL,NULL,NULL,NULL);
-	AST* t2 = CreateAST("integer",createNode("6",SYMBOL_LIT_INTEGER),NULL,NULL,NULL,NULL);
-	AST* t3 = CreateAST("sum",NULL,t1,t2,NULL,NULL);
-	AST* t4 = CreateAST("boolean",createNode("TRUE",SYMBOL_LIT_TRUE),NULL,NULL,NULL,NULL);
-	AST* t5 = CreateAST("if-then-else",NULL,t4,t3,t1,NULL);
-
-	PrintTree(t5);
-
-	/*
 	if(argc < 2) // insuficient arguments
 		exit(0);
 
@@ -66,9 +59,12 @@ int main(int argc, char** argv)
 
 	close_input();
 
+	fprintf(stderr,"%s\n",ASTtoString(root,0));
+
+	fprintf(stderr,"%s\n",toSource(root));
+
 	// If computation reached this point, no yyparse() errors ocurred. The input code is syntactically correct
 	fprintf(stderr,"The input code is syntactically correct!\n");
 
 	exit(0);
-	*/
 }

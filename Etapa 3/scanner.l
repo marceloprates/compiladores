@@ -6,6 +6,7 @@
 	#include <stdlib.h>
 	#include <string.h>
 	#include "hash.h"
+	#include "ast.h"
 	#include "y.tab.h"
 
 	int open_input(char* file_path);

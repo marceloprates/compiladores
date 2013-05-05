@@ -6,9 +6,11 @@
 	#include <string.h>
 	#include "hash.h"
 	#include "ast.h"
+
+	AST* root;
 %}
 
-%start program
+%start S
 
 %union{ linkedList_t* symbol; AST* ast; }
 
@@ -36,7 +38,7 @@
 %token <symbol>	LIT_STRING
 %token 			TOKEN_ERROR
 
-//%type <ast> program
+%type <ast> program
 %type <ast> identifier
 %type <ast> item
 %type <ast> global_dec
@@ -45,25 +47,25 @@
 %type <ast> local_dec
 %type <ast> type
 %type <ast> literal
-//%type <ast> literal_list
+%type <ast> literal_list
 %type <ast> fun_def
-//%type <ast> local_type_decs
+%type <ast> local_type_decs
 %type <ast> header
 %type <ast> variable
-//%type <ast> type_parameter_list
-//%type <ast> type_parameter_list_tail
-//%type <ast> parameter_list
-//%type <ast> parameter_list_tail
+%type <ast> type_parameter_list
+%type <ast> type_parameter_list_tail
+%type <ast> parameter_list
+%type <ast> parameter_list_tail
 %type <ast> block
-//%type <ast> command_list
+%type <ast> command_list
 %type <ast> command
 %type <ast> atr
 %type <ast> flow_control
 %type <ast> input
 %type <ast> output
 %type <ast> element
-//%type <ast> element_list
-//%type <ast> element_list_tail
+%type <ast> element_list
+%type <ast> element_list_tail
 %type <ast> return
 %type <ast> expr
 
@@ -76,9 +78,12 @@
 %nonassoc KW_ELSE
 
 %%
+	S: program { root = $1; }
+	;
+
 	program:
-		item program	|
-		/* empty */
+		item program { $$ = CreateAST2(PROGRAM, NULL, $1, $2); } |
+		/* empty */ { $$ = CreateAST0(PROGRAM, NULL); }
 		;
 
 	identifier:
@@ -92,7 +97,7 @@
 
 	global_dec:
 		local_dec	|
-		type identifier '[' LIT_INTEGER ']' array_init	{ $$ = CreateAST3(ARRAYDECLARATION, NULL, $1, CreateAST0(LITERAL, $3), $5); }
+		type identifier '[' LIT_INTEGER ']' array_init	{ $$ = CreateAST3(ARRAYDECLARATION, NULL, $1, CreateAST0(LITERAL, $4), $6); }
 		;
 
 	scalar_init:
@@ -100,7 +105,7 @@
 		;
 
 	array_init:
-		':' literal_list	{ $$ = CreateAST1(LITERALLIST, NULL, $1); }	|
+		':' literal_list	{ $$ = CreateAST1(LITERALLIST, NULL, $2); }	|
 		/* empty */			{ $$ = NULL; }
 		;
 
@@ -123,21 +128,21 @@
 		;
 
 	literal_list:
-		literal literal_list |
-		/* empty */
+		literal literal_list { $$ = CreateAST2(LITERALLIST, NULL, $1, $2); } |
+		/* empty */ 		 { $$ = CreateAST0(LITERALLIST, NULL); }
 		;
 
 	fun_def:
-		header local_type_decs block	{ $$ = CreateAST2(FUNCTIONDEFINITION, NULL, $1, $2, $3); }
+		header local_type_decs block	{ $$ = CreateAST3(FUNCTIONDEFINITION, NULL, $1, $2, $3); }
 		;
 
 	local_type_decs:
-		local_type_decs local_dec ';' |
+		local_dec local_type_decs ';' { $$ = CreateAST2(DECLARATIONLIST, NULL, $1, $2); }|
 		/* empty */
 		;
 
 	header:
-		type identifier '(' type_parameter_list ')'	{ $$ = CreateAST3(FUNCTIONHEADER, NULL, $1, $2, $3); }
+		type identifier '(' type_parameter_list ')'	{ $$ = CreateAST3(FUNCTIONHEADER, NULL, $1, $2, $4); }
 		;
 
 	variable:
@@ -146,23 +151,23 @@
 		;
 
 	type_parameter_list:
-		type identifier type_parameter_list_tail |
-		/* empty */
+		type identifier type_parameter_list_tail { $$ = CreateAST3(TYPEPARAMETERLIST, NULL, $1, $2, $3); } |
+		/* empty */ { $$ = CreateAST0(TYPEPARAMETERLIST, NULL); }
 		;
 
 	type_parameter_list_tail:
-		',' type identifier type_parameter_list_tail |
-		/* empty */
+		',' type identifier type_parameter_list_tail { $$ = CreateAST3(TYPEPARAMETERLIST, NULL, $2, $3, $4); } |
+		/* empty */ { $$ = CreateAST0(TYPEPARAMETERLIST, NULL); }
 		;
 
 	parameter_list:
-		expr parameter_list_tail |
-		/* empty */
+		expr parameter_list_tail { $$ = CreateAST2(PARAMETERLIST, NULL, $1, $2); }|
+		/* empty */ { $$ = CreateAST0(PARAMETERLIST, NULL); }
 		;
 
 	parameter_list_tail:
-		',' expr parameter_list_tail |
-		/* empty */
+		',' expr parameter_list_tail { $$ = CreateAST2(PARAMETERLIST, NULL, $2, $3); } |
+		/* empty */ { $$ = CreateAST0(PARAMETERLIST, NULL); }
 		;
 
 	block:
@@ -170,7 +175,7 @@
 		;
 
 	command_list:
-		command ';' command_list |
+		command ';' command_list { $$ = CreateAST2(COMMANDLIST, NULL, $1, $3); } |
 		/* empty */
 		;
 
@@ -208,13 +213,13 @@
 		;
 
 	element_list:
-		element element_list_tail	|
-		/* empty */
+		element element_list_tail	{ $$ = CreateAST2(ELEMENTLIST, NULL, $1, $2); }|
+		/* empty */ { $$ = CreateAST0(ELEMENTLIST, NULL); }
 		;
 
 	element_list_tail:
-		',' element_list |
-		/* empty */
+		',' element_list { $$ = CreateAST1(ELEMENTLIST, NULL, $2); }|
+		/* empty */ { $$ = CreateAST0(ELEMENTLIST, NULL); }
 		;
 
 	return:

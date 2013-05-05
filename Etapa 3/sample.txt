@@ -1,5 +1,11 @@
 // UFRGS - Compiladores - Marcelo Johann - 2013/1
 
+word main()
+{
+  output "manha";
+}
+
+/*
 word a:0;
 word v[10]:0 0 0 0 0 0 0 0 0 0; 
 word mat[1000];
@@ -25,3 +31,4 @@ word outra () {}
 word maisuma ()
   {
   }
+*/
