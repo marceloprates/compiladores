@@ -97,7 +97,7 @@
 
 	global_dec:
 		local_dec	|
-		type identifier '[' LIT_INTEGER ']' array_init	{ $$ = CreateAST3(ARRAYDECLARATION, NULL, $1, CreateAST0(LITERAL, $4), $6); }
+		type identifier '[' LIT_INTEGER ']' array_init	{ $$ = CreateAST4(ARRAYDECLARATION, NULL, $1, $2, CreateAST0(LITERAL, $4), $6); }
 		;
 
 	scalar_init:

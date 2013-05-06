@@ -68,6 +68,7 @@ AST* CreateAST0(nodeType_t node_type, linkedList_t* node);
 AST* CreateAST1(nodeType_t node_type, linkedList_t* node, AST* child_0);
 AST* CreateAST2(nodeType_t node_type, linkedList_t* node, AST* child_0, AST* child_1);
 AST* CreateAST3(nodeType_t node_type, linkedList_t* node, AST* child_0, AST* child_1, AST* child_2);
+AST* CreateAST4(nodeType_t node_type, linkedList_t* node, AST* child_0, AST* child_1, AST* child_2, AST* child_3);
 char* NodeTypetoString(enum nodeType_e n);
 char* ASTtoString(AST* ast, int level);
 char* toSource(AST* ast);
