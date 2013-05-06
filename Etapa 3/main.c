@@ -59,7 +59,7 @@ int main(int argc, char** argv)
 
 	close_input();
 
-	fprintf(stderr,"%s\n",ASTtoString(root,0));
+	//fprintf(stderr,"%s\n",ASTtoString(root,0));
 
 	fprintf(stderr,"%s\n",toSource(root));
 

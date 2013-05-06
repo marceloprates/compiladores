@@ -137,8 +137,8 @@
 		;
 
 	local_type_decs:
-		local_dec local_type_decs ';' { $$ = CreateAST2(DECLARATIONLIST, NULL, $1, $2); }|
-		/* empty */
+		local_dec local_type_decs ';' { $$ = CreateAST2(DECLARATIONLIST, NULL, $1, $2); } |
+		/* empty */ { $$ = CreateAST0(DECLARATIONLIST, NULL); }
 		;
 
 	header:
@@ -176,7 +176,7 @@
 
 	command_list:
 		command ';' command_list { $$ = CreateAST2(COMMANDLIST, NULL, $1, $3); } |
-		/* empty */
+		/* empty */ { $$ = CreateAST0(COMMANDLIST, NULL); }
 		;
 
 	command:
@@ -209,7 +209,7 @@
 
 	element:
 		LIT_STRING	{ $$ = CreateAST0(LITERAL, $1); }		|
-		expr
+		expr { $$ = $1; }
 		;
 
 	element_list:
