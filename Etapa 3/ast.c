@@ -572,12 +572,12 @@ char* toSource(AST* ast)
 				{
 					char* child0_source = toSource(ast->child[0]);
 					char* child1_source = toSource(ast->child[1]);
-					char* buffer = (char*)calloc(strlen(child0_source) + 1 + strlen(child1_source) + 1,sizeof(char));
+					char* buffer = (char*)calloc(strlen(child0_source) + 1 + 1 + strlen(child1_source) + 1,sizeof(char));
 
 					if(strcmp(child1_source,"") == 0)
-						sprintf(buffer,"%s",child0_source);
+						sprintf(buffer,"%s;",child0_source);
 					else
-						sprintf(buffer,"%s %s",child0_source,child1_source);
+						sprintf(buffer,"%s;\n%s",child0_source,child1_source);
 
 					return buffer;
 				}

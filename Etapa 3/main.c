@@ -9,46 +9,27 @@
 
 extern AST* root;
 
-linkedList_t* createNode(char* text, type_t type)
+int WriteToFile(char* path, char* content)
 {
-	symbol_t* symbol = (symbol_t*)calloc(1,sizeof(symbol_t));
-	symbol->text = (char*) calloc(strlen(text) + 1, sizeof(char));
-	strcpy(symbol->text, text);
-	symbol->type = type;
+	FILE* file;
 
-	switch(type)
+	file = fopen(path,"w");
+
+	if(file == NULL)
 	{
-		case SYMBOL_LIT_INTEGER:
-			symbol->value.intLit = atoi(text);
-			break;
-		case SYMBOL_LIT_TRUE:
-			symbol->value.boolLit = 1;
-			break;
-		case SYMBOL_LIT_FALSE:
-			symbol->value.boolLit = 0;
-			break;
-		case SYMBOL_LIT_CHAR:
-			symbol->value.charLit = removeQuotes(text)[0];
-			break;
-		case SYMBOL_LIT_STRING:
-			symbol->value.stringLit = removeQuotes(text);
-			break;
-		case SYMBOL_IDENTIFIER:
-			symbol->value.identifier = text;
-			break;
+		fprintf(stderr,"ERROR: Couldn't open %s\n",path);
+		exit(1);
 	}
 
-	linkedList_t* node = (linkedList_t*)calloc(1,sizeof(linkedList_t));
-	node->symbol = *symbol;
-	node->tail = nil();
+	fprintf(file,"%s",content);
 
-	return node;
+	return 1;
 }
 
 int main(int argc, char** argv)
 {
-	if(argc < 2) // insuficient arguments
-		exit(0);
+	if(argc < 3) // insuficient arguments
+		exit(1);
 
 	if(!open_input(argv[1])) // couldn't open input file
 		exit(1);
@@ -59,9 +40,9 @@ int main(int argc, char** argv)
 
 	close_input();
 
-	//fprintf(stderr,"%s\n",ASTtoString(root,0));
+	char* decompiledAST = toSource(root);
 
-	fprintf(stderr,"%s\n",toSource(root));
+	WriteToFile(argv[2],decompiledAST);
 
 	// If computation reached this point, no yyparse() errors ocurred. The input code is syntactically correct
 	fprintf(stderr,"The input code is syntactically correct!\n");
