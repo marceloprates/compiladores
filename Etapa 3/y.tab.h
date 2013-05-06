@@ -97,8 +97,8 @@ typedef union YYSTYPE
 {
 
 /* Line 2068 of yacc.c  */
-#line 12 "parser.y"
- linkedList_t* symbol; 
+#line 15 "parser.y"
+ linkedList_t* symbol; AST* ast; 
 
 
 /* Line 2068 of yacc.c  */

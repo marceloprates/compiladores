@@ -6,6 +6,10 @@
 
 #include "ast.h"
 
+#define TEST fprintf(stderr, "%s\n", buffer);
+#define PRINT(x) fprintf(stderr, "%s\n", x);
+#define ECHO fprintf(stderr, "HELLO\n");
+
 AST* CreateAST(nodeType_t node_type, linkedList_t* node, AST* child_0, AST* child_1, AST* child_2, AST* child_3)
 {
 	AST* ast = (AST*)calloc(1,sizeof(AST));
@@ -138,7 +142,7 @@ char* toSource(AST* ast)
 		{
 			case IDENTIFIER:
 			{
-				char* s = (char*)calloc(strlen(ast->node->symbol.value.identifier),sizeof(char));
+				char* s = (char*)calloc(strlen(ast->node->symbol.value.identifier) + 1,sizeof(char));
 				strcpy(s,ast->node->symbol.value.identifier);
 				return s;
 				break;
@@ -186,7 +190,7 @@ char* toSource(AST* ast)
 					}
 					case SYMBOL_LIT_STRING:
 					{
-						char* s = (char*)calloc(strlen(ast->node->symbol.value.identifier),sizeof(char));
+						char* s = (char*)calloc(strlen(ast->node->symbol.value.identifier) + 1,sizeof(char));
 						strcpy(s,ast->node->symbol.value.stringLit);
 						return s;
 						break;
@@ -198,7 +202,7 @@ char* toSource(AST* ast)
 			{
 				char* child0_source = toSource(ast->child[0]);
 				char* child1_source = toSource(ast->child[1]);
-				char* buffer = (char*)calloc(strlen(child0_source) + 1 + strlen(child1_source),sizeof(char));
+				char* buffer = (char*)calloc(strlen(child0_source) + 1 + strlen(child1_source) + 1,sizeof(char));
 				sprintf(buffer,"%s+%s",child0_source,child1_source);
 				return buffer;
 				break;
@@ -207,7 +211,7 @@ char* toSource(AST* ast)
 			{
 				char* child0_source = toSource(ast->child[0]);
 				char* child1_source = toSource(ast->child[1]);
-				char* buffer = (char*)calloc(strlen(child0_source) + 1 + strlen(child1_source),sizeof(char));
+				char* buffer = (char*)calloc(strlen(child0_source) + 1 + strlen(child1_source) + 1,sizeof(char));
 				sprintf(buffer,"%s-%s",child0_source,child1_source);
 				return buffer;
 				break;
@@ -216,7 +220,7 @@ char* toSource(AST* ast)
 			{
 				char* child0_source = toSource(ast->child[0]);
 				char* child1_source = toSource(ast->child[1]);
-				char* buffer = (char*)calloc(strlen(child0_source) + 1 + strlen(child1_source),sizeof(char));
+				char* buffer = (char*)calloc(strlen(child0_source) + 1 + strlen(child1_source) + 1,sizeof(char));
 				sprintf(buffer,"%s*%s",child0_source,child1_source);
 				return buffer;
 				break;
@@ -225,7 +229,7 @@ char* toSource(AST* ast)
 			{
 				char* child0_source = toSource(ast->child[0]);
 				char* child1_source = toSource(ast->child[1]);
-				char* buffer = (char*)calloc(strlen(child0_source) + 1 + strlen(child1_source),sizeof(char));
+				char* buffer = (char*)calloc(strlen(child0_source) + 1 + strlen(child1_source) + 1,sizeof(char));
 				sprintf(buffer,"%s/%s",child0_source,child1_source);
 				return buffer;
 				break;
@@ -234,7 +238,7 @@ char* toSource(AST* ast)
 			{
 				char* child0_source = toSource(ast->child[0]);
 				char* child1_source = toSource(ast->child[1]);
-				char* buffer = (char*)calloc(strlen(child0_source) + 1 + strlen(child1_source),sizeof(char));
+				char* buffer = (char*)calloc(strlen(child0_source) + 1 + strlen(child1_source) + 1,sizeof(char));
 				sprintf(buffer,"%s<%s",child0_source,child1_source);
 				return buffer;
 				break;
@@ -243,7 +247,7 @@ char* toSource(AST* ast)
 			{
 				char* child0_source = toSource(ast->child[0]);
 				char* child1_source = toSource(ast->child[1]);
-				char* buffer = (char*)calloc(strlen(child0_source) + 1 + strlen(child1_source),sizeof(char));
+				char* buffer = (char*)calloc(strlen(child0_source) + 1 + strlen(child1_source) + 1,sizeof(char));
 				sprintf(buffer,"%s>%s",child0_source,child1_source);
 				return buffer;
 				break;
@@ -252,7 +256,7 @@ char* toSource(AST* ast)
 			{
 				char* child0_source = toSource(ast->child[0]);
 				char* child1_source = toSource(ast->child[1]);
-				char* buffer = (char*)calloc(strlen(child0_source) + 1 + strlen(child1_source),sizeof(char));
+				char* buffer = (char*)calloc(strlen(child0_source) + 1 + strlen(child1_source) + 1,sizeof(char));
 				sprintf(buffer,"%s<=%s",child0_source,child1_source);
 				return buffer;
 				break;
@@ -261,7 +265,7 @@ char* toSource(AST* ast)
 			{
 				char* child0_source = toSource(ast->child[0]);
 				char* child1_source = toSource(ast->child[1]);
-				char* buffer = (char*)calloc(strlen(child0_source) + 1 + strlen(child1_source),sizeof(char));
+				char* buffer = (char*)calloc(strlen(child0_source) + 1 + strlen(child1_source) + 1,sizeof(char));
 				sprintf(buffer,"%s>=%s",child0_source,child1_source);
 				return buffer;
 				break;
@@ -270,7 +274,7 @@ char* toSource(AST* ast)
 			{
 				char* child0_source = toSource(ast->child[0]);
 				char* child1_source = toSource(ast->child[1]);
-				char* buffer = (char*)calloc(strlen(child0_source) + 1 + strlen(child1_source),sizeof(char));
+				char* buffer = (char*)calloc(strlen(child0_source) + 1 + strlen(child1_source) + 1,sizeof(char));
 				sprintf(buffer,"%s==%s",child0_source,child1_source);
 				return buffer;
 				break;
@@ -279,7 +283,7 @@ char* toSource(AST* ast)
 			{
 				char* child0_source = toSource(ast->child[0]);
 				char* child1_source = toSource(ast->child[1]);
-				char* buffer = (char*)calloc(strlen(child0_source) + 1 + strlen(child1_source),sizeof(char));
+				char* buffer = (char*)calloc(strlen(child0_source) + 1 + strlen(child1_source) + 1,sizeof(char));
 				sprintf(buffer,"%s!=%s",child0_source,child1_source);
 				return buffer;
 				break;
@@ -288,7 +292,7 @@ char* toSource(AST* ast)
 			{
 				char* child0_source = toSource(ast->child[0]);
 				char* child1_source = toSource(ast->child[1]);
-				char* buffer = (char*)calloc(strlen(child0_source) + 1 + strlen(child1_source),sizeof(char));
+				char* buffer = (char*)calloc(strlen(child0_source) + 1 + strlen(child1_source) + 1,sizeof(char));
 				sprintf(buffer,"%s&&%s",child0_source,child1_source);
 				return buffer;
 				break;
@@ -297,7 +301,7 @@ char* toSource(AST* ast)
 			{
 				char* child0_source = toSource(ast->child[0]);
 				char* child1_source = toSource(ast->child[1]);
-				char* buffer = (char*)calloc(strlen(child0_source) + 1 + strlen(child1_source),sizeof(char));
+				char* buffer = (char*)calloc(strlen(child0_source) + 1 + strlen(child1_source) + 1,sizeof(char));
 				sprintf(buffer,"%s||%s",child0_source,child1_source);
 				return buffer;
 				break;
@@ -305,7 +309,7 @@ char* toSource(AST* ast)
 			case REF:
 			{
 				char* child0_source = toSource(ast->child[0]);
-				char* buffer = (char*)calloc(1 + strlen(child0_source),sizeof(char));
+				char* buffer = (char*)calloc(1 + strlen(child0_source) + 1,sizeof(char));
 				sprintf(buffer,"&%s",child0_source);
 				return buffer;
 				break;
@@ -313,7 +317,7 @@ char* toSource(AST* ast)
 			case DEREF:
 			{
 				char* child0_source = toSource(ast->child[0]);
-				char* buffer = (char*)calloc(1 + strlen(child0_source),sizeof(char));
+				char* buffer = (char*)calloc(1 + strlen(child0_source) + 1,sizeof(char));
 				sprintf(buffer,"*%s",child0_source);
 				return buffer;
 				break;
@@ -322,7 +326,7 @@ char* toSource(AST* ast)
 			{
 				char* child0_source = toSource(ast->child[0]);
 				char* child1_source = toSource(ast->child[1]);
-				char* buffer = (char*)calloc(strlen(child0_source) + 1 + strlen(child1_source) + 1,sizeof(char));
+				char* buffer = (char*)calloc(strlen(child0_source) + 1 + strlen(child1_source) + 1 + 1,sizeof(char));
 				sprintf(buffer,"%s(%s)",child0_source,child1_source);
 				return buffer;
 				break;
@@ -331,7 +335,7 @@ char* toSource(AST* ast)
 			{
 				char* child0_source = toSource(ast->child[0]);
 				char* child1_source = toSource(ast->child[1]);
-				char* buffer = (char*)calloc(strlen(child0_source) + 1 + strlen(child1_source) + 1,sizeof(char));
+				char* buffer = (char*)calloc(strlen(child0_source) + 1 + strlen(child1_source) + 1 + 1,sizeof(char));
 				sprintf(buffer,"%s[%s]",child0_source,child1_source);
 				return buffer;
 				break;
@@ -346,7 +350,7 @@ char* toSource(AST* ast)
 				{
 					char* child0_source = toSource(ast->child[0]);
 					char* child1_source = toSource(ast->child[1]);
-					char* buffer = (char*)calloc(strlen(child0_source) + 1 + strlen(child1_source),sizeof(char));
+					char* buffer = (char*)calloc(strlen(child0_source) + 1 + strlen(child1_source) + 1,sizeof(char));
 					sprintf(buffer,"%s,%s",child0_source,child1_source);
 					return buffer;
 				}
@@ -355,7 +359,7 @@ char* toSource(AST* ast)
 			case RETURN:
 			{
 				char* child0_source = toSource(ast->child[0]);
-				char* buffer = (char*)calloc(strlen("return") + 1 + strlen(child0_source),sizeof(char));
+				char* buffer = (char*)calloc(strlen("return") + 1 + strlen(child0_source) + 1,sizeof(char));
 				sprintf(buffer,"return %s",child0_source);
 				return buffer;
 				break;
@@ -370,7 +374,7 @@ char* toSource(AST* ast)
 				{
 					char* child0_source = toSource(ast->child[0]);
 					char* child1_source = toSource(ast->child[1]);
-					char* buffer = (char*)calloc(strlen(child0_source) + 1 + strlen(child1_source),sizeof(char));
+					char* buffer = (char*)calloc(strlen(child0_source) + 1 + strlen(child1_source) + 1,sizeof(char));
 					sprintf(buffer,"%s,%s",child0_source,child1_source);
 					return buffer;
 				}
@@ -379,7 +383,7 @@ char* toSource(AST* ast)
 			case OUTPUT:
 			{
 				char* child0_source = toSource(ast->child[0]);
-				char* buffer = (char*)calloc(strlen("output") + 1 + strlen(child0_source),sizeof(char));
+				char* buffer = (char*)calloc(strlen("output") + 1 + strlen(child0_source) + 1,sizeof(char));
 				sprintf(buffer,"output %s",child0_source);
 				return buffer;
 				break;
@@ -387,7 +391,7 @@ char* toSource(AST* ast)
 			case INPUT:
 			{
 				char* child0_source = toSource(ast->child[0]);
-				char* buffer = (char*)calloc(strlen("input") + 1 + strlen(child0_source),sizeof(char));
+				char* buffer = (char*)calloc(strlen("input") + 1 + strlen(child0_source) + 1,sizeof(char));
 				sprintf(buffer,"input %s",child0_source);
 				return buffer;
 				break;
@@ -396,7 +400,7 @@ char* toSource(AST* ast)
 			{
 				char* child0_source = toSource(ast->child[0]);
 				char* child1_source = toSource(ast->child[1]);
-				char* buffer = (char*)calloc(strlen("if") + 1 + strlen(child0_source) + 1 + 1 + strlen("then") + 1 + strlen(child1_source),sizeof(char));
+				char* buffer = (char*)calloc(strlen("if") + 1 + strlen(child0_source) + 1 + 1 + strlen("then") + 1 + strlen(child1_source) + 1,sizeof(char));
 				sprintf(buffer,"if(%s) then %s",child0_source,child1_source);
 				return buffer;
 				break;
@@ -406,7 +410,7 @@ char* toSource(AST* ast)
 				char* child0_source = toSource(ast->child[0]);
 				char* child1_source = toSource(ast->child[1]);
 				char* child2_source = toSource(ast->child[2]);
-				char* buffer = (char*)calloc(strlen("if") + 1 + strlen(child0_source) + 1 + 1 + strlen("then") + 1 + strlen(child1_source) + 1 + strlen("else"),sizeof(char));
+				char* buffer = (char*)calloc(strlen("if") + 1 + strlen(child0_source) + 1 + 1 + strlen("then") + 1 + strlen(child1_source) + 1 + strlen("else") + 1 + strlen(child2_source) + 1,sizeof(char));
 				sprintf(buffer,"if(%s) then %s else %s",child0_source,child1_source,child2_source);
 				return buffer;
 				break;
@@ -415,7 +419,7 @@ char* toSource(AST* ast)
 			{
 				char* child0_source = toSource(ast->child[0]);
 				char* child1_source = toSource(ast->child[1]);
-				char* buffer = (char*)calloc(strlen("loop") + 1 + strlen(child0_source) + 1 + 1 + strlen(child1_source),sizeof(char));
+				char* buffer = (char*)calloc(strlen("loop") + 1 + strlen(child0_source) + 1 + 1 + strlen(child1_source) + 1,sizeof(char));
 				sprintf(buffer,"loop(%s) %s",child0_source,child1_source);
 				return buffer;
 				break;
@@ -424,7 +428,7 @@ char* toSource(AST* ast)
 			{
 				char* child0_source = toSource(ast->child[0]);
 				char* child1_source = toSource(ast->child[1]);
-				char* buffer = (char*)calloc(strlen(child0_source) + 1 + strlen(child1_source),sizeof(char));
+				char* buffer = (char*)calloc(strlen(child0_source) + 1 + strlen(child1_source) + 1,sizeof(char));
 				sprintf(buffer,"%s=%s",child0_source,child1_source);
 				return buffer;
 				break;
@@ -439,7 +443,7 @@ char* toSource(AST* ast)
 				{
 					char* child0_source = toSource(ast->child[0]);
 					char* child1_source = toSource(ast->child[1]);
-					char* buffer = (char*)calloc(strlen(child0_source) + 1 + strlen(child1_source),sizeof(char));
+					char* buffer = (char*)calloc(strlen(child0_source) + 1 + strlen(child1_source) + 1,sizeof(char));
 					sprintf(buffer,"%s;%s",child0_source,child1_source);
 					return buffer;
 				}
@@ -448,7 +452,7 @@ char* toSource(AST* ast)
 			case BLOCK:
 			{
 				char* child0_source = toSource(ast->child[0]);
-				char* buffer = (char*)calloc(1 + strlen(child0_source) + 1,sizeof(char));
+				char* buffer = (char*)calloc(1 + strlen(child0_source) + 1 + 1,sizeof(char));
 				sprintf(buffer,"{%s}",child0_source);
 				return buffer;
 				break;
@@ -463,8 +467,8 @@ char* toSource(AST* ast)
 				{
 					char* child0_source = toSource(ast->child[0]);
 					char* child1_source = toSource(ast->child[1]);
-					char* child2_source = toSource(ast->child[1]);
-					char* buffer = (char*)calloc(strlen(child0_source) + 1 + strlen(child1_source) + 1 + strlen(child2_source),sizeof(char));
+					char* child2_source = toSource(ast->child[2]);
+					char* buffer = (char*)calloc(strlen(child0_source) + 1 + strlen(child1_source) + 1 + strlen(child2_source) + 1,sizeof(char));
 					sprintf(buffer,"%s %s, %s",child0_source,child1_source,child2_source);
 					return buffer;
 				}
@@ -474,8 +478,8 @@ char* toSource(AST* ast)
 			{
 				char* child0_source = toSource(ast->child[0]);
 				char* child1_source = toSource(ast->child[1]);
-				char* child2_source = toSource(ast->child[1]);
-				char* buffer = (char*)calloc(strlen(child0_source) + 1 + strlen(child1_source) + 1 + strlen(child2_source) + 1,sizeof(char));
+				char* child2_source = toSource(ast->child[2]);
+				char* buffer = (char*)calloc(strlen(child0_source) + 1 + strlen(child1_source) + 1 + strlen(child2_source) + 1 + 1,sizeof(char));
 				sprintf(buffer,"%s %s(%s)",child0_source,child1_source,child2_source);
 				return buffer;
 				break;
@@ -484,8 +488,8 @@ char* toSource(AST* ast)
 			{
 				char* child0_source = toSource(ast->child[0]);
 				char* child1_source = toSource(ast->child[1]);
-				char* child2_source = toSource(ast->child[1]);
-				char* buffer = (char*)calloc(strlen(child0_source) + 1 + strlen(child1_source) + 1 + strlen(child2_source),sizeof(char));
+				char* child2_source = toSource(ast->child[2]);
+				char* buffer = (char*)calloc(strlen(child0_source) + 1 + strlen(child1_source) + 1 + strlen(child2_source) + 1,sizeof(char));
 				sprintf(buffer,"%s %s:%s",child0_source,child1_source,child2_source);
 				return buffer;
 				break;
@@ -494,8 +498,8 @@ char* toSource(AST* ast)
 			{
 				char* child0_source = toSource(ast->child[0]);
 				char* child1_source = toSource(ast->child[1]);
-				char* child2_source = toSource(ast->child[1]);
-				char* buffer = (char*)calloc(strlen(child0_source) + 1 + 1 + strlen(child1_source) + 1 + strlen(child2_source),sizeof(char));
+				char* child2_source = toSource(ast->child[2]);
+				char* buffer = (char*)calloc(strlen(child0_source) + 1 + 1 + strlen(child1_source) + 1 + strlen(child2_source) + 1,sizeof(char));
 				sprintf(buffer,"%s &%s:%s",child0_source,child1_source,child2_source);
 				return buffer;
 				break;
@@ -504,7 +508,7 @@ char* toSource(AST* ast)
 			{
 				char* child0_source = toSource(ast->child[0]);
 				char* child1_source = toSource(ast->child[1]);
-				char* buffer = (char*)calloc(strlen(child0_source) + 1 + strlen(child1_source),sizeof(char));
+				char* buffer = (char*)calloc(strlen(child0_source) + 1 + strlen(child1_source) + 1,sizeof(char));
 				sprintf(buffer,"%s %s",child0_source,child1_source);
 				return buffer;
 				break;
@@ -513,9 +517,9 @@ char* toSource(AST* ast)
 			{
 				char* child0_source = toSource(ast->child[0]);
 				char* child1_source = toSource(ast->child[1]);
-				char* child2_source = toSource(ast->child[1]);
-				char* child3_source = toSource(ast->child[1]);
-				char* buffer = (char*)calloc(strlen(child0_source) + 1 + strlen(child1_source) + 1 + strlen(child2_source) + 1 + 1 + strlen(child3_source),sizeof(char));
+				char* child2_source = toSource(ast->child[2]);
+				char* child3_source = toSource(ast->child[3]);
+				char* buffer = (char*)calloc(strlen(child0_source) + 1 + strlen(child1_source) + 1 + strlen(child2_source) + 1 + 1 + strlen(child3_source) + 1,sizeof(char));
 				sprintf(buffer,"%s %s[%s]:%s",child0_source,child1_source,child2_source,child3_source);
 				return buffer;
 				break;
@@ -530,7 +534,7 @@ char* toSource(AST* ast)
 				{
 					char* child0_source = toSource(ast->child[0]);
 					char* child1_source = toSource(ast->child[1]);
-					char* buffer = (char*)calloc(strlen(child0_source) + 1 + strlen(child1_source),sizeof(char));
+					char* buffer = (char*)calloc(strlen(child0_source) + 1 + strlen(child1_source) + 1,sizeof(char));
 					sprintf(buffer,"%s %s",child0_source,child1_source);
 					return buffer;
 				}
@@ -540,8 +544,8 @@ char* toSource(AST* ast)
 			{
 				char* child0_source = toSource(ast->child[0]);
 				char* child1_source = toSource(ast->child[1]);
-				char* child2_source = toSource(ast->child[1]);
-				char* buffer = (char*)calloc(strlen(child0_source) + 1 + strlen(child1_source) + 1 + strlen(child2_source),sizeof(char));
+				char* child2_source = toSource(ast->child[2]);
+				char* buffer = (char*)calloc(strlen(child0_source) + 1 + strlen(child1_source) + 1 + strlen(child2_source) + 1,sizeof(char));
 				sprintf(buffer,"%s %s %s",child0_source,child1_source,child2_source);
 				return buffer;
 				break;
@@ -556,7 +560,7 @@ char* toSource(AST* ast)
 				{
 					char* child0_source = toSource(ast->child[0]);
 					char* child1_source = toSource(ast->child[1]);
-					char* buffer = (char*)calloc(strlen(child0_source) + 1 + strlen(child1_source),sizeof(char));
+					char* buffer = (char*)calloc(strlen(child0_source) + 1 + strlen(child1_source) + 1,sizeof(char));
 					sprintf(buffer,"%s %s",child0_source,child1_source);
 					return buffer;
 				}

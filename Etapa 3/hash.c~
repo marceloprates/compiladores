@@ -214,7 +214,7 @@ linkedList_t* addSymbol(char* text, type_t type)
 			symbol.value.charLit = removeQuotes(text)[0];
 			break;
 		case SYMBOL_LIT_STRING:
-			symbol.value.stringLit = removeQuotes(text);
+			symbol.value.stringLit, = removeQuotes(text);
 			break;
 		case SYMBOL_IDENTIFIER:
 			symbol.value.identifier = (char*) calloc(strlen(text) + 1, sizeof(char));
