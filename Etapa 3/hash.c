@@ -202,8 +202,19 @@ linkedList_t* addSymbol(char* text, type_t type)
 	switch(type)
 	{
 		case SYMBOL_LIT_INTEGER:
-			symbol.value.intLit = atoi(text);
+		{
+			char* hexString = (char*)calloc(strlen(text),sizeof(char));
+			sprintf(hexString,"%s",text);
+
+			int i;
+
+			for(i = 0; i < strlen(hexString); i++)
+				hexString[i] = tolower(hexString[i]);
+
+			char* junk;
+			symbol.value.intLit = strtol(hexString,&junk,16);
 			break;
+		}
 		case SYMBOL_LIT_TRUE:
 			symbol.value.boolLit = 1;
 			break;

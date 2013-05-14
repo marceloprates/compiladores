@@ -174,7 +174,7 @@ char* toSource(AST* ast)
 					case SYMBOL_LIT_INTEGER:
 					{
 						char* buffer = (char*)calloc(30,sizeof(char));
-						sprintf(buffer,"%d",ast->node->symbol.value.intLit);
+						sprintf(buffer,"0%x",ast->node->symbol.value.intLit);
 						return buffer;
 						break;
 					}
@@ -190,7 +190,9 @@ char* toSource(AST* ast)
 					}
 					case SYMBOL_LIT_CHAR:
 					{
-						ast->node->symbol.value.charLit;
+						char* buffer = (char*)calloc(3,sizeof(char));
+						sprintf(buffer,"'%c'",ast->node->symbol.value.charLit);
+						return buffer;
 						break;
 					}
 					case SYMBOL_LIT_STRING:
@@ -525,7 +527,7 @@ char* toSource(AST* ast)
 				char* child1_source = toSource(ast->child[1]);
 				char* child2_source = toSource(ast->child[2]);
 				char* buffer = (char*)calloc(strlen(child0_source) + 1 + 1 + strlen(child1_source) + 1 + strlen(child2_source) + 1,sizeof(char));
-				sprintf(buffer,"%s &%s:%s",child0_source,child1_source,child2_source);
+				sprintf(buffer,"%s $%s:%s",child0_source,child1_source,child2_source);
 				return buffer;
 				break;
 			}

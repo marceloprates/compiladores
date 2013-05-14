@@ -1,6 +1,6 @@
 // UFRGS - Compiladores - Marcelo Johann - 2013/1
 
-word a:0;
+word a:0ABC;
 word v[10]:0 0 0 0 0 0 0 0 0 0; 
 word mat[1000];
 

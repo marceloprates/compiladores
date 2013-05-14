@@ -137,7 +137,7 @@
 		;
 
 	local_type_decs:
-		local_dec local_type_decs ';' { $$ = CreateAST2(DECLARATIONLIST, NULL, $1, $2); } |
+		local_dec ';' local_type_decs  { $$ = CreateAST2(DECLARATIONLIST, NULL, $1, $3); } |
 		/* empty */ { $$ = CreateAST0(DECLARATIONLIST, NULL); }
 		;
 
