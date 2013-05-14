@@ -52,10 +52,10 @@
 %type <ast> local_type_decs
 %type <ast> header
 %type <ast> variable
-%type <ast> type_parameter_list
-%type <ast> type_parameter_list_tail
 %type <ast> parameter_list
-%type <ast> parameter_list_tail
+%type <ast> nonempty_parameter_list
+%type <ast> argument_list
+%type <ast> nonempty_argument_list
 %type <ast> block
 %type <ast> command_list
 %type <ast> command
@@ -65,7 +65,7 @@
 %type <ast> output
 %type <ast> element
 %type <ast> element_list
-%type <ast> element_list_tail
+%type <ast> nonempty_element_list
 %type <ast> return
 %type <ast> expr
 
@@ -82,7 +82,7 @@
 	;
 
 	program:
-		item program { $$ = CreateAST2(PROGRAM, NULL, $1, $2); } |
+		program item { $$ = CreateAST2(PROGRAM, NULL, $1, $2); } |
 		/* empty */ { $$ = CreateAST0(PROGRAM, NULL); }
 		;
 
@@ -128,7 +128,7 @@
 		;
 
 	literal_list:
-		literal literal_list { $$ = CreateAST2(LITERALLIST, NULL, $1, $2); } |
+		literal_list literal { $$ = CreateAST2(LITERALLIST, NULL, $1, $2); } |
 		/* empty */ 		 { $$ = CreateAST0(LITERALLIST, NULL); }
 		;
 
@@ -137,12 +137,12 @@
 		;
 
 	local_type_decs:
-		local_dec ';' local_type_decs  { $$ = CreateAST2(DECLARATIONLIST, NULL, $1, $3); } |
+		local_type_decs local_dec ';' { $$ = CreateAST2(DECLARATIONLIST, NULL, $1, $2); } |
 		/* empty */ { $$ = CreateAST0(DECLARATIONLIST, NULL); }
 		;
 
 	header:
-		type identifier '(' type_parameter_list ')'	{ $$ = CreateAST3(FUNCTIONHEADER, NULL, $1, $2, $4); }
+		type identifier '(' parameter_list ')'	{ $$ = CreateAST3(FUNCTIONHEADER, NULL, $1, $2, $4); }
 		;
 
 	variable:
@@ -150,24 +150,24 @@
 		identifier '[' expr ']'	{ $$ = CreateAST2(ARRAYACCESS, NULL, $1, $3); }
 		;
 
-	type_parameter_list:
-		type identifier type_parameter_list_tail { $$ = CreateAST3(TYPEPARAMETERLIST, NULL, $1, $2, $3); } |
-		/* empty */ { $$ = CreateAST0(TYPEPARAMETERLIST, NULL); }
-		;
-
-	type_parameter_list_tail:
-		',' type identifier type_parameter_list_tail { $$ = CreateAST3(TYPEPARAMETERLIST, NULL, $2, $3, $4); } |
-		/* empty */ { $$ = CreateAST0(TYPEPARAMETERLIST, NULL); }
-		;
-
 	parameter_list:
-		expr parameter_list_tail { $$ = CreateAST2(PARAMETERLIST, NULL, $1, $2); }|
+		nonempty_parameter_list |
 		/* empty */ { $$ = CreateAST0(PARAMETERLIST, NULL); }
 		;
 
-	parameter_list_tail:
-		',' expr parameter_list_tail { $$ = CreateAST2(PARAMETERLIST, NULL, $2, $3); } |
-		/* empty */ { $$ = CreateAST0(PARAMETERLIST, NULL); }
+	nonempty_parameter_list:
+		nonempty_parameter_list ',' type identifier { $$ = CreateAST3(PARAMETERLIST, NULL, $1, $3, $4); } |
+		type identifier { $$ = CreateAST2(PARAMETERLIST, NULL, $1, $2); }
+		;
+
+	argument_list:
+		nonempty_argument_list |
+		/* empty */ { $$ = CreateAST0(ARGUMENTLIST, NULL); }
+		;
+
+	nonempty_argument_list:
+		nonempty_argument_list ',' expr { $$ = CreateAST2(ARGUMENTLIST, NULL, $1, $3); } |
+		expr { $$ = CreateAST1(ARGUMENTLIST, NULL, $1); }
 		;
 
 	block:
@@ -175,7 +175,7 @@
 		;
 
 	command_list:
-		command ';' command_list { $$ = CreateAST2(COMMANDLIST, NULL, $1, $3); } |
+		command_list command ';' { $$ = CreateAST2(COMMANDLIST, NULL, $1, $2); } |
 		/* empty */ { $$ = CreateAST0(COMMANDLIST, NULL); }
 		;
 
@@ -213,13 +213,13 @@
 		;
 
 	element_list:
-		element element_list_tail	{ $$ = CreateAST2(ELEMENTLIST, NULL, $1, $2); }|
+		nonempty_element_list |
 		/* empty */ { $$ = CreateAST0(ELEMENTLIST, NULL); }
 		;
 
-	element_list_tail:
-		',' element_list { $$ = CreateAST1(ELEMENTLIST, NULL, $2); }|
-		/* empty */ { $$ = CreateAST0(ELEMENTLIST, NULL); }
+	nonempty_element_list:
+		nonempty_element_list ',' element { $$ = CreateAST2(ELEMENTLIST, NULL, $1, $3); } |
+		element { $$ = CreateAST1(ELEMENTLIST, NULL, $1); }
 		;
 
 	return:
@@ -228,7 +228,7 @@
 
 	expr:
 		variable						  		 													|
-		identifier '(' parameter_list ')'		{ $$ = CreateAST2(FUNCTIONCALL, NULL, $1, $3); }	|
+		identifier '(' argument_list ')'		{ $$ = CreateAST2(FUNCTIONCALL, NULL, $1, $3); }	|
 		literal 					  		 														|
 		'(' expr ')'							{ $$ = $2; }				  		 				|
 		expr '+' expr				 			{ $$ = CreateAST2(ADDITION, NULL, $1, $3); }		|
