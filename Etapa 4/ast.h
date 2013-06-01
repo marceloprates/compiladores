@@ -50,7 +50,16 @@ enum nodeType_e
 	PROGRAM
 };
 
+enum type_e
+{
+	BOOL,
+	INTEGER,
+	ERROR
+}
+
 typedef enum nodeType_e nodeType_t;
+
+typedef enum type_e type_t;
 
 struct AST_struct
 {

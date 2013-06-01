@@ -11,6 +11,7 @@ hashTable_ref symbolTable;
 
 int equal(symbol_t symbol1, symbol_t symbol2)
 {
+
 	return (symbol1.type == symbol2.type) && (strcmp(symbol1.text, symbol2.text) == 0);
 }
 
@@ -54,11 +55,13 @@ void printType(type_t type)
 
 linkedList_t* nil(void)
 {
+
 	return NULL;
 }
 
 int isEmpty(linkedList_t* list)
 {
+
 	return list == NULL;
 }
 
@@ -180,6 +183,7 @@ void printTable(hashTable_ref table, int tableSize)
 
 void initMe(void)
 {
+
 	symbolTable = newHashTable(SYMBOL_TABLE_SIZE);
 }
 
@@ -238,11 +242,13 @@ linkedList_t* addSymbol(char* text, type_t type)
 
 linkedList_t* findSymbol(symbol_t symbol)
 {
+
 	return findInTable(symbol, symbolTable, SYMBOL_TABLE_SIZE);
 }
 
 void printSymbolTable(void)
 {
+	
 	printTable(symbolTable, SYMBOL_TABLE_SIZE);
 }
 

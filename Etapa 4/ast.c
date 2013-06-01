@@ -668,7 +668,7 @@ void PrintTree(AST* ast)
 	fprintf(stderr,"%s\n",ASTtoString(ast,0));
 }
 
-int Verify(AST* ast)
+int verify(AST* ast)
 {
 	switch(ast->node_type)
 	{
@@ -678,15 +678,15 @@ int Verify(AST* ast)
 		}
 		case TYPEWORD:
 		{
-			return 1;
+
 		}
 		case TYPEBOOL:
 		{
-			return 1;
+
 		}
 		case TYPEBYTE:
 		{
-			return 1;
+
 		}
 		case LITERAL:
 		{
@@ -694,160 +694,182 @@ int Verify(AST* ast)
 		}
 		case ADDITION:
 		{
-			int child0_type = Verify(ast->child[0]);
-			int child1_type = Verify(ast->child[1]);
+			int t0 = verify(ast->child[0]);
+			int t1 = verify(ast->child[1]);
 
-			if(!((child0_type == TYPEWORD || child0_type == TYPEBYTE) && (child0_type == TYPEWORD || child0_type == TYPEBYTE)))
+			if(t0 != INTEGER || t1 != INTEGER)
 			{
-				fprintf(stderr,"Incompatible types for aritimetic operation: %s + %s", child0_type, child1_type);
-				return 0;
+				fprintf(stderr,"Incompatible types for aritimetic operation: %s + %s\n", t0, t1);
+				exit(3);
 			}
 			else
 			{
-				return 1;
+				return INTEGER;
 			}
 		}
 		case SUBTRACTION:
 		{
-			int child0_type = Verify(ast->child[0]);
-			int child1_type = Verify(ast->child[1]);
+			int t0 = verify(ast->child[0]);
+			int t1 = verify(ast->child[1]);
 
-			if(!((child0_type == TYPEWORD || child0_type == TYPEBYTE) && (child0_type == TYPEWORD || child0_type == TYPEBYTE)))
+			if(t0 != INTEGER || t1 != INTEGER)
 			{
-				fprintf(stderr,"Incompatible types for aritimetic operation: %s - %s", child0_type, child1_type);
-				return 0;
+				fprintf(stderr,"Incompatible types for aritimetic operation: %s - %s\n", t0, t1);
+				exit(3);
 			}
 			else
 			{
-				return 1;
+				return INTEGER;
 			}
 		}
 		case MULTIPLICATION:
 		{
-			int child0_type = Verify(ast->child[0]);
-			int child1_type = Verify(ast->child[1]);
+			int t0 = verify(ast->child[0]);
+			int t1 = verify(ast->child[1]);
 
-			if(!((child0_type == TYPEWORD || child0_type == TYPEBYTE) && (child0_type == TYPEWORD || child0_type == TYPEBYTE)))
+			if(t0 != INTEGER || t1 != INTEGER)
 			{
-				fprintf(stderr,"Incompatible types for aritimetic operation: %s * %s", child0_type, child1_type);
-				return 0;
+				fprintf(stderr,"Incompatible types for aritimetic operation: %s * %s\n", t0, t1);
+				exit(3);
 			}
 			else
 			{
-				return 1;
+				return INTEGER;
 			}
 		}
 		case DIVISION:
 		{
-			int child0_type = Verify(ast->child[0]);
-			int child1_type = Verify(ast->child[1]);
+			int t0 = verify(ast->child[0]);
+			int t1 = verify(ast->child[1]);
 
-			if(!((child0_type == TYPEWORD || child0_type == TYPEBYTE) && (child0_type == TYPEWORD || child0_type == TYPEBYTE)))
+			if(t0 != INTEGER || t1 != INTEGER)
 			{
-				fprintf(stderr,"Incompatible types for aritimetic operation: %s / %s", child0_type, child1_type);
-				return 0;
+				fprintf(stderr,"Incompatible types for aritimetic operation: %s / %s\n", t0, t1);
+				exit(3);
 			}
 			else
 			{
-				return 1;
+				return INTEGER;
 			}
 		}
 		case LESSERTHAN:
 		{
-			int child0_type = Verify(ast->child[0]);
-			int child1_type = Verify(ast->child[1]);
+			int t0 = verify(ast->child[0]);
+			int t1 = verify(ast->child[1]);
 
-			if(!((child0_type == TYPEWORD || child0_type == TYPEBYTE) && (child0_type == TYPEWORD || child0_type == TYPEBYTE)))
+			if(t0 != INTEGER || t1 != INTEGER)
 			{
-				fprintf(stderr,"Incompatible types for relational operation: %s < %s", child0_type, child1_type);
-				return 0;
+				fprintf(stderr,"Incompatible types for relational operation: %s < %s\n", t0, t1);
+				exit(3);
 			}
 			else
 			{
-				return 1;
+				return BOOL;
 			}
 		}
 		case GREATERTHAN:
 		{
-			int child0_type = Verify(ast->child[0]);
-			int child1_type = Verify(ast->child[1]);
+			int t0 = verify(ast->child[0]);
+			int t1 = verify(ast->child[1]);
 
-			if(!((child0_type == TYPEWORD || child0_type == TYPEBYTE) && (child0_type == TYPEWORD || child0_type == TYPEBYTE)))
+			if(t0 != INTEGER || t1 != INTEGER)
 			{
-				fprintf(stderr,"Incompatible types for relational operation: %s > %s", child0_type, child1_type);
-				return 0;
+				fprintf(stderr,"Incompatible types for relational operation: %s > %s\n", t0, t1);
+				exit(3);
 			}
 			else
 			{
-				return 1;
+				return BOOL;
 			}
 		}
 		case LESSEREQUAL:
 		{
-			int child0_type = Verify(ast->child[0]);
-			int child1_type = Verify(ast->child[1]);
+			int t0 = verify(ast->child[0]);
+			int t1 = verify(ast->child[1]);
 
-			if(!((child0_type == TYPEWORD || child0_type == TYPEBYTE) && (child0_type == TYPEWORD || child0_type == TYPEBYTE)))
+			if(t0 != INTEGER || t1 != INTEGER)
 			{
-				fprintf(stderr,"Incompatible types for relational operation: %s <= %s", child0_type, child1_type);
-				return 0;
+				fprintf(stderr,"Incompatible types for relational operation: %s <= %s\n", t0, t1);
+				exit(3);
 			}
 			else
 			{
-				return 1;
+				return BOOL;
 			}
 		}
 		case GREATEREQUAL:
 		{
-			int child0_type = Verify(ast->child[0]);
-			int child1_type = Verify(ast->child[1]);
+			int t0 = verify(ast->child[0]);
+			int t1 = verify(ast->child[1]);
 
-			if(!((child0_type == TYPEWORD || child0_type == TYPEBYTE) && (child0_type == TYPEWORD || child0_type == TYPEBYTE)))
+			if(t0 != INTEGER || t1 != INTEGER)
 			{
-				fprintf(stderr,"Incompatible types for relational operation: %s >= %s", child0_type, child1_type);
-				return 0;
+				fprintf(stderr,"Incompatible types for relational operation: %s >= %s\n", t0, t1);
+				exit(3);
 			}
 			else
 			{
-				return 1;
+				return BOOL;
 			}
 		}
 		case EQUAL:
 		{
+			int t0 = verify(ast->child[0]);
+			int t1 = verify(ast->child[1]);
 
-		}
-		case NOTEQUAL:
-		{
-
-		}
-		case AND:
-		{
-			int child0_type = Verify(ast->child[0]);
-			int child1_type = Verify(ast->child[1]);
-
-			if(!((child0_type == TYPEBOOL) && (child0_type == TYPEBOOL)))
+			if(t0 != t1)
 			{
-				fprintf(stderr,"Incompatible types for boolean operation: %s && %s", child0_type, child1_type);
-				return 0;
+				fprintf(stderr,"Incompatible types for relational operation: %s == %s\n", t0, t1);
+				exit(3);
 			}
 			else
 			{
-				return 1;
+				return BOOL;
+			}
+		}
+		case NOTEQUAL:
+		{
+			int t0 = verify(ast->child[0]);
+			int t1 = verify(ast->child[1]);
+
+			if(t0 != t1)
+			{
+				fprintf(stderr,"Incompatible types for relational operation: %s != %s\n", t0, t1);
+				exit(3);
+			}
+			else
+			{
+				return BOOL;
+			}
+		}
+		case AND:
+		{
+			int t0 = verify(ast->child[0]);
+			int t1 = verify(ast->child[1]);
+
+			if(t0 != BOOL || t1 != BOOL)
+			{
+				fprintf(stderr,"Incompatible types for boolean operation: %s && %s\n", t0, t1);
+				exit(3);
+			}
+			else
+			{
+				return BOOL;
 			}
 		}
 		case OR:
 		{
-			int child0_type = Verify(ast->child[0]);
-			int child1_type = Verify(ast->child[1]);
+			int t0 = verify(ast->child[0]);
+			int t1 = verify(ast->child[1]);
 
-			if(!((child0_type == TYPEBOOL) && (child0_type == TYPEBOOL)))
+			if(t0 != BOOL || t1 != BOOL)
 			{
-				fprintf(stderr,"Incompatible types for boolean operation: %s || %s", child0_type, child1_type);
-				return 0;
+				fprintf(stderr,"Incompatible types for boolean operation: %s || %s\n", t0, t1);
+				exit(3);
 			}
 			else
 			{
-				return 1;
+				return BOOL;
 			}
 		}
 		case REF:
