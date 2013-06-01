@@ -54,7 +54,7 @@ enum type_e
 {
 	BOOL,
 	INTEGER,
-	ERROR
+	NOTYPE
 }
 
 typedef enum nodeType_e nodeType_t;

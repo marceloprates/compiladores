@@ -678,15 +678,15 @@ int verify(AST* ast)
 		}
 		case TYPEWORD:
 		{
-
+			return NOTYPE;
 		}
 		case TYPEBOOL:
 		{
-
+			return NOTYPE;
 		}
 		case TYPEBYTE:
 		{
-
+			return NOTYPE;
 		}
 		case LITERAL:
 		{
