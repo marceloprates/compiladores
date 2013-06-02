@@ -14,7 +14,18 @@
 #define SYMBOL_LIT_STRING 6
 #define SYMBOL_IDENTIFIER 7
 
+#define FALSE 0
+#define TRUE 1
+
+enum dataType_e
+{
+	INTEGER,
+	BOOL
+};
+
 typedef int type_t;
+
+typedef enum dataType_e dataType_t;
 
 union value_s
 {
@@ -30,6 +41,8 @@ struct symbol_s
 	union value_s value;
 	char* text;
 	type_t type;
+	dataType_t dataType;
+	int marked;
 };
 
 struct linkedList_s
@@ -87,6 +100,8 @@ char* removeQuotes(char* s);
 linkedList_t* addSymbol(char* text, type_t type);
 
 linkedList_t* findSymbol(symbol_t symbol);
+
+linkedList_t* search(char* text);
 
 void printSymbolTable(void);
 

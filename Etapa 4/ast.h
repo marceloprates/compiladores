@@ -1,5 +1,8 @@
 // Lucas Martinelli Tabajara, Marcelo de Oliveira Rosa Prates
 
+#ifndef AST_H
+#define AST_H
+
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -50,21 +53,14 @@ enum nodeType_e
 	PROGRAM
 };
 
-enum type_e
-{
-	BOOL,
-	INTEGER,
-	NOTYPE
-}
-
 typedef enum nodeType_e nodeType_t;
-
-typedef enum type_e type_t;
 
 struct AST_struct
 {
 	nodeType_t node_type;
 	linkedList_t* node;
+
+	dataType_t dataType;
 
 	int numChildren;
 	struct AST_struct** child;
@@ -82,3 +78,5 @@ char* NodeTypetoString(enum nodeType_e n);
 char* ASTtoString(AST* ast, int level);
 char* toSource(AST* ast);
 void PrintTree(AST* ast);
+
+#endif

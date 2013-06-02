@@ -202,6 +202,7 @@ linkedList_t* addSymbol(char* text, type_t type)
 	symbol.text = (char*) calloc(strlen(text) + 1, sizeof(char));
 	strcpy(symbol.text, text);
 	symbol.type = type;
+	symbol.marked = FALSE;
 
 	switch(type)
 	{
@@ -217,24 +218,48 @@ linkedList_t* addSymbol(char* text, type_t type)
 
 			char* junk;
 			symbol.value.intLit = strtol(hexString,&junk,16);
+
+			symbol.dataType = INTEGER;
+
 			break;
 		}
 		case SYMBOL_LIT_TRUE:
+		{
 			symbol.value.boolLit = 1;
+
+			symbol.dataType = BOOL;
+
 			break;
+		}
 		case SYMBOL_LIT_FALSE:
+		{
 			symbol.value.boolLit = 0;
+
+			symbol.dataType = BOOL;
+
 			break;
+		}
 		case SYMBOL_LIT_CHAR:
+		{
 			symbol.value.charLit = removeQuotes(text)[0];
+
+			symbol.dataType = INTEGER;
+
 			break;
+		}
 		case SYMBOL_LIT_STRING:
+		{
 			symbol.value.stringLit = removeQuotes(text);
+
 			break;
+		}
 		case SYMBOL_IDENTIFIER:
+		{
 			symbol.value.identifier = (char*) calloc(strlen(text) + 1, sizeof(char));
 			strcpy(symbol.value.identifier, text);
+
 			break;
+		}
 	}
 
 	return addToTable(symbol, symbolTable, SYMBOL_TABLE_SIZE);
@@ -244,6 +269,16 @@ linkedList_t* findSymbol(symbol_t symbol)
 {
 
 	return findInTable(symbol, symbolTable, SYMBOL_TABLE_SIZE);
+}
+
+linkedList_t* search(char* text)
+{
+	symbol_t symbol;
+	symbol.text = (char*) calloc(strlen(text) + 1, sizeof(char));
+	strcpy(symbol.text, text);
+	symbol.type = SYMBOL_IDENTIFIER;
+
+	return findSymbol(symbol);
 }
 
 void printSymbolTable(void)
