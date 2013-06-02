@@ -23,9 +23,19 @@ enum dataType_e
 	BOOL
 };
 
+enum nature_e
+{
+	SCALAR,
+	POINTER,
+	ARRAY,
+	FUNCTION
+}
+
 typedef int type_t;
 
 typedef enum dataType_e dataType_t;
+
+typedef enum nature_e nature_t;
 
 union value_s
 {
@@ -42,6 +52,7 @@ struct symbol_s
 	char* text;
 	type_t type;
 	dataType_t dataType;
+	nature_t nature;
 	int marked;
 };
 
