@@ -32,7 +32,6 @@ enum dataType_e
 enum nature_e
 {
 	SCALAR,
-	POINTER,
 	ARRAY,
 	FUNCTION
 };
