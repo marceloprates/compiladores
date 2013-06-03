@@ -23,6 +23,8 @@ enum dataType_e
 {
 	INTEGER,
 	BOOL,
+	INTEGER_POINTER,
+	BOOL_POINTER,
 	NO_TYPE,
 	FUNCTION_TYPE,
 };
