@@ -1,0 +1,8 @@
+// UFRGS - Compiladores - Marcelo Johann - 2013/1
+
+word a: 1;
+
+word main()
+{
+  return 1;
+}
