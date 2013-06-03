@@ -181,6 +181,14 @@ int declare_parameters(AST* fun_def)
 	}
 }
 
+int compatible(dataType_t t0, dataType_t t1)
+{
+	int t0_is_pointer = t0 == INTEGER_POINTER || t0 == BOOL_POINTER;
+	int t1_is_pointer = t1 == INTEGER_POINTER || t1 == BOOL_POINTER;
+	
+	return t0 == t1 || (t0_is_pointer && t1_is_pointer)
+}
+
 int same_types(AST* parameter, AST* argument)
 {
 	AST* identifier;
@@ -207,7 +215,7 @@ int same_types(AST* parameter, AST* argument)
 	dataType_t tpar = identifier->node->symbol.dataType;
 	dataType_t targ = typecheck(expr);
 	
-	return tpar == targ;
+	return compatible(tpar, targ);
 }
 
 int check_parameters(AST* parameters, AST* arguments, int* expected, int* given)
@@ -570,6 +578,7 @@ int typecheck(AST* ast)
 				if(array_entry->nature != ARRAY)
 				{
 					fprintf(stderr,"(SEMANTIC) Value > %s < is not an array\n", array_entry->text);
+					return NO_TYPE;
 				}
 
 				int t1 = typecheck(ast->child[1]);
@@ -615,3 +624,88 @@ int typecheck(AST* ast)
 		}
 	}
 }
+
+int verify(AST* ast)
+{
+	if(ast == NULL)
+	{
+		return FALSE;
+	}
+	else
+	{
+		switch(ast->node_type)
+		{
+			case IDENTIFIER:
+			case LITERAL:
+			case ADDITION:
+			case SUBTRACTION:
+			case MULTIPLICATION:
+			case DIVISION:
+			case LESSERTHAN:
+			case GREATERTHAN:
+			case LESSEREQUAL:
+			case GREATEREQUAL:
+			case EQUAL:
+			case NOTEQUAL:
+			case AND:
+			case OR:
+			case REF:
+			case DEREF:
+			case FUNCTIONCALL:
+			case ARRAYACCESS:
+			{
+				return typecheck(ast) != NO_TYPE;
+			}
+			//case ARGUMENTLIST:
+			//case RETURN:
+			//case ELEMENTLIST:
+			//case OUTPUT:
+			//case INPUT:
+			case IFTHEN:
+			case IFTHENELSE:
+			case LOOP:
+			{
+				dataType_t t = typecheck(ast->child[0]);
+				
+				if(t != BOOL)
+				{
+					fprintf(stderr,"(SEMANTIC) Expected boolean type in condition\n");
+					return FALSE;
+				}
+				
+				return TRUE;
+			}
+			case ASSIGNMENT:
+			{
+				dataType_t varType = typecheck(ast->child[0]);
+				dataType_t valType = typecheck(ast->child[1]);
+				
+				if(ast->child[0]->node_type == IDENTIFIER && varType != NO_TYPE && ast->child[0]->node->symbol.nature != SCALAR)
+				{
+					fprintf(stderr,"(SEMANTIC) Value > %s < is not a variable\n", ast->child[0]->node->symbol.text);
+					return FALSE;
+				}
+				
+				if(varType != NO_TYPE && valType != NO_TYPE && !compatible(varType, valType))
+				{
+					fprintf(stderr,"(SEMANTIC) Incompatible type in assignment: %d = %d\n", varType, valType);
+					return FALSE;
+				}
+				
+				return TRUE;
+			}
+			//case COMMANDLIST:
+			//case BLOCK:
+			//case PARAMETERLIST:
+			//case FUNCTIONHEADER:
+			//case DECLARATION:
+			//case POINTERDECLARATION:
+			//case LITERALLIST:
+			//case ARRAYDECLARATION:
+			//case DECLARATIONLIST:
+			//case FUNCTIONDEFINITION:
+			//case PROGRAM:
+			//default:
+		}
+	}
+} 
