@@ -125,9 +125,9 @@ int same_types(AST* parameter, AST* argument)
 	symbol_t expr;
 	
 	if(parameter->child[2] == NULL) identifier = parameter->child[1]; else identifier = parameter->child[2];
-	if(argument->child[2] == NULL) expr = argument->child[0]; else expr = argument->child[1];
+	if(argument->child[1] == NULL) expr = argument->child[0]; else expr = argument->child[1];
 	
-	dataType_t tpar = parameter_id->node->symbol->dataType;
+	dataType_t tpar = identifier->node->symbol->dataType;
 	dataType_t targ = typecheck(expr);
 	
 	return tpar == targ;
@@ -147,30 +147,42 @@ int check_parameters(AST* parameters, AST* arguments, int* expected, int* given)
 	*given = 0;
 	int types_are_correct = 1;
 	
-	while(!finished(parameter) && !finished(argument))
+	while(1)
 	{
+		if(parameter->child[0] == NULL || argument->child[0] == NULL)
+			break;
+			
 		if(!same_types(parameter, argument))
-		{
 			types_are_correct = 0;
+			
+		expected++; given++;
+			
+		if(parameter->child[2] == NULL)
+			break;
+			
+		if(argument->child[1] == NULL)
+			break;
+			
+		parameter = parameter->child[2]; argument = argument->child[1];
+	}
+	
+	if(parameter->child[0] != NULL)
+	{
+		while(parameter->child[2] != NULL)
+		{
+			expected++; parameter = parameter->child[2];
 		}
-		
-		parameter = next_item(parameter);
-		expected++;
-		argument = next_item(argument);
-		given++;
 	}
 	
-	while(!finished(parameter))
+	if(argument->child[0] != NULL)
 	{
-		parameter = next_item(parameter);
-		expected++;
+		while(argument->child[1] != NULL)
+		{
+			given++; argument = argument->child[1];
+		}
 	}
 	
-	while(!finished(argument))
-	{
-		argument = next_item(argument);
-		given++;
-	}
+	return types_are_correct;
 }
 
 int typecheck(AST* ast)
