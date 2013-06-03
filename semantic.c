@@ -230,15 +230,12 @@ int check_parameters(AST* parameters, AST* arguments, int* expected, int* given)
 			break;
 			
 		if(!same_types(parameter, argument))
+		{
 			types_are_correct = 0;
+			break;
+		}
 			
 		(*expected)++; (*given)++;
-			
-		if(parameter->child[2] == NULL)
-			break;
-			
-		if(argument->child[1] == NULL)
-			break;
 			
 		parameter = parameter->child[2]; argument = argument->child[1];
 	}
@@ -258,8 +255,6 @@ int check_parameters(AST* parameters, AST* arguments, int* expected, int* given)
 			(*given)++; argument = argument->child[0];
 		}
 	}
-
-	fprintf(stderr,"expected: %d given %d\n",*expected,*given);
 	
 	return types_are_correct;
 }

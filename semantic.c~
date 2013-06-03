@@ -230,32 +230,36 @@ int check_parameters(AST* parameters, AST* arguments, int* expected, int* given)
 			break;
 			
 		if(!same_types(parameter, argument))
+		{
 			types_are_correct = 0;
+			break;
+		}
 			
 		(*expected)++; (*given)++;
-			
+		/*
 		if(parameter->child[2] == NULL)
 			break;
 			
 		if(argument->child[1] == NULL)
 			break;
+		*/
 			
 		parameter = parameter->child[2]; argument = argument->child[1];
 	}
 	
 	if(parameter->child[0] != NULL)
 	{
-		while(parameter->child[2] != NULL)
+		while(parameter->child[0] != NULL)
 		{
-			(*expected)++; parameter = parameter->child[2];
+			(*expected)++; parameter = parameter->child[0];
 		}
 	}
 	
 	if(argument->child[0] != NULL)
 	{
-		while(argument->child[1] != NULL)
+		while(argument->child[0] != NULL)
 		{
-			(*given)++; argument = argument->child[1];
+			(*given)++; argument = argument->child[0];
 		}
 	}
 
