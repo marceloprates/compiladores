@@ -115,7 +115,16 @@ void first_pass(AST* ast)
 	}
 }
 
+int check_parameters(AST* arguments, AST* parameters, int* expected, int* given)
+{
+	if(arguments->node->symbol->type != ARGUMENTLIST || parameters->node->symbol->type != PARAMETERLIST)
+	{
+		fprintf(stderr, "ASSERTION FAILURE!!");
+		exit(3);
+	}
 
+	
+}
 
 int typecheck(AST* ast)
 {
@@ -367,7 +376,7 @@ int typecheck(AST* ast)
 				{
 					int expected; int given;
 
-					int types_are_correct = check_parameters(function_entry->declaration, ast->child[1], &expected, &given);
+					int types_are_correct = check_parameters(function_entry->declaration->child[0]->child[2], ast->child[1], &expected, &given);
 
 					if(expected != given)
 					{
