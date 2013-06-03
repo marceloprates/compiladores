@@ -1,4 +1,3 @@
-
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -115,7 +114,26 @@ void first_pass(AST* ast)
 	}
 }
 
-int check_parameters(AST* arguments, AST* parameters, int* expected, int* given)
+int finished(AST* ast)
+{
+	return ast->child[2] == NULL;
+}
+
+int same_types(AST* parameter, AST* argument)
+{
+	symbol_t identifier;
+	symbol_t expr;
+	
+	if(parameter->child[2] == NULL) identifier = parameter->child[1]; else identifier = parameter->child[2];
+	if(argument->child[2] == NULL) expr = argument->child[0]; else expr = argument->child[1];
+	
+	dataType_t tpar = parameter_id->node->symbol->dataType;
+	dataType_t targ = typecheck(expr);
+	
+	return tpar == targ;
+}
+
+int check_parameters(AST* parameters, AST* arguments, int* expected, int* given)
 {
 	if(arguments->node->symbol->type != ARGUMENTLIST || parameters->node->symbol->type != PARAMETERLIST)
 	{
@@ -123,7 +141,36 @@ int check_parameters(AST* arguments, AST* parameters, int* expected, int* given)
 		exit(3);
 	}
 
+	AST* parameter = parameters;
+	AST* argument = arguments;
+	*expected = 0;
+	*given = 0;
+	int types_are_correct = 1;
 	
+	while(!finished(parameter) && !finished(argument))
+	{
+		if(!same_types(parameter, argument))
+		{
+			types_are_correct = 0;
+		}
+		
+		parameter = next_item(parameter);
+		expected++;
+		argument = next_item(argument);
+		given++;
+	}
+	
+	while(!finished(parameter))
+	{
+		parameter = next_item(parameter);
+		expected++;
+	}
+	
+	while(!finished(argument))
+	{
+		argument = next_item(argument);
+		given++;
+	}
 }
 
 int typecheck(AST* ast)
