@@ -73,6 +73,7 @@ void first_pass(AST* ast)
 					function_entry->marked = TRUE;
 					function_entry->dataType = FUNCTION_TYPE;
 					function_entry-> declaration = ast;
+					function_entry->nature = FUNCTION;
 
 					AST* returnTypeAST = headerAST->child[0];
 					
@@ -97,6 +98,8 @@ void first_pass(AST* ast)
 							break;
 						}
 					}
+
+					declare_parameters(ast);	
 				}
 
 				break;
@@ -114,15 +117,94 @@ void first_pass(AST* ast)
 	}
 }
 
+int declare_parameters(AST* fun_def)
+{
+	//char* function_name = fun_def->child[0]->child[0]->node->symbol.text;
+	AST* parameter = fun_def->child[0]->child[2];
+	AST* identifier;
+	symbol_t* variable_entry;
+
+	while(TRUE)
+	{
+		if(parameter->child[0] == NULL)
+		{
+			break;
+		}
+
+		if(parameter->child[2] == NULL)
+		{
+			identifier = parameter->child[1];
+		}
+		else
+		{
+			identifier = parameter->child[2];
+		}
+
+		
+		variable_entry = &(identifier->node->symbol);
+
+		if(variable_entry->marked == TRUE)
+		{
+			fprintf(stderr,"(SEMANTIC) Variable > %s < is already defined\n", variable_entry->text);
+		}
+		else
+		{
+			variable_entry->marked = TRUE;
+			variable_entry->declaration = fun_def;
+			//variable_entry->scope = (char*)malloc(sizeof(function_name));
+			//sprintf(variable_entry->scope,"%s",function_name);
+
+			switch(fun_def->child[0]->child[0]->node_type)
+			{
+				case TYPEWORD:
+				{
+					variable_entry->dataType = INTEGER;
+
+					break;
+				}
+				case TYPEBYTE:
+				{
+					variable_entry->dataType = INTEGER;
+
+					break;
+				}
+				case TYPEBOOL:
+				{
+					variable_entry->dataType = BOOL;
+
+					break;
+				}
+			}
+		}
+
+		parameter = parameter->child[0];		
+	}
+}
+
 int same_types(AST* parameter, AST* argument)
 {
-	symbol_t identifier;
-	symbol_t expr;
+	AST* identifier;
+	AST* expr;
 	
-	if(parameter->child[2] == NULL) identifier = parameter->child[1]; else identifier = parameter->child[2];
-	if(argument->child[1] == NULL) expr = argument->child[0]; else expr = argument->child[1];
+	if(parameter->child[2] == NULL)
+	{
+		identifier = parameter->child[1];
+	}
+	else
+	{
+		identifier = parameter->child[2];
+	}
 	
-	dataType_t tpar = identifier->node->symbol->dataType;
+	if(argument->child[1] == NULL)
+	{
+		expr = argument->child[0];
+	}
+	else
+	{
+		expr = argument->child[1];
+	}
+	
+	dataType_t tpar = identifier->node->symbol.dataType;
 	dataType_t targ = typecheck(expr);
 	
 	return tpar == targ;
@@ -130,7 +212,7 @@ int same_types(AST* parameter, AST* argument)
 
 int check_parameters(AST* parameters, AST* arguments, int* expected, int* given)
 {
-	if(arguments->node->symbol->type != ARGUMENTLIST || parameters->node->symbol->type != PARAMETERLIST)
+	if(arguments->node_type != ARGUMENTLIST || parameters->node_type != PARAMETERLIST)
 	{
 		fprintf(stderr, "ASSERTION FAILURE!!");
 		exit(3);
@@ -140,7 +222,7 @@ int check_parameters(AST* parameters, AST* arguments, int* expected, int* given)
 	AST* argument = arguments;
 	*expected = 0;
 	*given = 0;
-	int types_are_correct = 1;
+	int types_are_correct = 1;	
 	
 	while(1)
 	{
@@ -148,32 +230,29 @@ int check_parameters(AST* parameters, AST* arguments, int* expected, int* given)
 			break;
 			
 		if(!same_types(parameter, argument))
+		{
 			types_are_correct = 0;
-			
-		expected++; given++;
-			
-		if(parameter->child[2] == NULL)
 			break;
+		}
 			
-		if(argument->child[1] == NULL)
-			break;
+		(*expected)++; (*given)++;
 			
 		parameter = parameter->child[2]; argument = argument->child[1];
 	}
 	
 	if(parameter->child[0] != NULL)
 	{
-		while(parameter->child[2] != NULL)
+		while(parameter->child[0] != NULL)
 		{
-			expected++; parameter = parameter->child[2];
+			(*expected)++; parameter = parameter->child[0];
 		}
 	}
 	
 	if(argument->child[0] != NULL)
 	{
-		while(argument->child[1] != NULL)
+		while(argument->child[0] != NULL)
 		{
-			given++; argument = argument->child[1];
+			(*given)++; argument = argument->child[0];
 		}
 	}
 	

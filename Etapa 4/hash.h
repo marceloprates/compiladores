@@ -19,7 +19,7 @@
 
 #include "ast.h"
 
-enum dataType_e
+/*enum dataType_e
 {
 	INTEGER,
 	BOOL,
@@ -27,7 +27,7 @@ enum dataType_e
 	BOOL_POINTER,
 	NO_TYPE,
 	FUNCTION_TYPE,
-};
+};*/
 
 enum nature_e
 {
@@ -38,7 +38,7 @@ enum nature_e
 
 typedef int type_t;
 
-typedef enum dataType_e dataType_t;
+//typedef enum dataType_e dataType_t;
 
 typedef enum nature_e nature_t;
 
@@ -61,6 +61,7 @@ struct symbol_s
 	dataType_t returnType;
 	int marked;
 	AST* declaration;
+	char* scope;
 };
 
 struct linkedList_s
@@ -74,6 +75,8 @@ typedef struct symbol_s symbol_t;
 typedef struct linkedList_s linkedList_t;
 
 typedef linkedList_t** hashTable_ref;
+
+
 
 // Symbol module
 

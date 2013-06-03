@@ -1,8 +1,11 @@
 // UFRGS - Compiladores - Marcelo Johann - 2013/1
 
-word a: 1;
+word f1(word a, word b)
+{
+	return 1;
+}
 
 word main()
 {
-  return 1;
+  return f1(1,2,TRUE);
 }

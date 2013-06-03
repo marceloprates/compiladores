@@ -6,8 +6,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "hash.h"
-
 enum nodeType_e
 {
 	IDENTIFIER,
@@ -53,12 +51,24 @@ enum nodeType_e
 	PROGRAM
 };
 
+enum dataType_e
+{
+	INTEGER,
+	BOOL,
+	INTEGER_POINTER,
+	BOOL_POINTER,
+	NO_TYPE,
+	FUNCTION_TYPE,
+};
+
+typedef enum dataType_e dataType_t;
+
 typedef enum nodeType_e nodeType_t;
 
 struct AST_struct
 {
 	nodeType_t node_type;
-	linkedList_t* node;
+	struct linkedList_s* node;
 
 	dataType_t dataType;
 
@@ -68,12 +78,14 @@ struct AST_struct
 
 typedef struct AST_struct AST;
 
-AST* CreateAST(nodeType_t node_type, linkedList_t* node, AST* child_0, AST* child_1, AST* child_2, AST* child_3);
-AST* CreateAST0(nodeType_t node_type, linkedList_t* node);
-AST* CreateAST1(nodeType_t node_type, linkedList_t* node, AST* child_0);
-AST* CreateAST2(nodeType_t node_type, linkedList_t* node, AST* child_0, AST* child_1);
-AST* CreateAST3(nodeType_t node_type, linkedList_t* node, AST* child_0, AST* child_1, AST* child_2);
-AST* CreateAST4(nodeType_t node_type, linkedList_t* node, AST* child_0, AST* child_1, AST* child_2, AST* child_3);
+#include "hash.h"
+
+AST* CreateAST(nodeType_t node_type,  struct linkedList_s* node, AST* child_0, AST* child_1, AST* child_2, AST* child_3);
+AST* CreateAST0(nodeType_t node_type, struct linkedList_s* node);
+AST* CreateAST1(nodeType_t node_type, struct linkedList_s* node, AST* child_0);
+AST* CreateAST2(nodeType_t node_type, struct linkedList_s* node, AST* child_0, AST* child_1);
+AST* CreateAST3(nodeType_t node_type, struct linkedList_s* node, AST* child_0, AST* child_1, AST* child_2);
+AST* CreateAST4(nodeType_t node_type, struct linkedList_s* node, AST* child_0, AST* child_1, AST* child_2, AST* child_3);
 char* NodeTypetoString(enum nodeType_e n);
 char* ASTtoString(AST* ast, int level);
 char* toSource(AST* ast);
