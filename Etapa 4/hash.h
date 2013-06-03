@@ -17,6 +17,8 @@
 #define FALSE 0
 #define TRUE 1
 
+#include "ast.h"
+
 enum dataType_e
 {
 	INTEGER,
@@ -57,6 +59,7 @@ struct symbol_s
 	nature_t nature;
 	dataType_t returnType;
 	int marked;
+	AST* declaration;
 };
 
 struct linkedList_s

@@ -25,6 +25,7 @@ void first_pass(AST* ast)
 				else
 				{
 					variable_entry->marked = TRUE;
+					variable_entry->declaration = ast;
 
 					switch(ast->child[0]->node_type)
 					{
@@ -72,6 +73,7 @@ void first_pass(AST* ast)
 				{
 					function_entry->marked = TRUE;
 					function_entry->dataType = FUNCTION_TYPE;
+					function_entry-> declaration = ast;
 
 					AST* returnTypeAST = headerAST->child[0];
 					
@@ -112,6 +114,8 @@ void first_pass(AST* ast)
 		}
 	}
 }
+
+
 
 int typecheck(AST* ast)
 {
@@ -350,22 +354,55 @@ int typecheck(AST* ast)
 			}
 			//case REF:
 			//case DEREF:
-			/*case FUNCTIONCALL:
+			case FUNCTIONCALL:
 			{
-				symbol_t* function_entry = &(ast->child[1]->node->symbol);
+				symbol_t* function_entry = &(ast->child[0]->node->symbol);
 
-				if(function_entry.nature != FUNCTION)
+				if(function_entry->nature != FUNCTION)
 				{
-					fprintf(stderr,"(SEMANTIC) Value > %s < is not a function\n", symbol->text);
+					fprintf(stderr,"(SEMANTIC) Value > %s < is not a function\n", function_entry->text);
+					return NO_TYPE;
 				}
 				else
 				{
-					checkParameters(symbol.declaration, ast->child[2]);
+					int expected; int given;
+
+					int types_are_correct = check_parameters(function_entry->declaration, ast->child[1], &expected, &given);
+
+					if(expected != given)
+					{
+						fprintf(stderr,"(SEMANTIC) Function > %s < expected %d parameters, but given %d\n", function_entry->text, expected, given);
+					}
+					else if(!types_are_correct)
+					{
+						fprintf(stderr,"(SEMANTIC) Incorrect types for parameters of function > %s <\n", function_entry->text);
+					}
+
+					return function_entry->returnType;
 				}
 
 				break;
-			}*/
-			//case ARRAYACCESS:
+			}
+			case ARRAYACCESS:
+			{
+				symbol_t* array_entry = &(ast->child[0]->node->symbol);
+
+				if(array_entry->nature != ARRAY)
+				{
+					fprintf(stderr,"(SEMANTIC) Value > %s < is not an array\n", array_entry->text);
+				}
+
+				int t1 = typecheck(ast->child[1]);
+
+				if(t1 != INTEGER)
+				{
+					fprintf(stderr,"(SEMANTIC) Array indices must be integer types");
+				}
+				
+				return array_entry->dataType;
+
+				break;
+			}
 			//case ARGUMENTLIST:
 			//case RETURN:
 			//case ELEMENTLIST:
