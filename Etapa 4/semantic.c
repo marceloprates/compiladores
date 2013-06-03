@@ -114,11 +114,6 @@ void first_pass(AST* ast)
 	}
 }
 
-int finished(AST* ast)
-{
-	return ast->child[2] == NULL;
-}
-
 int same_types(AST* parameter, AST* argument)
 {
 	symbol_t identifier;
@@ -420,8 +415,46 @@ int typecheck(AST* ast)
 
 				break;
 			}
-			//case REF:
-			//case DEREF:
+			case REF:
+			{
+				dataType_t dataType = typecheck(ast->child[0]);
+
+				if(dataType == INTEGER)
+				{
+					return INTEGER_POINTER;
+				}
+				else if(dataType == BOOL)
+				{
+					return BOOL_POINTER;
+				}
+				else
+				{
+					fprintf(stderr,"(SEMANTIC) Attempting to make reference out of non-scalar variable: &%d\n", dataType);
+					return NO_TYPE;
+				}
+
+				break;
+			}
+			case DEREF:
+			{
+				dataType_t dataType = typecheck(ast->child[0]);
+
+				if(dataType == INTEGER_POINTER)
+				{
+					return INTEGER;
+				}
+				else if(dataType == BOOL_POINTER)
+				{
+					return BOOL;
+				}
+				else
+				{
+					fprintf(stderr,"(SEMANTIC) Attempting to dereference a non-pointer type: *%d\n", dataType);
+					return NO_TYPE;
+				}
+
+				break;
+			}
 			case FUNCTIONCALL:
 			{
 				symbol_t* function_entry = &(ast->child[0]->node->symbol);
