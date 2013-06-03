@@ -23,6 +23,7 @@ int main(int argc, char** argv)
 	yyparse();
 
 	first_pass(root);
+	typecheck(root);
 
 	close_input();
 

@@ -20,7 +20,9 @@
 enum dataType_e
 {
 	INTEGER,
-	BOOL
+	BOOL,
+	NO_TYPE,
+	FUNCTION_TYPE,
 };
 
 enum nature_e
@@ -29,7 +31,7 @@ enum nature_e
 	POINTER,
 	ARRAY,
 	FUNCTION
-}
+};
 
 typedef int type_t;
 
@@ -53,6 +55,7 @@ struct symbol_s
 	type_t type;
 	dataType_t dataType;
 	nature_t nature;
+	dataType_t returnType;
 	int marked;
 };
 
