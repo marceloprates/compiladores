@@ -904,7 +904,7 @@ int typecheck(AST* ast)
 			//case PROGRAM:
 			default:
 			{
-				errorCount++; fprintf(stderr, "MISSING CASE! ABORT!");
+				//errorCount++; fprintf(stderr, "MISSING CASE! ABORT!");
 				typecheck(ast->child[0]);
 				typecheck(ast->child[1]);
 				typecheck(ast->child[2]);
@@ -994,7 +994,7 @@ int verify(AST* ast)
 
 				if(t != INTEGER && t != BOOL)
 				{
-					errorCount++; fprintf(stderr,"(SEMANTIC) Input must use a scalar variable on line %d\n", tstr, ast->lineNumber);
+					errorCount++; fprintf(stderr,"(SEMANTIC) Input must use a scalar variable on line %d\n", ast->lineNumber);
 					return FALSE;
 				}
 
