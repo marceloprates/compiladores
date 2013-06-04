@@ -1,0 +1,34 @@
+
+word magic: 1;
+word love: 1;
+bool unicorn: TRUE;
+bool fun: TRUE;
+
+bool princesscelestia()
+{
+	return TRUE;
+}
+
+bool nightmaremoon()
+{
+	return FALSE;
+}
+
+word main()
+{
+	// deve funcionar
+	magic = 42;
+	unicorn = TRUE;
+
+	// não deve funcionar
+	magic = FALSE;
+	unicorn = 0;
+
+	// deve funcionar
+	magic = love;
+	unicorn = fun;
+
+	// não deve funcionar
+	princesscelestia = nightmaremoon;
+}
+

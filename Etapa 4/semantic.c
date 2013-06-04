@@ -3,6 +3,10 @@
 
 #include "semantic.h"
 
+struct symbol_s globalScope;
+
+struct symbol_s* currentScope;
+
 void first_pass(AST* ast)
 {
 	if(ast == NULL)
@@ -25,6 +29,8 @@ void first_pass(AST* ast)
 				{
 					variable_entry->marked = TRUE;
 					variable_entry->declaration = ast;
+					variable_entry->nature = SCALAR;
+					variable_entry->scope = &globalScope;
 
 					switch(ast->child[0]->node_type)
 					{
@@ -52,7 +58,75 @@ void first_pass(AST* ast)
 
 					if(literal_entry->dataType != variable_entry->dataType)
 					{
-						fprintf(stderr, "(SEMANTIC) Incompatible types in declaration: %d %s: %d\n", variable_entry->dataType, variable_entry->text, literal_entry->dataType);
+						char t1str[80];
+						char t2str[80];
+						typeToString(variable_entry->dataType,t1str);
+						typeToString(literal_entry->dataType,t2str);
+
+						fprintf(stderr, "(SEMANTIC) Incompatible types in declaration: %s %s: %s\n", t1str, variable_entry->text, t2str);
+					}
+				}
+
+				break;
+			}
+			case ARRAYDECLARATION:
+			{
+				symbol_t* variable_entry = &(ast->child[1]->node->symbol);
+
+				if(variable_entry->marked == TRUE)
+				{
+					fprintf(stderr,"(SEMANTIC) Variable > %s < is already defined\n", variable_entry->text);
+				}
+				else
+				{
+					variable_entry->marked = TRUE;
+					variable_entry->declaration = ast;
+					variable_entry->nature = ARRAY;
+					variable_entry->scope = &globalScope;
+
+					switch(ast->child[0]->node_type)
+					{
+						case TYPEWORD:
+						{
+							variable_entry->dataType = INTEGER;
+
+							break;
+						}
+						case TYPEBYTE:
+						{
+							variable_entry->dataType = INTEGER;
+
+							break;
+						}
+						case TYPEBOOL:
+						{
+							variable_entry->dataType = BOOL;
+
+							break;
+						}
+					}
+
+					AST* ptr = ast->child[3];
+	
+					while(ptr != NULL)
+					{
+						if(ptr->child[0] == NULL)
+						{
+							break;
+						}
+	
+						if(ptr->child[1]->child[0]->node->symbol.dataType != variable_entry->dataType)
+						{
+							char t0str[80];
+							char t1str[80];
+
+							//typeToString(variable_entry->dataType, t0str);
+							//typeToString(ptr->child[1]->child[0]->node->symbol.dataType, t1str);
+	
+							//fprintf(stderr,"(SEMANTIC) Expected only %s values on %s array >%s< initializer, but found %s instead\n", t0str, t0str, variable_entry->text, t1str);
+						}
+	
+						ptr = ptr->child[1];
 					}
 				}
 
@@ -74,6 +148,7 @@ void first_pass(AST* ast)
 					function_entry->dataType = FUNCTION_TYPE;
 					function_entry-> declaration = ast;
 					function_entry->nature = FUNCTION;
+					function_entry->scope = &globalScope;
 
 					AST* returnTypeAST = headerAST->child[0];
 					
@@ -99,7 +174,7 @@ void first_pass(AST* ast)
 						}
 					}
 
-					declare_parameters(ast);	
+					local_declarations(ast);	
 				}
 
 				break;
@@ -117,44 +192,49 @@ void first_pass(AST* ast)
 	}
 }
 
-int declare_parameters(AST* fun_def)
+int local_declarations(AST* fun_def)
 {
-	//char* function_name = fun_def->child[0]->child[0]->node->symbol.text;
-	AST* parameter = fun_def->child[0]->child[2];
-	AST* identifier;
-	symbol_t* variable_entry;
+	AST* parameters = fun_def->child[0]->child[2];
+	AST* local_decs = fun_def->child[1];
 
+	AST* type;
+	AST* identifier;
+	AST* literal;
+
+	symbol_t* variable_entry;
+	symbol_t* literal_entry;
+
+	// formal parameters
 	while(TRUE)
 	{
-		if(parameter->child[0] == NULL)
+		if(parameters->child[0] == NULL)
 		{
 			break;
 		}
 
-		if(parameter->child[2] == NULL)
+		if(parameters->child[2] == NULL)
 		{
-			identifier = parameter->child[1];
+			type = parameters->child[0];
+			identifier = parameters->child[1];
 		}
 		else
 		{
-			identifier = parameter->child[2];
+			type = parameters->child[1];
+			identifier = parameters->child[2];
 		}
-
 		
 		variable_entry = &(identifier->node->symbol);
 
-		if(variable_entry->marked == TRUE)
+		if(variable_entry->marked == TRUE)// && exists_in_scope(variable_entry,currentScope))
 		{
 			fprintf(stderr,"(SEMANTIC) Variable > %s < is already defined\n", variable_entry->text);
 		}
 		else
 		{
 			variable_entry->marked = TRUE;
-			variable_entry->declaration = fun_def;
-			//variable_entry->scope = (char*)malloc(sizeof(function_name));
-			//sprintf(variable_entry->scope,"%s",function_name);
+			variable_entry->scope = &(fun_def->child[0]->child[1]->node->symbol);
 
-			switch(fun_def->child[0]->child[0]->node_type)
+			switch(type->node_type)
 			{
 				case TYPEWORD:
 				{
@@ -177,7 +257,57 @@ int declare_parameters(AST* fun_def)
 			}
 		}
 
-		parameter = parameter->child[0];		
+		parameters = parameters->child[0];		
+	}
+
+	// local declarations
+	while(TRUE)
+	{
+		if(local_decs->child[0] == NULL)
+		{
+			break;
+		}
+
+		type = local_decs->child[1]->child[0];
+		identifier = local_decs->child[1]->child[1];
+		literal = local_decs->child[1]->child[2];
+
+		variable_entry = &(identifier->node->symbol);
+		literal_entry = &(literal->node->symbol);
+
+		variable_entry->marked = TRUE;
+		variable_entry->scope = &(fun_def->child[0]->child[1]->node->symbol);
+
+		switch(type->node_type)
+		{
+			case TYPEWORD:
+			{
+				variable_entry->dataType = INTEGER;
+				break;
+			}
+			case TYPEBYTE:
+			{
+				variable_entry->dataType = INTEGER;
+				break;
+			}
+			case TYPEBOOL:
+			{
+				variable_entry->dataType = BOOL;
+				break;
+			}
+		}
+
+		if(variable_entry->dataType != literal_entry->dataType)
+		{
+			char t1str[80];
+			char t2str[80];
+			typeToString(variable_entry->dataType,t1str);
+			typeToString(literal_entry->dataType,t2str);
+
+			fprintf(stderr, "(SEMANTIC) Incompatible types in declaration: %s %s: %s\n", t1str, variable_entry->text, t2str);
+		}
+
+		local_decs = local_decs->child[0];
 	}
 }
 
@@ -186,7 +316,7 @@ int compatible(dataType_t t0, dataType_t t1)
 	int t0_is_pointer = t0 == INTEGER_POINTER || t0 == BOOL_POINTER;
 	int t1_is_pointer = t1 == INTEGER_POINTER || t1 == BOOL_POINTER;
 	
-	return t0 == t1 || (t0_is_pointer && t1_is_pointer)
+	return t0 == t1 || (t0_is_pointer && t1_is_pointer);
 }
 
 int same_types(AST* parameter, AST* argument)
@@ -245,7 +375,7 @@ int check_parameters(AST* parameters, AST* arguments, int* expected, int* given)
 			
 		(*expected)++; (*given)++;
 			
-		parameter = parameter->child[2]; argument = argument->child[1];
+		parameter = parameter->child[0]; argument = argument->child[0];
 	}
 	
 	if(parameter->child[0] != NULL)
@@ -279,7 +409,7 @@ int typecheck(AST* ast)
 		{
 			case IDENTIFIER:
 			{
-				if(ast->node->symbol.marked == FALSE)
+				if(ast->node->symbol.marked == FALSE)// || !exists_in_scope(&(ast->node->symbol),currentScope) )
 				{
 					fprintf(stderr,"(SEMANTIC) Variable > %s < is not yet defined\n", ast->node->symbol.text);
 
@@ -305,7 +435,12 @@ int typecheck(AST* ast)
 
 				if(t0 != INTEGER || t1 != INTEGER)
 				{
-					fprintf(stderr,"(SEMANTIC) Incompatible types for aritimetic operation: %d + %d\n", t0, t1);
+					char t0str[80];
+					char t1str[80];
+					typeToString(t0,t0str);
+					typeToString(t1,t1str);
+
+					fprintf(stderr,"(SEMANTIC) Incompatible types for aritimetic operation: %s + %s\n", t0str, t1str);
 					return NO_TYPE;
 				}
 				else
@@ -322,7 +457,12 @@ int typecheck(AST* ast)
 
 				if(t0 != INTEGER || t1 != INTEGER)
 				{
-					fprintf(stderr,"(SEMANTIC) Incompatible types for aritimetic operation: %d - %d\n", t0, t1);
+					char t0str[80];
+					char t1str[80];
+					typeToString(t0,t0str);
+					typeToString(t1,t1str);
+
+					fprintf(stderr,"(SEMANTIC) Incompatible types for aritimetic operation: %s - %s\n", t0str, t1str);
 					return NO_TYPE;
 				}
 				else
@@ -339,7 +479,12 @@ int typecheck(AST* ast)
 
 				if(t0 != INTEGER || t1 != INTEGER)
 				{
-					fprintf(stderr,"(SEMANTIC) Incompatible types for aritimetic operation: %d * %d\n", t0, t1);
+					char t0str[80];
+					char t1str[80];
+					typeToString(t0,t0str);
+					typeToString(t1,t1str);
+
+					fprintf(stderr,"(SEMANTIC) Incompatible types for aritimetic operation: %s * %s\n", t0str, t1str);
 					return NO_TYPE;
 				}
 				else
@@ -356,7 +501,12 @@ int typecheck(AST* ast)
 
 				if(t0 != INTEGER || t1 != INTEGER)
 				{
-					fprintf(stderr,"(SEMANTIC) Incompatible types for aritimetic operation: %d / %d\n", t0, t1);
+					char t0str[80];
+					char t1str[80];
+					typeToString(t0,t0str);
+					typeToString(t1,t1str);
+
+					fprintf(stderr,"(SEMANTIC) Incompatible types for aritimetic operation: %s / %s\n", t0str, t1str);
 					return NO_TYPE;
 				}
 				else
@@ -373,7 +523,12 @@ int typecheck(AST* ast)
 
 				if(t0 != INTEGER || t1 != INTEGER)
 				{
-					fprintf(stderr,"(SEMANTIC) Incompatible types for relational operation: %d < %d\n", t0, t1);
+					char t0str[80];
+					char t1str[80];
+					typeToString(t0,t0str);
+					typeToString(t1,t1str);
+
+					fprintf(stderr,"(SEMANTIC) Incompatible types for relational operation: %s < %s\n", t0str, t1str);
 					return NO_TYPE;
 				}
 				else
@@ -390,7 +545,12 @@ int typecheck(AST* ast)
 
 				if(t0 != INTEGER || t1 != INTEGER)
 				{
-					fprintf(stderr,"(SEMANTIC) Incompatible types for relational operation: %d > %d\n", t0, t1);
+					char t0str[80];
+					char t1str[80];
+					typeToString(t0,t0str);
+					typeToString(t1,t1str);
+
+					fprintf(stderr,"(SEMANTIC) Incompatible types for relational operation: %s > %s\n", t0str, t1str);
 					return NO_TYPE;
 				}
 				else
@@ -407,7 +567,12 @@ int typecheck(AST* ast)
 
 				if(t0 != INTEGER || t1 != INTEGER)
 				{
-					fprintf(stderr,"(SEMANTIC) Incompatible types for relational operation: %d <= %d\n", t0, t1);
+					char t0str[80];
+					char t1str[80];
+					typeToString(t0,t0str);
+					typeToString(t1,t1str);
+
+					fprintf(stderr,"(SEMANTIC) Incompatible types for relational operation: %s <= %s\n", t0str, t1str);
 					return NO_TYPE;
 				}
 				else
@@ -424,7 +589,12 @@ int typecheck(AST* ast)
 
 				if(t0 != INTEGER || t1 != INTEGER)
 				{
-					fprintf(stderr,"(SEMANTIC) Incompatible types for relational operation: %d >= %d\n", t0, t1);
+					char t0str[80];
+					char t1str[80];
+					typeToString(t0,t0str);
+					typeToString(t1,t1str);
+
+					fprintf(stderr,"(SEMANTIC) Incompatible types for relational operation: %s >= %s\n", t0str, t1str);
 					return NO_TYPE;
 				}
 				else
@@ -441,7 +611,12 @@ int typecheck(AST* ast)
 
 				if(t0 != INTEGER || t1 != INTEGER)
 				{
-					fprintf(stderr,"(SEMANTIC) Incompatible types for relational operation: %d == %d\n", t0, t1);
+					char t0str[80];
+					char t1str[80];
+					typeToString(t0,t0str);
+					typeToString(t1,t1str);
+
+					fprintf(stderr,"(SEMANTIC) Incompatible types for relational operation: %s == %s\n", t0str, t1str);
 					return NO_TYPE;
 				}
 				else
@@ -458,7 +633,12 @@ int typecheck(AST* ast)
 
 				if(t0 != INTEGER || t1 != INTEGER)
 				{
-					fprintf(stderr,"(SEMANTIC) Incompatible types for relational operation: %d != %d\n", t0, t1);
+					char t0str[80];
+					char t1str[80];
+					typeToString(t0,t0str);
+					typeToString(t1,t1str);
+
+					fprintf(stderr,"(SEMANTIC) Incompatible types for relational operation: %s != %s\n", t0str, t1str);
 					return NO_TYPE;
 				}
 				else
@@ -475,7 +655,12 @@ int typecheck(AST* ast)
 
 				if(t0 != BOOL || t1 != BOOL)
 				{
-					fprintf(stderr,"(SEMANTIC) Incompatible types for boolean operation: %d && %d\n", t0, t1);
+					char t0str[80];
+					char t1str[80];
+					typeToString(t0,t0str);
+					typeToString(t1,t1str);
+
+					fprintf(stderr,"(SEMANTIC) Incompatible types for boolean operation: %s && %s\n", t0str, t1str);
 					return NO_TYPE;
 				}
 				else
@@ -492,7 +677,12 @@ int typecheck(AST* ast)
 
 				if(t0 != BOOL || t1 != BOOL)
 				{
-					fprintf(stderr,"(SEMANTIC) Incompatible types for boolean operation: %d || %d\n", t0, t1);
+					char t0str[80];
+					char t1str[80];
+					typeToString(t0,t0str);
+					typeToString(t1,t1str);
+
+					fprintf(stderr,"(SEMANTIC) Incompatible types for boolean operation: %s || %s\n", t0str, t1str);
 					return NO_TYPE;
 				}
 				else
@@ -516,7 +706,10 @@ int typecheck(AST* ast)
 				}
 				else
 				{
-					fprintf(stderr,"(SEMANTIC) Attempting to make reference out of non-scalar variable: &%d\n", dataType);
+					char t0str[80];
+					typeToString(dataType,t0str);
+
+					fprintf(stderr,"(SEMANTIC) Attempting to make reference out of non-scalar variable: &%s\n", t0str);
 					return NO_TYPE;
 				}
 
@@ -536,7 +729,10 @@ int typecheck(AST* ast)
 				}
 				else
 				{
-					fprintf(stderr,"(SEMANTIC) Attempting to dereference a non-pointer type: *%d\n", dataType);
+					char t0str[80];
+					typeToString(dataType,t0str);
+
+					fprintf(stderr,"(SEMANTIC) Attempting to dereference a non-pointer type: *%s\n", t0str);
 					return NO_TYPE;
 				}
 
@@ -655,14 +851,34 @@ int verify(AST* ast)
 			case ARRAYACCESS:
 			{
 				return typecheck(ast) != NO_TYPE;
+
+				break;
 			}
 			//case ARGUMENTLIST:
-			//case RETURN:
+			case RETURN:
+			{
+				int return_type = typecheck(ast->child[0]);
+
+				if(return_type != currentScope->returnType)
+				{
+					char t0str[80];
+					char t1str[80];
+
+					typeToString(return_type,t0str);
+					typeToString(currentScope->returnType,t1str);
+
+					fprintf(stderr,"(SEMANTIC) Incompatible return type for %s function >%s< : %s\n", t1str, currentScope->text, t0str);
+				}
+
+				currentScope = &globalScope;
+
+				break;
+			}
 			//case ELEMENTLIST:
 			//case OUTPUT:
 			//case INPUT:
-			case IFTHEN:
-			case IFTHENELSE:
+			//case IFTHEN:
+			//case IFTHENELSE:
 			case LOOP:
 			{
 				dataType_t t = typecheck(ast->child[0]);
@@ -674,6 +890,8 @@ int verify(AST* ast)
 				}
 				
 				return TRUE;
+
+				break;
 			}
 			case ASSIGNMENT:
 			{
@@ -688,11 +906,18 @@ int verify(AST* ast)
 				
 				if(varType != NO_TYPE && valType != NO_TYPE && !compatible(varType, valType))
 				{
-					fprintf(stderr,"(SEMANTIC) Incompatible type in assignment: %d = %d\n", varType, valType);
+					char t0str[80];
+					char t1str[80];
+					typeToString(varType,t0str);
+					typeToString(valType,t1str);
+
+					fprintf(stderr,"(SEMANTIC) Incompatible type in assignment: %s = %s\n", t0str, t1str);
 					return FALSE;
 				}
 				
 				return TRUE;
+
+				break;
 			}
 			//case COMMANDLIST:
 			//case BLOCK:
@@ -703,9 +928,70 @@ int verify(AST* ast)
 			//case LITERALLIST:
 			//case ARRAYDECLARATION:
 			//case DECLARATIONLIST:
-			//case FUNCTIONDEFINITION:
+			case FUNCTIONDEFINITION:
+			{
+				currentScope = &(ast->child[0]->child[1]->node->symbol);
+
+				verify(ast->child[2]);
+
+				break;
+			}
 			//case PROGRAM:
-			//default:
+			default:
+			{
+				verify(ast->child[0]);
+				verify(ast->child[1]);
+				verify(ast->child[2]);
+				verify(ast->child[3]);
+
+				break;
+			}
 		}
 	}
-} 
+}
+
+void initSemanticAnalyzer()
+{
+	globalScope.text = (char*)calloc(80,sizeof(char));
+	sprintf(globalScope.text, "@global");
+	addToTable(globalScope,symbolTable,SYMBOL_TABLE_SIZE);
+
+	currentScope = &globalScope;
+}
+
+void typeToString(int type, char* str)
+{
+	switch(type)
+	{
+		case INTEGER:
+		{
+			sprintf(str,"INTEGER");
+			break;
+		}
+		case BOOL:
+		{
+			sprintf(str,"BOOL");
+			break;
+		}
+		case INTEGER_POINTER:
+		{
+			sprintf(str,"INTEGER POINTER");
+			break;
+		}
+		case BOOL_POINTER:
+		{
+			sprintf(str,"BOOL POINTER");
+			break;
+		}
+		case NO_TYPE:
+		{
+			sprintf(str,"NO TYPE");
+			break;
+		}
+		case FUNCTION_TYPE:
+		{
+			sprintf(str,"FUNCTION TYPE");
+			break;
+		}
+	}
+}

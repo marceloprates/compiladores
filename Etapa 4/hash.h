@@ -61,7 +61,7 @@ struct symbol_s
 	dataType_t returnType;
 	int marked;
 	AST* declaration;
-	char* scope;
+	struct symbol_s* scope;
 };
 
 struct linkedList_s
@@ -76,7 +76,7 @@ typedef struct linkedList_s linkedList_t;
 
 typedef linkedList_t** hashTable_ref;
 
-
+hashTable_ref symbolTable;
 
 // Symbol module
 

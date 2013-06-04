@@ -1,0 +1,21 @@
+bool magic[2];
+word unicorn[2]: 1 2 1;
+word notAnArray: 1;
+
+word main()
+{
+	// deve funcionar
+	magic[3] = TRUE;
+	unicorn[4] = 100;
+	
+	// deve funcionar
+	output unicorn[4];
+	output magic[4];
+
+	// não deve funcionar
+	output notAnArray[4];
+
+	// não deve funcionar
+	unicorn[4] = FALSE;
+	magic[3] = 3;
+}

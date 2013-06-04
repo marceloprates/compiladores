@@ -1,0 +1,21 @@
+
+word main()
+	word a: 1;
+	word b: 1;
+	bool c: TRUE;
+{
+	// devem funcionar
+	output a * b;
+	output a / b;
+	output a - b;
+	output a + b;
+
+	// não devem funcionar
+	output a * c;
+	output a / c;
+	output a - c;
+	output a + c;
+
+	return 1;
+}
+

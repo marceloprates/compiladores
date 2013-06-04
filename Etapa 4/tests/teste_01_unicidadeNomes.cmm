@@ -1,0 +1,14 @@
+
+// não deve funcionar
+word a: 1;
+word a: 1;
+
+// não deve funcionar
+bool c: TRUE;
+word c: 1;
+
+word main() 
+{
+	return 1;
+}
+

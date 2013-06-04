@@ -1,0 +1,28 @@
+
+word main()
+  word a: 1;
+  word b: 1;
+  bool c: TRUE;
+  bool d: TRUE;
+{
+
+  // devem funcionar
+  output a <  b;
+  output a <= b;
+  output a >  b;
+  output a >= b;
+  output a == b;
+  output a != b;
+
+  // não devem funcionar
+  output c <  d;
+  output c <= d;
+  output c >  d;
+  output c >= d;
+  output c == d;
+  output c != d;
+
+  return 1;
+}
+
+

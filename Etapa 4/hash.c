@@ -5,8 +5,6 @@
 #include <string.h>
 #include "hash.h"
 
-hashTable_ref symbolTable;
-
 // Symbol module
 
 int equal(symbol_t symbol1, symbol_t symbol2)

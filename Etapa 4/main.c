@@ -22,8 +22,10 @@ int main(int argc, char** argv)
 
 	yyparse();
 
+	initSemanticAnalyzer();
 	first_pass(root);
-	typecheck(root);
+	//typecheck(root);
+	verify(root);
 
 	close_input();
 
