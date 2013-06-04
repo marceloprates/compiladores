@@ -1006,7 +1006,53 @@ int verify(AST* ast)
 				break;
 			}
 			case IFTHEN:
+			{
+				dataType_t t = typecheck(ast->child[0]);
+				
+				if(t != BOOL)
+				{
+					char tstr[80];
+					typeToString(t, tstr);
+
+					errorCount++; fprintf(stderr,"(SEMANTIC) Expected boolean expression in condition, got %s instead on line %d\n", tstr, ast->lineNumber);
+					return FALSE;
+				}
+				
+				if(verify(ast->child[1]))
+				{
+					return TRUE;
+				}
+				else
+				{
+					return FALSE;
+				}
+
+				break;
+			}
 			case IFTHENELSE:
+			{
+				dataType_t t = typecheck(ast->child[0]);
+				
+				if(t != BOOL)
+				{
+					char tstr[80];
+					typeToString(t, tstr);
+
+					errorCount++; fprintf(stderr,"(SEMANTIC) Expected boolean expression in condition, got %s instead on line %d\n", tstr, ast->lineNumber);
+					return FALSE;
+				}
+				
+				if(verify(ast->child[1]) && verify(ast->child[2]))
+				{
+					return TRUE;
+				}
+				else
+				{
+					return FALSE;
+				}
+
+				break;
+			}
 			case LOOP:
 			{
 				dataType_t t = typecheck(ast->child[0]);
@@ -1020,7 +1066,14 @@ int verify(AST* ast)
 					return FALSE;
 				}
 				
-				return TRUE;
+				if(verify(ast->child[1]))
+				{
+					return TRUE;
+				}
+				else
+				{
+					return FALSE;
+				}
 
 				break;
 			}
