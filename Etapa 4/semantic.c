@@ -309,6 +309,7 @@ int local_declarations(AST* fun_def)
 		else
 		{
 			variable_entry->marked = TRUE;
+			variable_entry->nature = SCALAR;
 			variable_entry->scope = &(fun_def->child[0]->child[1]->node->symbol);
 
 			switch(type->node_type)
