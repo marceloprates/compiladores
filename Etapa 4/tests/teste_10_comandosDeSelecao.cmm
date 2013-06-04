@@ -9,11 +9,17 @@ word main()
 	// deve funcionar
 	if (TRUE) then {};
 
+	// deve funcionar
+	if (TRUE) then {} else {};
+
 	// não deve funcionar
 	loop (1) {};
 
 	// não deve funcionar
 	if(1) then {};
+
+	// não deve funcionar
+	if (1) then {} else {};
   
 }
 
