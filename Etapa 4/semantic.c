@@ -415,6 +415,12 @@ int typecheck(AST* ast)
 
 					return NO_TYPE;
 				}
+				else if(ast->node->symbol.nature != SCALAR)
+				{
+					fprintf(stderr,"(SEMANTIC) Value > %s < is not a scalar variable\n", ast->node->symbol.text);
+
+					return NO_TYPE;
+				}
 				else
 				{
 					return ast->node->symbol.dataType;
@@ -854,7 +860,7 @@ int verify(AST* ast)
 
 				break;
 			}
-			//case ARGUMENTLIST:
+			//case ARGUMENTLIST: //nunca entra aqui
 			case RETURN:
 			{
 				int return_type = typecheck(ast->child[0]);
@@ -874,18 +880,44 @@ int verify(AST* ast)
 
 				break;
 			}
-			//case ELEMENTLIST:
-			//case OUTPUT:
-			//case INPUT:
-			//case IFTHEN:
-			//case IFTHENELSE:
+			//case ELEMENTLIST: //nunca entra aqui
+			case OUTPUT:
+			{
+				AST* elementList = ast->child[0];
+
+				if(elementList->child[0] == NULL)
+					return TRUE;
+				else if(elementList->child[1] == NULL)
+					return typecheck(elementList->child[0]) != NO_TYPE;
+				else
+				{
+					dataType_t t = typecheck(elementList->child[1]);
+					int restIsCorrect = verify(elementList->child[0]);
+
+					return t != NO_TYPE && restIsCorrect;
+				}
+
+				break;
+			}
+			case INPUT:
+			{
+				dataType_t t = typecheck(ast->child[0]);
+
+				return t == INTEGER || T == BOOL;
+				break;
+			}
+			case IFTHEN:
+			case IFTHENELSE:
 			case LOOP:
 			{
 				dataType_t t = typecheck(ast->child[0]);
 				
 				if(t != BOOL)
 				{
-					fprintf(stderr,"(SEMANTIC) Expected boolean type in condition\n");
+					char tstr[80];
+					typeToString(t, tstr);
+
+					fprintf(stderr,"(SEMANTIC) Expected boolean expression in condition, got %s instead\n", tstr);
 					return FALSE;
 				}
 				
@@ -897,12 +929,6 @@ int verify(AST* ast)
 			{
 				dataType_t varType = typecheck(ast->child[0]);
 				dataType_t valType = typecheck(ast->child[1]);
-				
-				if(ast->child[0]->node_type == IDENTIFIER && varType != NO_TYPE && ast->child[0]->node->symbol.nature != SCALAR)
-				{
-					fprintf(stderr,"(SEMANTIC) Value > %s < is not a variable\n", ast->child[0]->node->symbol.text);
-					return FALSE;
-				}
 				
 				if(varType != NO_TYPE && valType != NO_TYPE && !compatible(varType, valType))
 				{
@@ -919,9 +945,27 @@ int verify(AST* ast)
 
 				break;
 			}
-			//case COMMANDLIST:
-			//case BLOCK:
-			//case PARAMETERLIST:
+			case COMMANDLIST:
+			{
+				if(ast->child[0] == NULL)
+					return TRUE;
+				else if(ast->child[1] == NULL)
+					return verify(ast->child[0]);
+				else
+				{
+					int firstAreCorrect = verify(ast->child[0]);
+					int lastIsCorrect = verify(ast->child[1]);
+
+					return firstAreCorrect && lastIsCorrect;
+				}
+				break;
+			}
+			case BLOCK:
+			{
+				return verify(ast->child[0]);
+				break;
+			}
+			//case PARAMETERLIST: //nunca entra aqui
 			//case FUNCTIONHEADER:
 			//case DECLARATION:
 			//case POINTERDECLARATION:
