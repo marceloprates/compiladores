@@ -903,7 +903,7 @@ int typecheck(AST* ast)
 
 				if(t1 != INTEGER)
 				{
-					errorCount++; fprintf(stderr,"(SEMANTIC) Array indices must be integer types\n");
+					errorCount++; fprintf(stderr,"(SEMANTIC) Array indices must be integer types on line %d\n", ast->lineNumber);
 				}
 				
 				return array_entry->dataType;
