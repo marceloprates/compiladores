@@ -515,8 +515,22 @@ int typecheck(AST* ast)
 			{
 				int t0 = typecheck(ast->child[0]);
 				int t1 = typecheck(ast->child[1]);
+				int t0IsPointer = t0 == INTEGER_POINTER || t0 == BOOL_POINTER;
+				int t1IsPointer = t1 == INTEGER_POINTER || t1 == BOOL_POINTER;
 
-				if(t0 != INTEGER || t1 != INTEGER)
+				if(t0IsPointer && t1 == INTEGER)
+				{
+					return t0;
+				}
+				else if(t0 == INTEGER && t1IsPointer)
+				{
+					return t1;
+				}
+				else if(t0 == INTEGER || t1 == INTEGER)
+				{
+					return INTEGER;
+				}
+				else
 				{
 					char t0str[80];
 					char t1str[80];
@@ -525,10 +539,6 @@ int typecheck(AST* ast)
 
 					errorCount++; fprintf(stderr,"(SEMANTIC) Incompatible types for aritimetic operation: %s + %s on line %d\n", t0str, t1str);
 					return NO_TYPE;
-				}
-				else
-				{
-					return INTEGER;
 				}
 
 				break;
