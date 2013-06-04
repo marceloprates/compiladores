@@ -256,6 +256,7 @@ void first_pass(AST* ast)
 			}
 			default:
 			{
+				fprintf(stderr, "MISSING CASE! ABORT!");
 				first_pass(ast->child[0]);
 				first_pass(ast->child[1]);
 				first_pass(ast->child[2]);
@@ -891,6 +892,7 @@ int typecheck(AST* ast)
 			//case PROGRAM:
 			default:
 			{
+				fprintf(stderr, "MISSING CASE! ABORT!");
 				typecheck(ast->child[0]);
 				typecheck(ast->child[1]);
 				typecheck(ast->child[2]);
@@ -1041,23 +1043,41 @@ int verify(AST* ast)
 				break;
 			}
 			//case PARAMETERLIST: //nunca entra aqui
-			//case FUNCTIONHEADER:
-			//case DECLARATION:
-			//case POINTERDECLARATION:
-			//case LITERALLIST:
-			//case ARRAYDECLARATION:
-			//case DECLARATIONLIST:
+			//case FUNCTIONHEADER: //nunca entra aqui
+			//case DECLARATION: //nunca entra aqui
+			//case POINTERDECLARATION: //nunca entra aqui
+			//case LITERALLIST: //nunca entra aqui
+			//case ARRAYDECLARATION: //nunca entra aqui
+			//case DECLARATIONLIST: //nunca entra aqui
 			case FUNCTIONDEFINITION:
 			{
 				currentScope = &(ast->child[0]->child[1]->node->symbol);
 
-				verify(ast->child[2]);
+				return verify(ast->child[2]);
 
 				break;
 			}
-			//case PROGRAM:
+			case PROGRAM:
+			{
+				if(ast->child[0] == NULL)
+					return TRUE;
+				else
+				{
+					int lastIsCorrect;
+
+					if(ast->child[1]->node_type == FUNCTIONDEFINITION)
+						lastIsCorrect = verify(ast->child[1]);
+					else
+						lastIsCorrect = TRUE;
+
+					return verify(ast->child[0]) && lastIsCorrect;
+				}
+
+				break;
+			}
 			default:
 			{
+				fprintf(stderr, "MISSING CASE! ABORT!");
 				verify(ast->child[0]);
 				verify(ast->child[1]);
 				verify(ast->child[2]);
