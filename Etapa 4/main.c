@@ -27,6 +27,13 @@ int main(int argc, char** argv)
 	//typecheck(root);
 	verify(root);
 
+	int eCount = getErrorCount();
+
+	if(eCount > 0)
+	{
+		fprintf(stderr,"%d semantic errors\n", eCount);
+	}
+
 	close_input();
 
 	exit(0);
