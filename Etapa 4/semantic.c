@@ -3,6 +3,8 @@
 
 #include "semantic.h"
 
+#define TEST(x) fprintf(stderr, "%s\n", x);
+
 struct symbol_s globalScope;
 
 struct symbol_s* currentScope;
@@ -949,7 +951,7 @@ int verify(AST* ast)
 
 				break;
 			}
-			//case ARGUMENTLIST: //nunca entra aqui
+			//case ARGUMENTLIST: TEST("ARGUMENTLIST"); break;
 			case RETURN:
 			{
 				int return_type = typecheck(ast->child[0]);
@@ -969,22 +971,24 @@ int verify(AST* ast)
 
 				break;
 			}
-			//case ELEMENTLIST: //nunca entra aqui
-			case OUTPUT:
+			case ELEMENTLIST:
 			{
-				AST* elementList = ast->child[0];
-
-				if(elementList->child[0] == NULL)
+				if(ast->child[0] == NULL)
 					return TRUE;
-				else if(elementList->child[1] == NULL)
-					return typecheck(elementList->child[0]) != NO_TYPE;
+				else if(ast->child[1] == NULL)
+					return typecheck(ast->child[0]) != NO_TYPE;
 				else
 				{
-					dataType_t t = typecheck(elementList->child[1]);
-					int restIsCorrect = verify(elementList->child[0]);
+					dataType_t t = typecheck(ast->child[1]);
+					int restIsCorrect = verify(ast->child[0]);
 
 					return t != NO_TYPE && restIsCorrect;
 				}
+				break;
+			}
+			case OUTPUT:
+			{
+				return verify(ast->child[0]);
 
 				break;
 			}
@@ -1060,13 +1064,13 @@ int verify(AST* ast)
 				return verify(ast->child[0]);
 				break;
 			}
-			//case PARAMETERLIST: //nunca entra aqui
-			//case FUNCTIONHEADER: //nunca entra aqui
-			//case DECLARATION: //nunca entra aqui
-			//case POINTERDECLARATION: //nunca entra aqui
-			//case LITERALLIST: //nunca entra aqui
-			//case ARRAYDECLARATION: //nunca entra aqui
-			//case DECLARATIONLIST: //nunca entra aqui
+			//case PARAMETERLIST:  TEST("PARAMETERLIST"); break;
+			//case FUNCTIONHEADER:  TEST("FUNCTIONHEADER"); break;
+			//case DECLARATION:  TEST("DECLARATION"); break;
+			//case POINTERDECLARATION:  TEST("POINTERDECLARATION"); break;
+			//case LITERALLIST:  TEST("LITERALLIST"); break;
+			//case ARRAYDECLARATION:  TEST("ARRAYDECLARATION"); break;
+			//case DECLARATIONLIST:  TEST("DECLARATIONLIST"); break;
 			case FUNCTIONDEFINITION:
 			{
 				currentScope = &(ast->child[0]->child[1]->node->symbol);
