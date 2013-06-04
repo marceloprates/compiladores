@@ -67,6 +67,8 @@ typedef enum nodeType_e nodeType_t;
 
 struct AST_struct
 {
+	int lineNumber;
+
 	nodeType_t node_type;
 	struct linkedList_s* node;
 

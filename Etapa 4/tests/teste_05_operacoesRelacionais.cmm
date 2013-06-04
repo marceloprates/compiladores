@@ -24,5 +24,3 @@ word main()
 
   return 1;
 }
-
-

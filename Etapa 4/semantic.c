@@ -25,7 +25,7 @@ void first_pass(AST* ast)
 
 				if(variable_entry->marked == TRUE)
 				{
-					errorCount++; fprintf(stderr,"(SEMANTIC) Variable > %s < is already defined on line %d\n", variable_entry->text);
+					errorCount++; fprintf(stderr,"(SEMANTIC) Variable > %s < is already defined on line %d\n", variable_entry->text, ast->lineNumber);
 				}
 				else
 				{
@@ -65,7 +65,7 @@ void first_pass(AST* ast)
 						typeToString(variable_entry->dataType,t1str);
 						typeToString(literal_entry->dataType,t2str);
 
-						errorCount++; fprintf(stderr, "(SEMANTIC) Incompatible types in declaration: %s %s: %s on line %d\n", t1str, variable_entry->text, t2str);
+						errorCount++; fprintf(stderr, "(SEMANTIC) Incompatible types in declaration: %s %s: %s on line %d\n", t1str, variable_entry->text, t2str, ast->lineNumber);
 					}
 				}
 
@@ -77,7 +77,7 @@ void first_pass(AST* ast)
 
 				if(variable_entry->marked == TRUE)
 				{
-					errorCount++; fprintf(stderr,"(SEMANTIC) Variable > %s < is already defined on line %d\n", variable_entry->text);
+					errorCount++; fprintf(stderr,"(SEMANTIC) Variable > %s < is already defined on line %d\n", variable_entry->text, ast->lineNumber);
 				}
 				else
 				{
@@ -141,7 +141,7 @@ void first_pass(AST* ast)
 								typeToString(variable_entry->dataType, t0str);
 								typeToString(literal_entry->dataType, t1str);
 		
-								errorCount++; fprintf(stderr,"(SEMANTIC) Expected only %s values on %s array >%s< initializer, but found %s instead on line %d\n", t0str, t0str, variable_entry->text, t1str);
+								errorCount++; fprintf(stderr,"(SEMANTIC) Expected only %s values on %s array >%s< initializer, but found %s instead on line %d\n", t0str, t0str, variable_entry->text, t1str, ast->lineNumber);
 							}
 	
 							literal_count++;
@@ -150,7 +150,7 @@ void first_pass(AST* ast)
 	
 						if(expected_literal_count != literal_count)
 						{
-							errorCount++; fprintf(stderr,"(SEMANTIC) Expected %d literals on array >%s< initializer, but found %d instead on line %d\n", expected_literal_count, variable_entry->text, literal_count);
+							errorCount++; fprintf(stderr,"(SEMANTIC) Expected %d literals on array >%s< initializer, but found %d instead on line %d\n", expected_literal_count, variable_entry->text, literal_count, ast->lineNumber);
 						}
 					}
 				}
@@ -163,7 +163,7 @@ void first_pass(AST* ast)
 
 				if(variable_entry->marked == TRUE)
 				{
-					errorCount++; fprintf(stderr,"(SEMANTIC) Variable > %s < is already defined on line %d\n", variable_entry->text);
+					errorCount++; fprintf(stderr,"(SEMANTIC) Variable > %s < is already defined on line %d\n", variable_entry->text, ast->lineNumber);
 				}
 				else
 				{
@@ -203,7 +203,7 @@ void first_pass(AST* ast)
 						typeToString(variable_entry->dataType,t1str);
 						typeToString(literal_entry->dataType,t2str);
 
-						errorCount++; fprintf(stderr, "(SEMANTIC) Incompatible types in declaration: %s %s: %s on line %d\n", t1str, variable_entry->text, t2str);
+						errorCount++; fprintf(stderr, "(SEMANTIC) Incompatible types in declaration: %s %s: %s on line %d\n", t1str, variable_entry->text, t2str, ast->lineNumber);
 					}
 				}
 
@@ -217,7 +217,7 @@ void first_pass(AST* ast)
 
 				if(function_entry->marked == TRUE)
 				{
-					errorCount++; fprintf(stderr,"(SEMANTIC) Function > %s < is already defined on line %d\n", function_entry->text);
+					errorCount++; fprintf(stderr,"(SEMANTIC) Function > %s < is already defined on line %d\n", function_entry->text, ast->lineNumber);
 				}
 				else
 				{
@@ -304,7 +304,7 @@ int local_declarations(AST* fun_def)
 
 		if(variable_entry->marked == TRUE)// && exists_in_scope(variable_entry,currentScope))
 		{
-			errorCount++; fprintf(stderr,"(SEMANTIC) Variable > %s < is already defined on line %d\n", variable_entry->text);
+			errorCount++; fprintf(stderr,"(SEMANTIC) Variable > %s < is already defined on line %d\n", variable_entry->text, fun_def->lineNumber);
 		}
 		else
 		{
@@ -381,7 +381,7 @@ int local_declarations(AST* fun_def)
 			typeToString(variable_entry->dataType,t1str);
 			typeToString(literal_entry->dataType,t2str);
 
-			errorCount++; fprintf(stderr, "(SEMANTIC) Incompatible types in declaration: %s %s: %s on line %d\n", t1str, variable_entry->text, t2str);
+			errorCount++; fprintf(stderr, "(SEMANTIC) Incompatible types in declaration: %s %s: %s on line %d\n", t1str, variable_entry->text, t2str, fun_def->lineNumber);
 		}
 
 		local_decs = local_decs->child[0];
@@ -488,13 +488,13 @@ int typecheck(AST* ast)
 			{
 				if(ast->node->symbol.marked == FALSE)// || !exists_in_scope(&(ast->node->symbol),currentScope) )
 				{
-					errorCount++; fprintf(stderr,"(SEMANTIC) Variable > %s < is not yet defined on line %d\n", ast->node->symbol.text);
+					errorCount++; fprintf(stderr,"(SEMANTIC) Variable > %s < is not yet defined on line %d\n", ast->node->symbol.text, ast->lineNumber);
 
 					return NO_TYPE;
 				}
 				else if(ast->node->symbol.nature != SCALAR)
 				{
-					errorCount++; fprintf(stderr,"(SEMANTIC) Value > %s < is not a scalar variable on line %d\n", ast->node->symbol.text);
+					errorCount++; fprintf(stderr,"(SEMANTIC) Value > %s < is not a scalar variable on line %d\n", ast->node->symbol.text, ast->lineNumber);
 
 					return NO_TYPE;
 				}
@@ -526,7 +526,7 @@ int typecheck(AST* ast)
 				{
 					return t1;
 				}
-				else if(t0 == INTEGER || t1 == INTEGER)
+				else if(t0 == INTEGER && t1 == INTEGER)
 				{
 					return INTEGER;
 				}
@@ -537,7 +537,7 @@ int typecheck(AST* ast)
 					typeToString(t0,t0str);
 					typeToString(t1,t1str);
 
-					errorCount++; fprintf(stderr,"(SEMANTIC) Incompatible types for aritimetic operation: %s + %s on line %d\n", t0str, t1str);
+					errorCount++; fprintf(stderr,"(SEMANTIC) Incompatible types for aritimetic operation: %s + %s on line %d\n", t0str, t1str, ast->lineNumber);
 					return NO_TYPE;
 				}
 
@@ -555,7 +555,7 @@ int typecheck(AST* ast)
 					typeToString(t0,t0str);
 					typeToString(t1,t1str);
 
-					errorCount++; fprintf(stderr,"(SEMANTIC) Incompatible types for aritimetic operation: %s - %s on line %d\n", t0str, t1str);
+					errorCount++; fprintf(stderr,"(SEMANTIC) Incompatible types for aritimetic operation: %s - %s on line %d\n", t0str, t1str, ast->lineNumber);
 					return NO_TYPE;
 				}
 				else
@@ -577,7 +577,7 @@ int typecheck(AST* ast)
 					typeToString(t0,t0str);
 					typeToString(t1,t1str);
 
-					errorCount++; fprintf(stderr,"(SEMANTIC) Incompatible types for aritimetic operation: %s * %s on line %d\n", t0str, t1str);
+					errorCount++; fprintf(stderr,"(SEMANTIC) Incompatible types for aritimetic operation: %s * %s on line %d\n", t0str, t1str, ast->lineNumber);
 					return NO_TYPE;
 				}
 				else
@@ -599,7 +599,7 @@ int typecheck(AST* ast)
 					typeToString(t0,t0str);
 					typeToString(t1,t1str);
 
-					errorCount++; fprintf(stderr,"(SEMANTIC) Incompatible types for aritimetic operation: %s / %s on line %d\n", t0str, t1str);
+					errorCount++; fprintf(stderr,"(SEMANTIC) Incompatible types for aritimetic operation: %s / %s on line %d\n", t0str, t1str, ast->lineNumber);
 					return NO_TYPE;
 				}
 				else
@@ -621,7 +621,7 @@ int typecheck(AST* ast)
 					typeToString(t0,t0str);
 					typeToString(t1,t1str);
 
-					errorCount++; fprintf(stderr,"(SEMANTIC) Incompatible types for relational operation: %s < %s on line %d\n", t0str, t1str);
+					errorCount++; fprintf(stderr,"(SEMANTIC) Incompatible types for relational operation: %s < %s on line %d\n", t0str, t1str, ast->lineNumber);
 					return NO_TYPE;
 				}
 				else
@@ -643,7 +643,7 @@ int typecheck(AST* ast)
 					typeToString(t0,t0str);
 					typeToString(t1,t1str);
 
-					errorCount++; fprintf(stderr,"(SEMANTIC) Incompatible types for relational operation: %s > %s on line %d\n", t0str, t1str);
+					errorCount++; fprintf(stderr,"(SEMANTIC) Incompatible types for relational operation: %s > %s on line %d\n", t0str, t1str, ast->lineNumber);
 					return NO_TYPE;
 				}
 				else
@@ -665,7 +665,7 @@ int typecheck(AST* ast)
 					typeToString(t0,t0str);
 					typeToString(t1,t1str);
 
-					errorCount++; fprintf(stderr,"(SEMANTIC) Incompatible types for relational operation: %s <= %s on line %d\n", t0str, t1str);
+					errorCount++; fprintf(stderr,"(SEMANTIC) Incompatible types for relational operation: %s <= %s on line %d\n", t0str, t1str, ast->lineNumber);
 					return NO_TYPE;
 				}
 				else
@@ -687,7 +687,7 @@ int typecheck(AST* ast)
 					typeToString(t0,t0str);
 					typeToString(t1,t1str);
 
-					errorCount++; fprintf(stderr,"(SEMANTIC) Incompatible types for relational operation: %s >= %s on line %d\n", t0str, t1str);
+					errorCount++; fprintf(stderr,"(SEMANTIC) Incompatible types for relational operation: %s >= %s on line %d\n", t0str, t1str, ast->lineNumber);
 					return NO_TYPE;
 				}
 				else
@@ -709,7 +709,7 @@ int typecheck(AST* ast)
 					typeToString(t0,t0str);
 					typeToString(t1,t1str);
 
-					errorCount++; fprintf(stderr,"(SEMANTIC) Incompatible types for relational operation: %s == %s on line %d\n", t0str, t1str);
+					errorCount++; fprintf(stderr,"(SEMANTIC) Incompatible types for relational operation: %s == %s on line %d\n", t0str, t1str, ast->lineNumber);
 					return NO_TYPE;
 				}
 				else
@@ -731,7 +731,7 @@ int typecheck(AST* ast)
 					typeToString(t0,t0str);
 					typeToString(t1,t1str);
 
-					errorCount++; fprintf(stderr,"(SEMANTIC) Incompatible types for relational operation: %s != %s on line %d\n", t0str, t1str);
+					errorCount++; fprintf(stderr,"(SEMANTIC) Incompatible types for relational operation: %s != %s on line %d\n", t0str, t1str, ast->lineNumber);
 					return NO_TYPE;
 				}
 				else
@@ -753,7 +753,7 @@ int typecheck(AST* ast)
 					typeToString(t0,t0str);
 					typeToString(t1,t1str);
 
-					errorCount++; fprintf(stderr,"(SEMANTIC) Incompatible types for boolean operation: %s && %s on line %d\n", t0str, t1str);
+					errorCount++; fprintf(stderr,"(SEMANTIC) Incompatible types for boolean operation: %s && %s on line %d\n", t0str, t1str, ast->lineNumber);
 					return NO_TYPE;
 				}
 				else
@@ -775,7 +775,7 @@ int typecheck(AST* ast)
 					typeToString(t0,t0str);
 					typeToString(t1,t1str);
 
-					errorCount++; fprintf(stderr,"(SEMANTIC) Incompatible types for boolean operation: %s || %s on line %d\n", t0str, t1str);
+					errorCount++; fprintf(stderr,"(SEMANTIC) Incompatible types for boolean operation: %s || %s on line %d\n", t0str, t1str, ast->lineNumber);
 					return NO_TYPE;
 				}
 				else
@@ -802,7 +802,7 @@ int typecheck(AST* ast)
 					char t0str[80];
 					typeToString(dataType,t0str);
 
-					errorCount++; fprintf(stderr,"(SEMANTIC) Attempting to make reference out of non-scalar variable: &%s on line %d\n", t0str);
+					errorCount++; fprintf(stderr,"(SEMANTIC) Attempting to make reference out of non-scalar variable: &%s on line %d\n", t0str, ast->lineNumber);
 					return NO_TYPE;
 				}
 
@@ -825,7 +825,7 @@ int typecheck(AST* ast)
 					char t0str[80];
 					typeToString(dataType,t0str);
 
-					errorCount++; fprintf(stderr,"(SEMANTIC) Attempting to dereference a non-pointer type: *%s on line %d\n", t0str);
+					errorCount++; fprintf(stderr,"(SEMANTIC) Attempting to dereference a non-pointer type: *%s on line %d\n", t0str, ast->lineNumber);
 					return NO_TYPE;
 				}
 
@@ -837,7 +837,7 @@ int typecheck(AST* ast)
 
 				if(function_entry->nature != FUNCTION)
 				{
-					errorCount++; fprintf(stderr,"(SEMANTIC) Value > %s < is not a function on line %d\n", function_entry->text);
+					errorCount++; fprintf(stderr,"(SEMANTIC) Value > %s < is not a function on line %d\n", function_entry->text, ast->lineNumber);
 					return NO_TYPE;
 				}
 				else
@@ -848,11 +848,11 @@ int typecheck(AST* ast)
 
 					if(expected != given)
 					{
-						errorCount++; fprintf(stderr,"(SEMANTIC) Function > %s < expected %d parameters, but given %d on line %d\n", function_entry->text, expected, given);
+						errorCount++; fprintf(stderr,"(SEMANTIC) Function > %s < expected %d parameters, but given %d on line %d\n", function_entry->text, expected, given, ast->lineNumber);
 					}
 					else if(!types_are_correct)
 					{
-						errorCount++; fprintf(stderr,"(SEMANTIC) Incorrect types for parameters of function > %s < on line %d\n", function_entry->text);
+						errorCount++; fprintf(stderr,"(SEMANTIC) Incorrect types for parameters of function > %s < on line %d\n", function_entry->text, ast->lineNumber);
 					}
 
 					return function_entry->returnType;
@@ -866,7 +866,7 @@ int typecheck(AST* ast)
 
 				if(array_entry->nature != ARRAY)
 				{
-					errorCount++; fprintf(stderr,"(SEMANTIC) Value > %s < is not an array on line %d\n", array_entry->text);
+					errorCount++; fprintf(stderr,"(SEMANTIC) Value > %s < is not an array on line %d\n", array_entry->text, ast->lineNumber);
 					return NO_TYPE;
 				}
 
@@ -961,7 +961,7 @@ int verify(AST* ast)
 					typeToString(return_type,t0str);
 					typeToString(currentScope->returnType,t1str);
 
-					errorCount++; fprintf(stderr,"(SEMANTIC) Incompatible return type for %s function >%s< : %s on line %d\n", t1str, currentScope->text, t0str);
+					errorCount++; fprintf(stderr,"(SEMANTIC) Incompatible return type for %s function >%s< : %s on line %d\n", t1str, currentScope->text, t0str, ast->lineNumber);
 				}
 
 				currentScope = &globalScope;
@@ -1005,7 +1005,7 @@ int verify(AST* ast)
 					char tstr[80];
 					typeToString(t, tstr);
 
-					errorCount++; fprintf(stderr,"(SEMANTIC) Expected boolean expression in condition, got %s instead on line %d\n", tstr);
+					errorCount++; fprintf(stderr,"(SEMANTIC) Expected boolean expression in condition, got %s instead on line %d\n", tstr, ast->lineNumber);
 					return FALSE;
 				}
 				
@@ -1025,7 +1025,7 @@ int verify(AST* ast)
 					typeToString(varType,t0str);
 					typeToString(valType,t1str);
 
-					errorCount++; fprintf(stderr,"(SEMANTIC) Incompatible type in assignment: %s = %s on line %d\n", t0str, t1str);
+					errorCount++; fprintf(stderr,"(SEMANTIC) Incompatible type in assignment: %s = %s on line %d\n", t0str, t1str, ast->lineNumber);
 					return FALSE;
 				}
 				
@@ -1088,7 +1088,7 @@ int verify(AST* ast)
 			}
 			default:
 			{
-				errorCount++; fprintf(stderr, "MISSING CASE! ABORT! on line %d\n");
+				errorCount++; fprintf(stderr, "MISSING CASE! ABORT!\n");
 				verify(ast->child[0]);
 				verify(ast->child[1]);
 				verify(ast->child[2]);

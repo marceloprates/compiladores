@@ -30,6 +30,8 @@ AST* CreateAST(nodeType_t node_type, linkedList_t* node, AST* child_0, AST* chil
 			ast->numChildren++;
 	}
 
+	ast->lineNumber = getLineNumber();
+
 	return ast;
 }
 
