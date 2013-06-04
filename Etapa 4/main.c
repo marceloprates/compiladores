@@ -24,7 +24,6 @@ int main(int argc, char** argv)
 
 	initSemanticAnalyzer();
 	first_pass(root);
-	//typecheck(root);
 	verify(root);
 
 	int eCount = getErrorCount();

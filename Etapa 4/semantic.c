@@ -1082,17 +1082,26 @@ int verify(AST* ast)
 			case PROGRAM:
 			{
 				if(ast->child[0] == NULL)
+				{
 					return TRUE;
+				}
 				else
 				{
+					int firstIsCorrect;
 					int lastIsCorrect;
 
-					if(ast->child[1]->node_type == FUNCTIONDEFINITION)
-						lastIsCorrect = verify(ast->child[1]);
-					else
-						lastIsCorrect = TRUE;
+					firstIsCorrect = verify(ast->child[0]);
 
-					return verify(ast->child[0]) && lastIsCorrect;
+					if(ast->child[1]->node_type == FUNCTIONDEFINITION)
+					{
+						lastIsCorrect = verify(ast->child[1]);
+					}
+					else
+					{
+						lastIsCorrect = TRUE;
+					}
+
+					return firstIsCorrect && lastIsCorrect;
 				}
 
 				break;
