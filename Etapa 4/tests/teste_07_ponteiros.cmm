@@ -11,5 +11,11 @@ bool $pt6: 1;
 
 word main()
 {
-	return 1;
+	// deve funcionar
+
+	output *pt1;
+
+	// não deve funcionar
+
+	output &pt1;
 }
