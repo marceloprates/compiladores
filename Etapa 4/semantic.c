@@ -875,7 +875,7 @@ int typecheck(AST* ast)
 
 				if(t1 != INTEGER)
 				{
-					errorCount++; fprintf(stderr,"(SEMANTIC) Array indices must be integer types");
+					errorCount++; fprintf(stderr,"(SEMANTIC) Array indices must be integer types\n");
 				}
 				
 				return array_entry->dataType;
@@ -991,6 +991,12 @@ int verify(AST* ast)
 			case INPUT:
 			{
 				dataType_t t = typecheck(ast->child[0]);
+
+				if(t != INTEGER && t != BOOL)
+				{
+					errorCount++; fprintf(stderr,"(SEMANTIC) Input must use a scalar variable on line %d\n", tstr, ast->lineNumber);
+					return FALSE;
+				}
 
 				return t == INTEGER || t == BOOL;
 				break;
