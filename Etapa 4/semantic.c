@@ -906,7 +906,7 @@ int typecheck(AST* ast)
 			//case PROGRAM:
 			default:
 			{
-				//errorCount++; fprintf(stderr, "MISSING CASE! ABORT!");
+				errorCount++; fprintf(stderr, "MISSING CASE! ABORT!");
 				typecheck(ast->child[0]);
 				typecheck(ast->child[1]);
 				typecheck(ast->child[2]);
