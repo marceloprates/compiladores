@@ -1,7 +1,9 @@
-byte f()
+
 byte scalar:0;
-byte array[10];
+byte array[0a]:0 1 2 3 4 5 6 7 8 9;
 byte $pointer:1;
+
+byte f()
 {
-	return scalar[9] + &array + pointer + scalar() + f[2] + pointer[f];
+	return scalar[9] + &array + pointer + scalar() + f[2] + array[f];
 }
