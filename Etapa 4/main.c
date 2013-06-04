@@ -32,6 +32,8 @@ int main(int argc, char** argv)
 	if(eCount > 0)
 	{
 		fprintf(stderr,"%d semantic errors\n", eCount);
+
+		exit(3);
 	}
 
 	close_input();
