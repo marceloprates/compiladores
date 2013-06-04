@@ -1,6 +1,12 @@
+// deve funcionar
 bool magic[2];
-word unicorn[2]: 1 2 1;
+word unicorn[2]: 1 2;
 word notAnArray: 1;
+
+// não deve funcionar
+
+word badlyInitializedArray1[2]: 1 TRUE;
+word badlyInitializedArray2[2]: 1 2 3;
 
 word main()
 {

@@ -107,26 +107,101 @@ void first_pass(AST* ast)
 					}
 
 					AST* ptr = ast->child[3];
-	
-					while(ptr != NULL)
+
+					if(ptr != NULL)
 					{
-						if(ptr->child[0] == NULL)
+						if(ptr->child[1] == NULL)
 						{
+							ptr = ptr->child[0];
+						}
+
+						int expected_literal_count = ast->child[2]->node->symbol.value.intLit;
+						int literal_count = 0;
+		
+						while(ptr != NULL)
+						{
+							if(ptr->child[0] == NULL)
+							{
+								break;
+							}
+
+							AST* literal;
+
+							literal = ptr->child[1];
+	
+							symbol_t* literal_entry = &(literal->node->symbol);
+		
+							if(literal_entry->dataType != variable_entry->dataType)
+							{
+								char t0str[80];
+								char t1str[80];
+	
+								typeToString(variable_entry->dataType, t0str);
+								typeToString(literal_entry->dataType, t1str);
+		
+								fprintf(stderr,"(SEMANTIC) Expected only %s values on %s array >%s< initializer, but found %s instead\n", t0str, t0str, variable_entry->text, t1str);
+							}
+	
+							literal_count++;
+							ptr = ptr->child[0];
+						}
+	
+						if(expected_literal_count != literal_count)
+						{
+							fprintf(stderr,"(SEMANTIC) Expected %d literals on array >%s< initializer, but found %d instead\n", expected_literal_count, variable_entry->text, literal_count);
+						}
+					}
+				}
+
+				break;
+			}
+			case POINTERDECLARATION:
+			{
+				symbol_t* variable_entry = &(ast->child[1]->node->symbol);
+
+				if(variable_entry->marked == TRUE)
+				{
+					fprintf(stderr,"(SEMANTIC) Variable > %s < is already defined\n", variable_entry->text);
+				}
+				else
+				{
+					variable_entry->marked = TRUE;
+					variable_entry->declaration = ast;
+					variable_entry->nature = SCALAR;
+					variable_entry->scope = &globalScope;
+
+					switch(ast->child[0]->node_type)
+					{
+						case TYPEWORD:
+						{
+							variable_entry->dataType = INTEGER_POINTER;
+
 							break;
 						}
-	
-						if(ptr->child[1]->child[0]->node->symbol.dataType != variable_entry->dataType)
+						case TYPEBYTE:
 						{
-							char t0str[80];
-							char t1str[80];
+							variable_entry->dataType = INTEGER_POINTER;
 
-							//typeToString(variable_entry->dataType, t0str);
-							//typeToString(ptr->child[1]->child[0]->node->symbol.dataType, t1str);
-	
-							//fprintf(stderr,"(SEMANTIC) Expected only %s values on %s array >%s< initializer, but found %s instead\n", t0str, t0str, variable_entry->text, t1str);
+							break;
 						}
-	
-						ptr = ptr->child[1];
+						case TYPEBOOL:
+						{
+							variable_entry->dataType = BOOL_POINTER;
+
+							break;
+						}
+					}
+
+					symbol_t* literal_entry = &(ast->child[2]->node->symbol);
+
+					if(!compatible(literal_entry->dataType,variable_entry->dataType))
+					{
+						char t1str[80];
+						char t2str[80];
+						typeToString(variable_entry->dataType,t1str);
+						typeToString(literal_entry->dataType,t2str);
+
+						fprintf(stderr, "(SEMANTIC) Incompatible types in declaration: %s %s: %s\n", t1str, variable_entry->text, t2str);
 					}
 				}
 
@@ -316,7 +391,7 @@ int compatible(dataType_t t0, dataType_t t1)
 	int t0_is_pointer = t0 == INTEGER_POINTER || t0 == BOOL_POINTER;
 	int t1_is_pointer = t1 == INTEGER_POINTER || t1 == BOOL_POINTER;
 	
-	return t0 == t1 || (t0_is_pointer && t1_is_pointer);
+	return t0 == t1 || (t0_is_pointer && t1_is_pointer) || (t0 == INTEGER_POINTER && t1 == INTEGER) || (t1 == INTEGER_POINTER && t0 == INTEGER) || (t0 == BOOL_POINTER && t1 == BOOL) || (t1 == BOOL_POINTER && t0 == BOOL);
 }
 
 int same_types(AST* parameter, AST* argument)

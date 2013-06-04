@@ -1,0 +1,15 @@
+
+// deve funcionar
+word $pt1: 1;
+byte $pt2: 1;
+bool $pt3: TRUE;
+
+// não deve funcionar
+word $pt4: TRUE;
+byte $pt5: TRUE;
+bool $pt6: 1;
+
+word main()
+{
+	return 1;
+}
