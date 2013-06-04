@@ -169,6 +169,8 @@ void first_pass(AST* ast)
 				}
 				else
 				{
+					fprintf(stderr,"TO NO POINTER\n");
+
 					variable_entry->marked = TRUE;
 					variable_entry->declaration = ast;
 					variable_entry->nature = SCALAR;
@@ -358,22 +360,46 @@ int local_declarations(AST* fun_def)
 		variable_entry->marked = TRUE;
 		variable_entry->scope = &(fun_def->child[0]->child[1]->node->symbol);
 
-		switch(type->node_type)
+		if(local_decs->child[1]->node_type != POINTERDECLARATION)
 		{
-			case TYPEWORD:
+			switch(type->node_type)
 			{
-				variable_entry->dataType = INTEGER;
-				break;
+				case TYPEWORD:
+				{
+					variable_entry->dataType = INTEGER;
+					break;
+				}
+				case TYPEBYTE:
+				{
+					variable_entry->dataType = INTEGER;
+					break;
+				}
+				case TYPEBOOL:
+				{
+					variable_entry->dataType = BOOL;
+					break;
+				}
 			}
-			case TYPEBYTE:
+		}
+		else
+		{
+			switch(type->node_type)
 			{
-				variable_entry->dataType = INTEGER;
-				break;
-			}
-			case TYPEBOOL:
-			{
-				variable_entry->dataType = BOOL;
-				break;
+				case TYPEWORD:
+				{
+					variable_entry->dataType = INTEGER_POINTER;
+					break;
+				}
+				case TYPEBYTE:
+				{
+					variable_entry->dataType = INTEGER_POINTER;
+					break;
+				}
+				case TYPEBOOL:
+				{
+					variable_entry->dataType = BOOL_POINTER;
+					break;
+				}
 			}
 		}
 
