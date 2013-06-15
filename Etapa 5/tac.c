@@ -51,6 +51,8 @@ TAC* generateCode(AST* ast)
 	
 	switch(ast->node_type)
 	{
+		case IDENTIFIER: tac(TAC_SYMBOL, ast->node, NULL, NULL); break;
+		
 		case ADDITION: binaryOp_tac(TAC_ADD, childTac); break;
 		case SUBTRACTION: binaryOp_tac(TAC_SUB, childTac); break;
 		case MULTIPLICATION: binaryOp_tac(TAC_MUL, childTac); break;
