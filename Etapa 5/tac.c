@@ -148,3 +148,14 @@ linkedList_t* newTemp()
 	
 	return addSymbol(tempName, SYMBOL_IDENTIFIER);
 }
+
+linkedList_t* newLabel()
+{
+	static int count = 0;
+	char* labelName = malloc(11 + sizeof(int) * 8 + 1);
+	
+	sprintf(tempName, "___label%d___", count);
+	count++;
+	
+	return addSymbol(tempName, SYMBOL_LABEL);
+}
