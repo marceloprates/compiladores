@@ -64,6 +64,9 @@ TAC* generateCode(AST* ast)
 		case AND: binaryOp(TAC_AND, childTac); break;
 		case OR: binaryOp(TAC_OR, childTac); break;
 		
+		case REF: unaryOp(TAC_REF, childTac[0]); break;
+		case DEREF: unaryOp(TAC_REF, childTac[0]); break;
+		
 		case IFTHEN:
 		case IFTHENELSE:
 			ifZero(childTac[0], childTac[1], childTac[2]);
@@ -79,6 +82,11 @@ TAC* binaryOp(tacType_t type, TAC** children)
 	linkedList_t* temp2 = children[1]->destination;
 	
 	return append(append(children[0], children[1]), tac(type, newTemp(), temp1, temp2));
+}
+
+TAC* unaryOp(tacType_t type, TAC* op)
+{
+	return append(op, tac(type, newTemp(), op->destination, NULL));
 }
 
 TAC* ifZero(TAC* test, TAC* thenBlock, TAC* elseBlock)
