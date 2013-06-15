@@ -1,6 +1,6 @@
 #include "hash.h"
 
-enum TAC_type
+enum tacType_e
 {
 	TAC_SYMBOL,
 	TAC_MOVE,
@@ -16,6 +16,8 @@ enum TAC_type
 	TAC_NOT_EQUAL,
 	TAC_AND,
 	TAC_OR,
+	TAC_REF,
+	TAC_DEREF,
 	TAC_LABEL,
 	TAC_BEGINFUN,
 	TAC_ENDFUN,
@@ -28,16 +30,18 @@ enum TAC_type
 	TAC_READ
 };
 
-struct TAC_struct
+struct TAC_s
 {
-	enum TAC_type type;
-	linkedList_t* result;
-	linkedList_t* op1;
-	linkedList_t* op2;
-	struct TAC_struct* prev;
-	struct TAC_struct* next;
+	tacType_t tac_type;
+
+	linkedList_t* destination;
+	linkedList_t* source1;
+	linkedList_t* source2;
+
+	struct TAC_s* prev;
+	struct TAC_s* next;
 };
 
-typedef struct TAC_struct TAC;
+typedef struct TAC_s TAC;
 
-TAC* tac_join(TAC* tac1, TAC* tac2);
+TAC* append(TAC* tac1, TAC* tac2);
