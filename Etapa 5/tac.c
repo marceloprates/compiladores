@@ -79,32 +79,32 @@ void printTypeTAC(tacType_t type)
 {
 	switch(type)
 	{
-		TAC_SYMBOL: printf("SYMBOL"); break;
-		TAC_MOVE: printf("MOVE"); break;
-		TAC_ADD: printf("ADD"); break;
-		TAC_SUB: printf("SUB"); break;
-		TAC_MUL: printf("MUL"); break;
-		TAC_DIV: printf("DIV"); break;
-		TAC_LESS: printf("LESS"); break;
-		TAC_LESS_EQUAL: printf("LESS_EQUAL"); break;
-		TAC_GREATER: printf("GREATER"); break;
-		TAC_GREATER_THAN: printf("GREATER_THAN"); break;
-		TAC_EQUAL: printf("EQUAL"); break;
-		TAC_NOT_EQUAL: printf("NOT_EQUAL"); break;
-		TAC_AND: printf("AND"); break;
-		TAC_OR: printf("OR"); break;
-		TAC_REF: printf("REF"); break;
-		TAC_DEREF: printf("DEREF"); break;
-		TAC_LABEL: printf("LABEL"); break;
-		TAC_BEGINFUN: printf("BEGINFUN"); break;
-		TAC_ENDFUN: printf("ENDFUN"); break;
-		TAC_IFZ: printf("IFZ"); break;
-		TAC_JUMP: printf("JUMP"); break;
-		TAC_CALL: printf("CALL"); break;
-		TAC_ARG: printf("ARG"); break;
-		TAC_RET: printf("RET"); break;
-		TAC_PRINT: printf("PRINT"); break;
-		TAC_READ: printf("READ"); break;
+		case TAC_SYMBOL: printf("SYMBOL"); break;
+		case TAC_MOVE: printf("MOVE"); break;
+		case TAC_ADD: printf("ADD"); break;
+		case TAC_SUB: printf("SUB"); break;
+		case TAC_MUL: printf("MUL"); break;
+		case TAC_DIV: printf("DIV"); break;
+		case TAC_LESS: printf("LESS"); break;
+		case TAC_LESS_EQUAL: printf("LESS_EQUAL"); break;
+		case TAC_GREATER: printf("GREATER"); break;
+		case TAC_GREATER_EQUAL: printf("GREATER_EQUAL"); break;
+		case TAC_EQUAL: printf("EQUAL"); break;
+		case TAC_NOT_EQUAL: printf("NOT_EQUAL"); break;
+		case TAC_AND: printf("AND"); break;
+		case TAC_OR: printf("OR"); break;
+		case TAC_REF: printf("REF"); break;
+		case TAC_DEREF: printf("DEREF"); break;
+		case TAC_LABEL: printf("LABEL"); break;
+		case TAC_BEGINFUN: printf("BEGINFUN"); break;
+		case TAC_ENDFUN: printf("ENDFUN"); break;
+		case TAC_IFZ: printf("IFZ"); break;
+		case TAC_JUMP: printf("JUMP"); break;
+		case TAC_CALL: printf("CALL"); break;
+		case TAC_ARG: printf("ARG"); break;
+		case TAC_RET: printf("RET"); break;
+		case TAC_PRINT: printf("PRINT"); break;
+		case TAC_READ: printf("READ"); break;
 		
 		default: printf("??"); break;
 	}
@@ -117,7 +117,10 @@ void printCode(TAC* myTac)
 	for(aux = myTac; aux != NULL; aux = aux->next)
 	{
 		printTypeTAC(aux->tac_type);
-		printf(" %s %s %s\n", aux->destination->symbol.text, aux->source1->symbol.text, aux->source2->symbol.text);
+		printf(" %s %s %s\n",
+			aux->destination ? aux->destination->symbol.text : "NULL",
+			aux->source1 ? aux->source1->symbol.text : "NULL",
+			aux->source2 ? aux->source2->symbol.text : "NULL");
 	}
 }
 
@@ -227,6 +230,8 @@ TAC* generateCode(AST* ast)
 	
 	TAC* result;
 	
+	//fprintf(stderr, "%s\n", NodeTypetoString(ast->node_type));
+
 	switch(ast->node_type)
 	{
 		case IDENTIFIER: result = tac(TAC_SYMBOL, ast->node, NULL, NULL); break;
