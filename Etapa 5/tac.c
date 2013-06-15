@@ -64,7 +64,12 @@ TAC* generateCode(AST* ast)
 		case AND: binaryOp(TAC_AND, childTac); break;
 		case OR: binaryOp(TAC_OR, childTac); break;
 		
-		case IFTHEN: ifZero(childTac[0], childTac[1], childTac[2]); break;
+		case IFTHEN:
+		case IFTHENELSE:
+			ifZero(childTac[0], childTac[1], childTac[2]);
+			break;
+			
+		case LOOP: loop(childTac[0], childTac[1]); break;
 	}
 }
 
@@ -109,6 +114,28 @@ TAC* ifZero(TAC* test, TAC* thenBlock, TAC* elseBlock)
 	}
 	
 	return tac;
+}
+
+TAC* loop(TAC* test, TAC* loopBlock)
+{
+	linkedList_t* testResult = test->destination;
+	linkedList_t* loopLabel = newLabel();
+	linkedList_t* endLabel = newLabel();
+	
+	return
+		append(
+			append(
+				append(
+					append(
+						tac(TAC_LABEL, loopLabel, NULL, NULL),
+						tac(TAC_IFZ, endLabel, testResult, NULL)
+					),
+					loopBlock
+				),
+				tac(TAC_JUMP, loopLabel, NULL, NULL)
+			),
+			tac(TAC_LABEL, endLabel, NULL, NULL)
+		);
 }
 
 linkedList_t* newTemp()
