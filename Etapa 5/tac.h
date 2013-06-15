@@ -11,7 +11,7 @@ enum tacType_e
 	TAC_LESS,
 	TAC_LESS_EQUAL,
 	TAC_GREATER,
-	TAC_GREATER_THAN,
+	TAC_GREATER_EQUAL,
 	TAC_EQUAL,
 	TAC_NOT_EQUAL,
 	TAC_AND,
@@ -32,7 +32,7 @@ enum tacType_e
 
 struct TAC_s
 {
-	tacType_t tac_type;
+	enum tacType_e tac_type;
 
 	linkedList_t* destination;
 	linkedList_t* source1;
@@ -44,4 +44,8 @@ struct TAC_s
 
 typedef struct TAC_s TAC;
 
-TAC* append(TAC* tac1, TAC* tac2);
+typedef enum tacType_e tacType_t;
+
+TAC* reverse(TAC* myTac);
+void printCode(TAC* myTac);
+TAC* generateCode(AST* ast);

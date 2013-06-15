@@ -54,10 +54,10 @@ linkedList_t* newLabel()
 	static int count = 0;
 	char* labelName = malloc(11 + sizeof(int) * 8 + 1);
 	
-	sprintf(tempName, "___label%d___", count);
+	sprintf(labelName, "___label%d___", count);
 	count++;
 	
-	return addSymbol(tempName, SYMBOL_LABEL);
+	return addSymbol(labelName, SYMBOL_IDENTIFIER);
 }
 
 TAC* reverse(TAC* myTac)
@@ -116,8 +116,101 @@ void printCode(TAC* myTac)
 	
 	for(aux = myTac; aux != NULL; aux = aux->next)
 	{
-		printTypeTac(aux->tac_type);
-		printf(" %s %s %s\n", aux->destination, aux->source1, aux->source2);
+		printTypeTAC(aux->tac_type);
+		printf(" %s %s %s\n", aux->destination->symbol.text, aux->source1->symbol.text, aux->source2->symbol.text);
+	}
+}
+
+TAC* binaryOp_tac(tacType_t type, TAC** children)
+{
+	linkedList_t* temp1 = children[0]->destination;
+	linkedList_t* temp2 = children[1]->destination;
+	
+	return append(append(children[0], children[1]), tac(type, newTemp(), temp1, temp2));
+}
+
+TAC* unaryOp_tac(tacType_t type, TAC* op)
+{
+	return append(op, tac(type, newTemp(), op->destination, NULL));
+}
+
+TAC* ifZero_tac(TAC* test, TAC* thenBlock, TAC* elseBlock)
+{
+	TAC* result;
+	linkedList_t* testResult = test->destination;
+	linkedList_t* elseLabel = newLabel();
+	
+	TAC* ifThen = append(append(test, tac(TAC_IFZ, elseLabel, testResult, NULL)), thenBlock);
+	
+	if(elseBlock == NULL)
+	{
+		result = append(ifThen, tac(TAC_LABEL, elseLabel, NULL, NULL));
+	}
+	else
+	{
+		linkedList_t* endLabel = newLabel();
+		
+		result =
+			append(
+				append(
+					append(
+						append(
+							ifThen,
+							tac(TAC_JUMP, endLabel, NULL, NULL)
+						),
+						tac(TAC_LABEL, elseLabel, NULL, NULL)
+					),
+					elseBlock
+				),
+				tac(TAC_LABEL, endLabel, NULL, NULL)
+			);
+	}
+	
+	return result;
+}
+
+TAC* loop_tac(TAC* test, TAC* loopBlock)
+{
+	linkedList_t* testResult = test->destination;
+	linkedList_t* loopLabel = newLabel();
+	linkedList_t* endLabel = newLabel();
+	
+	return
+		append(
+			append(
+				append(
+					append(
+						tac(TAC_LABEL, loopLabel, NULL, NULL),
+						tac(TAC_IFZ, endLabel, testResult, NULL)
+					),
+					loopBlock
+				),
+				tac(TAC_JUMP, loopLabel, NULL, NULL)
+			),
+			tac(TAC_LABEL, endLabel, NULL, NULL)
+		);
+}
+
+TAC* call_tac(TAC* funcId, TAC* args)
+{
+	return append(append(args, funcId), tac(TAC_CALL, newTemp(), funcId->destination, NULL));
+}
+
+TAC* args_tac(TAC** children)
+{
+	if(children[0] == NULL)
+	// A função não recebe argumentos
+		return NULL;
+	
+	if(children[1] == NULL)
+	// Último argumento (calculado em children[0])
+	{
+		return tac(TAC_ARG, newTemp(), children[0]->destination, NULL);
+	}
+	else
+	// Mais de um argumento, argumentos anteriores empilhados em children[0] e último argumento calculado em children[1]
+	{
+		return append(children[0], tac(TAC_ARG, newTemp(), children[1]->destination, NULL));
 	}
 }
 
@@ -173,97 +266,4 @@ TAC* generateCode(AST* ast)
 	}
 	
 	return result;
-}
-
-TAC* binaryOp_tac(tacType_t type, TAC** children)
-{
-	linkedList_t* temp1 = children[0]->destination;
-	linkedList_t* temp2 = children[1]->destination;
-	
-	return append(append(children[0], children[1]), tac(type, newTemp(), temp1, temp2));
-}
-
-TAC* unaryOp_tac(tacType_t type, TAC* op)
-{
-	return append(op, tac(type, newTemp(), op->destination, NULL));
-}
-
-TAC* ifZero_tac(TAC* test, TAC* thenBlock, TAC* elseBlock)
-{
-	TAC* tac;
-	linkedList_t* testResult = test->destination;
-	linkedList_t* elseLabel = newLabel();
-	
-	TAC* ifThen = append(append(test, tac(TAC_IFZ, elseLabel, testResult, NULL)), thenBlock);
-	
-	if(elseBlock == NULL)
-	{
-		tac = append(ifThen, tac(TAC_LABEL, elseLabel, NULL, NULL));
-	}
-	else
-	{
-		linkedList_t* endLabel = newLabel();
-		
-		tac =
-			append(
-				append(
-					append(
-						append(
-							ifThen,
-							tac(TAC_JUMP, endLabel, NULL, NULL)
-						),
-						tac(TAC_LABEL, elseLabel, NULL, NULL)
-					),
-					elseBlock
-				),
-				tac(TAC_LABEL, endLabel, NULL, NULL)
-			);
-	}
-	
-	return tac;
-}
-
-TAC* loop_tac(TAC* test, TAC* loopBlock)
-{
-	linkedList_t* testResult = test->destination;
-	linkedList_t* loopLabel = newLabel();
-	linkedList_t* endLabel = newLabel();
-	
-	return
-		append(
-			append(
-				append(
-					append(
-						tac(TAC_LABEL, loopLabel, NULL, NULL),
-						tac(TAC_IFZ, endLabel, testResult, NULL)
-					),
-					loopBlock
-				),
-				tac(TAC_JUMP, loopLabel, NULL, NULL)
-			),
-			tac(TAC_LABEL, endLabel, NULL, NULL)
-		);
-}
-
-TAC* call_tac(TAC* funcId, TAC* args)
-{
-	return append(append(args, funcId), tac(TAC_CALL, newTemp(), funcId->destination, NULL))
-}
-
-TAC* args_tac(TAC** children)
-{
-	if(children[0] == NULL)
-	// A função não recebe argumentos
-		return NULL;
-	
-	if(children[1] == NULL)
-	// Último argumento (calculado em children[0])
-	{
-		return tac(TAC_ARG, newTemp(), children[0]->destination, NULL);
-	}
-	else
-	// Mais de um argumento, argumentos anteriores empilhados em children[0] e último argumento calculado em children[1]
-	{
-		return append(children[0], tac(TAC_ARG, newTemp(), children[1]->destination, NULL));
-	}
 }

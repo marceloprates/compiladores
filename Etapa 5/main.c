@@ -7,6 +7,7 @@
 #include "ast.h"
 #include "y.tab.h"
 #include "semantic.h"
+#include "tac.h"
 
 extern AST* root;
 
@@ -34,6 +35,8 @@ int main(int argc, char** argv)
 
 		exit(3);
 	}
+	
+	printCode(reverse(generateCode(root)));
 
 	close_input();
 
