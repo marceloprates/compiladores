@@ -51,32 +51,35 @@ TAC* generateCode(AST* ast)
 	
 	switch(ast->node_type)
 	{
-		case ADDITION: binaryOp(TAC_ADD, childTac); break;
-		case SUBTRACTION: binaryOp(TAC_SUB, childTac); break;
-		case MULTIPLICATION: binaryOp(TAC_MUL, childTac); break;
-		case DIVISION: binaryOp(TAC_DIV, childTac); break;
-		case LESSERTHAN: binaryOp(TAC_LESS, childTac); break;
-		case GREATERTHAN: binaryOp(TAC_GREATER, childTac); break;
-		case LESSEREQUAL: binaryOp(TAC_LESS_EQUAL, childTac); break;
-		case GREATEREQUAL: binaryOp(TAC_GREATER_EQUAL, childTac); break;
-		case EQUAL: binaryOp(TAC_EQUAL, childTac); break;
-		case NOTEQUAL: binaryOp(TAC_NOT_EQUAL, childTac); break;
-		case AND: binaryOp(TAC_AND, childTac); break;
-		case OR: binaryOp(TAC_OR, childTac); break;
+		case ADDITION: binaryOp_tac(TAC_ADD, childTac); break;
+		case SUBTRACTION: binaryOp_tac(TAC_SUB, childTac); break;
+		case MULTIPLICATION: binaryOp_tac(TAC_MUL, childTac); break;
+		case DIVISION: binaryOp_tac(TAC_DIV, childTac); break;
+		case LESSERTHAN: binaryOp_tac(TAC_LESS, childTac); break;
+		case GREATERTHAN: binaryOp_tac(TAC_GREATER, childTac); break;
+		case LESSEREQUAL: binaryOp_tac(TAC_LESS_EQUAL, childTac); break;
+		case GREATEREQUAL: binaryOp_tac(TAC_GREATER_EQUAL, childTac); break;
+		case EQUAL: binaryOp_tac(TAC_EQUAL, childTac); break;
+		case NOTEQUAL: binaryOp_tac(TAC_NOT_EQUAL, childTac); break;
+		case AND: binaryOp_tac(TAC_AND, childTac); break;
+		case OR: binaryOp_tac(TAC_OR, childTac); break;
 		
-		case REF: unaryOp(TAC_REF, childTac[0]); break;
-		case DEREF: unaryOp(TAC_REF, childTac[0]); break;
+		case REF: unaryOp_tac(TAC_REF, childTac[0]); break;
+		case DEREF: unaryOp_tac(TAC_REF, childTac[0]); break;
 		
 		case IFTHEN:
 		case IFTHENELSE:
-			ifZero(childTac[0], childTac[1], childTac[2]);
+			ifZero_tac(childTac[0], childTac[1], childTac[2]);
 			break;
 			
-		case LOOP: loop(childTac[0], childTac[1]); break;
+		case LOOP: loop_tac(childTac[0], childTac[1]); break;
+		
+		case FUNCTIONCALL: call_tac(childTac[0], childTac[1]); break;
+		case ARGUMENTLIST: args_tac(childTac); break;
 	}
 }
 
-TAC* binaryOp(tacType_t type, TAC** children)
+TAC* binaryOp_tac(tacType_t type, TAC** children)
 {
 	linkedList_t* temp1 = children[0]->destination;
 	linkedList_t* temp2 = children[1]->destination;
@@ -84,12 +87,12 @@ TAC* binaryOp(tacType_t type, TAC** children)
 	return append(append(children[0], children[1]), tac(type, newTemp(), temp1, temp2));
 }
 
-TAC* unaryOp(tacType_t type, TAC* op)
+TAC* unaryOp_tac(tacType_t type, TAC* op)
 {
 	return append(op, tac(type, newTemp(), op->destination, NULL));
 }
 
-TAC* ifZero(TAC* test, TAC* thenBlock, TAC* elseBlock)
+TAC* ifZero_tac(TAC* test, TAC* thenBlock, TAC* elseBlock)
 {
 	TAC* tac;
 	linkedList_t* testResult = test->destination;
@@ -124,7 +127,7 @@ TAC* ifZero(TAC* test, TAC* thenBlock, TAC* elseBlock)
 	return tac;
 }
 
-TAC* loop(TAC* test, TAC* loopBlock)
+TAC* loop_tac(TAC* test, TAC* loopBlock)
 {
 	linkedList_t* testResult = test->destination;
 	linkedList_t* loopLabel = newLabel();
@@ -144,6 +147,29 @@ TAC* loop(TAC* test, TAC* loopBlock)
 			),
 			tac(TAC_LABEL, endLabel, NULL, NULL)
 		);
+}
+
+TAC* call_tac(TAC* funcId, TAC* args)
+{
+	return append(append(args, funcId), tac(TAC_CALL, newTemp(), funcId->destination, NULL))
+}
+
+TAC* args_tac(TAC** children)
+{
+	if(children[0] == NULL)
+	// A função não recebe argumentos
+		return NULL;
+	
+	if(children[1] == NULL)
+	// Último argumento (calculado em children[0])
+	{
+		return tac(TAC_ARG, newTemp(), children[0]->destination, NULL);
+	}
+	else
+	// Mais de um argumento, argumentos anteriores empilhados em children[0] e último argumento calculado em children[1]
+	{
+		return append(children[0], tac(TAC_ARG, newTemp(), children[1]->destination, NULL));
+	}
 }
 
 linkedList_t* newTemp()
