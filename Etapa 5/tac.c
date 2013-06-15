@@ -51,27 +51,64 @@ TAC* generateCode(AST* ast)
 	
 	switch(ast->node_type)
 	{
-		case ADDITION: binaryOp(TAC_ADD, childTac[0], childTac[1]); break;
-		case SUBTRACTION: binaryOp(TAC_SUB, childTac[0], childTac[1]); break;
-		case MULTIPLICATION: binaryOp(TAC_MUL, childTac[0], childTac[1]); break;
-		case DIVISION: binaryOp(TAC_DIV, childTac[0], childTac[1]); break;
-		case LESSERTHAN: binaryOp(TAC_LESS, childTac[0], childTac[1]); break;
-		case GREATERTHAN: binaryOp(TAC_GREATER, childTac[0], childTac[1]); break;
-		case LESSEREQUAL: binaryOp(TAC_LESS_EQUAL, childTac[0], childTac[1]); break;
-		case GREATEREQUAL: binaryOp(TAC_GREATER_EQUAL, childTac[0], childTac[1]); break;
-		case EQUAL: binaryOp(TAC_EQUAL, childTac[0], childTac[1]); break;
-		case NOTEQUAL: binaryOp(TAC_NOT_EQUAL, childTac[0], childTac[1]); break;
-		case AND: binaryOp(TAC_AND, childTac[0], childTac[1]); break;
-		case OR: binaryOp(TAC_OR, childTac[0], childTac[1]); break;
+		case ADDITION: binaryOp(TAC_ADD, childTac); break;
+		case SUBTRACTION: binaryOp(TAC_SUB, childTac); break;
+		case MULTIPLICATION: binaryOp(TAC_MUL, childTac); break;
+		case DIVISION: binaryOp(TAC_DIV, childTac); break;
+		case LESSERTHAN: binaryOp(TAC_LESS, childTac); break;
+		case GREATERTHAN: binaryOp(TAC_GREATER, childTac); break;
+		case LESSEREQUAL: binaryOp(TAC_LESS_EQUAL, childTac); break;
+		case GREATEREQUAL: binaryOp(TAC_GREATER_EQUAL, childTac); break;
+		case EQUAL: binaryOp(TAC_EQUAL, childTac); break;
+		case NOTEQUAL: binaryOp(TAC_NOT_EQUAL, childTac); break;
+		case AND: binaryOp(TAC_AND, childTac); break;
+		case OR: binaryOp(TAC_OR, childTac); break;
+		
+		case IFTHEN: ifZero(childTac[0], childTac[1], childTac[2]); break;
 	}
 }
 
-TAC* binaryOp(tacType_t type, TAC* op1, TAC* op2)
+TAC* binaryOp(tacType_t type, TAC** children)
 {
-	linkedList_t* temp1 = op1->destination;
-	linkedList_t* temp2 = op2->destination;
+	linkedList_t* temp1 = children[0]->destination;
+	linkedList_t* temp2 = children[1]->destination;
 	
-	return append(append(op1, op2), tac(type, newTemp(), temp1, temp2));
+	return append(append(children[0], children[1]), tac(type, newTemp(), temp1, temp2));
+}
+
+TAC* ifZero(TAC* test, TAC* thenBlock, TAC* elseBlock)
+{
+	TAC* tac;
+	linkedList_t* testResult = test->destination;
+	linkedList_t* elseLabel = newLabel();
+	
+	TAC* ifThen = append(append(test, tac(TAC_IFZ, elseLabel, testResult, NULL)), thenBlock);
+	
+	if(elseBlock == NULL)
+	{
+		tac = append(ifThen, tac(TAC_LABEL, elseLabel, NULL, NULL));
+	}
+	else
+	{
+		linkedList_t* endLabel = newLabel();
+		
+		tac =
+			append(
+				append(
+					append(
+						append(
+							ifThen,
+							tac(TAC_JUMP, endLabel, NULL, NULL)
+						),
+						tac(TAC_LABEL, elseLabel, NULL, NULL)
+					),
+					elseBlock
+				),
+				tac(TAC_LABEL, endLabel, NULL, NULL)
+			);
+	}
+	
+	return tac;
 }
 
 linkedList_t* newTemp()
