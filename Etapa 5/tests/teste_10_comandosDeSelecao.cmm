@@ -1,0 +1,25 @@
+
+word main()
+	word i: 1;
+	bool a: TRUE;
+{
+	// deve funcionar
+	loop (TRUE) {};
+
+	// deve funcionar
+	if (TRUE) then {};
+
+	// deve funcionar
+	if (TRUE) then {} else {};
+
+	// não deve funcionar
+	loop (1) {};
+
+	// não deve funcionar
+	if(1) then {};
+
+	// não deve funcionar
+	if (1) then {} else {};
+  
+}
+

@@ -1,0 +1,34 @@
+
+// deve funcionar
+word f1(word a, bool b, word c)
+{
+	return a;
+}
+
+// não deve funcionar
+word f2(bool a, word b)
+{
+	return a;
+}
+
+// não deve funcionar
+word f3(word a, bool b)
+{
+	return c;
+}
+
+word main() 
+{
+	/*
+	// deve funcionar
+	output f1(1,TRUE);
+
+	// não deve funcionar
+	output f1(TRUE,TRUE);
+	output f1(1,TRUE,1);
+	output f1(1,1,1,1,1,1);
+	output f1(TRUE);
+	output f1(1);
+	output f1();
+	*/
+}

@@ -1,0 +1,24 @@
+
+word a()
+{
+    return 1;
+}
+
+word main() 
+{
+	// deve funcionar
+    output a();
+
+    // deve funcionar
+    output b();
+
+    // não deve funcionar
+    output c();
+
+    return 1;
+}
+
+word b()
+{
+    return 1;
+}
