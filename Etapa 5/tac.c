@@ -19,11 +19,11 @@ TAC* tac(tacType_t type, linkedList_t* destination, linkedList_t* source1, linke
 
 TAC* append(TAC* tac1, TAC* tac2)
 {
+	if(tac1 == NULL)
+		return tac2;
+
 	if(tac2 == NULL)
 		return tac1;
-
-	if(tac1 == NULL)
-		return NULL;
 
 	TAC* p = tac2;
 
@@ -49,36 +49,47 @@ TAC* generateCode(AST* ast)
 	childTac[2] = generateCode(ast->child[2]);
 	childTac[3] = generateCode(ast->child[3]);
 	
+	TAC* result;
+	
 	switch(ast->node_type)
 	{
-		case IDENTIFIER: tac(TAC_SYMBOL, ast->node, NULL, NULL); break;
+		case IDENTIFIER: result = tac(TAC_SYMBOL, ast->node, NULL, NULL); break;
 		
-		case ADDITION: binaryOp_tac(TAC_ADD, childTac); break;
-		case SUBTRACTION: binaryOp_tac(TAC_SUB, childTac); break;
-		case MULTIPLICATION: binaryOp_tac(TAC_MUL, childTac); break;
-		case DIVISION: binaryOp_tac(TAC_DIV, childTac); break;
-		case LESSERTHAN: binaryOp_tac(TAC_LESS, childTac); break;
-		case GREATERTHAN: binaryOp_tac(TAC_GREATER, childTac); break;
-		case LESSEREQUAL: binaryOp_tac(TAC_LESS_EQUAL, childTac); break;
-		case GREATEREQUAL: binaryOp_tac(TAC_GREATER_EQUAL, childTac); break;
-		case EQUAL: binaryOp_tac(TAC_EQUAL, childTac); break;
-		case NOTEQUAL: binaryOp_tac(TAC_NOT_EQUAL, childTac); break;
-		case AND: binaryOp_tac(TAC_AND, childTac); break;
-		case OR: binaryOp_tac(TAC_OR, childTac); break;
+		case ADDITION: result = binaryOp_tac(TAC_ADD, childTac); break;
+		case SUBTRACTION: result = binaryOp_tac(TAC_SUB, childTac); break;
+		case MULTIPLICATION: result = binaryOp_tac(TAC_MUL, childTac); break;
+		case DIVISION: result = binaryOp_tac(TAC_DIV, childTac); break;
+		case LESSERTHAN: result = binaryOp_tac(TAC_LESS, childTac); break;
+		case GREATERTHAN: result = binaryOp_tac(TAC_GREATER, childTac); break;
+		case LESSEREQUAL: result = binaryOp_tac(TAC_LESS_EQUAL, childTac); break;
+		case GREATEREQUAL: result = binaryOp_tac(TAC_GREATER_EQUAL, childTac); break;
+		case EQUAL: result = binaryOp_tac(TAC_EQUAL, childTac); break;
+		case NOTEQUAL: result = binaryOp_tac(TAC_NOT_EQUAL, childTac); break;
+		case AND: result = binaryOp_tac(TAC_AND, childTac); break;
+		case OR: result = binaryOp_tac(TAC_OR, childTac); break;
 		
-		case REF: unaryOp_tac(TAC_REF, childTac[0]); break;
-		case DEREF: unaryOp_tac(TAC_REF, childTac[0]); break;
+		case REF: result = unaryOp_tac(TAC_REF, childTac[0]); break;
+		case DEREF: result = unaryOp_tac(TAC_REF, childTac[0]); break;
 		
 		case IFTHEN:
 		case IFTHENELSE:
-			ifZero_tac(childTac[0], childTac[1], childTac[2]);
+			result = ifZero_tac(childTac[0], childTac[1], childTac[2]);
 			break;
 			
-		case LOOP: loop_tac(childTac[0], childTac[1]); break;
+		case LOOP: result = loop_tac(childTac[0], childTac[1]); break;
 		
-		case FUNCTIONCALL: call_tac(childTac[0], childTac[1]); break;
-		case ARGUMENTLIST: args_tac(childTac); break;
+		case FUNCTIONCALL: result = call_tac(childTac[0], childTac[1]); break;
+		case ARGUMENTLIST: result = args_tac(childTac); break;
+		
+		case BLOCK:
+		case COMMANDLIST:
+		case PROGRAM:
+		default:
+			result = append(append(append(childTac[0], childTac[1]), childTac[2]), childTac[3]);
+			break;
 	}
+	
+	return result;
 }
 
 TAC* binaryOp_tac(tacType_t type, TAC** children)
