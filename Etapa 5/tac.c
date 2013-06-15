@@ -25,17 +25,100 @@ TAC* append(TAC* tac1, TAC* tac2)
 	if(tac2 == NULL)
 		return tac1;
 
-	TAC* p = tac2;
+	TAC* aux = tac2;
 
-	while(p->prev != NULL)
+	while(aux->prev != NULL)
 	{
-		p = p->prev;
+		aux = aux->prev;
 	}
 
-	p->prev = tac1;
-	tac1->next = p;
+	aux->prev = tac1;
+	tac1->next = aux;
 
 	return tac2;
+}
+
+linkedList_t* newTemp()
+{
+	static int count = 0;
+	char* tempName = malloc(10 + sizeof(int) * 8 + 1);
+	
+	sprintf(tempName, "___temp%d___", count);
+	count++;
+	
+	return addSymbol(tempName, SYMBOL_IDENTIFIER);
+}
+
+linkedList_t* newLabel()
+{
+	static int count = 0;
+	char* labelName = malloc(11 + sizeof(int) * 8 + 1);
+	
+	sprintf(tempName, "___label%d___", count);
+	count++;
+	
+	return addSymbol(tempName, SYMBOL_LABEL);
+}
+
+TAC* reverse(TAC* myTac)
+{
+	if(myTac == NULL)
+		return NULL;
+		
+	TAC* aux = myTac;
+	
+	while(aux->prev != NULL)
+	{
+		aux = aux->prev;
+	}
+	
+	return aux;
+}
+
+void printTypeTAC(tacType_t type)
+{
+	switch(type)
+	{
+		TAC_SYMBOL: printf("SYMBOL"); break;
+		TAC_MOVE: printf("MOVE"); break;
+		TAC_ADD: printf("ADD"); break;
+		TAC_SUB: printf("SUB"); break;
+		TAC_MUL: printf("MUL"); break;
+		TAC_DIV: printf("DIV"); break;
+		TAC_LESS: printf("LESS"); break;
+		TAC_LESS_EQUAL: printf("LESS_EQUAL"); break;
+		TAC_GREATER: printf("GREATER"); break;
+		TAC_GREATER_THAN: printf("GREATER_THAN"); break;
+		TAC_EQUAL: printf("EQUAL"); break;
+		TAC_NOT_EQUAL: printf("NOT_EQUAL"); break;
+		TAC_AND: printf("AND"); break;
+		TAC_OR: printf("OR"); break;
+		TAC_REF: printf("REF"); break;
+		TAC_DEREF: printf("DEREF"); break;
+		TAC_LABEL: printf("LABEL"); break;
+		TAC_BEGINFUN: printf("BEGINFUN"); break;
+		TAC_ENDFUN: printf("ENDFUN"); break;
+		TAC_IFZ: printf("IFZ"); break;
+		TAC_JUMP: printf("JUMP"); break;
+		TAC_CALL: printf("CALL"); break;
+		TAC_ARG: printf("ARG"); break;
+		TAC_RET: printf("RET"); break;
+		TAC_PRINT: printf("PRINT"); break;
+		TAC_READ: printf("READ"); break;
+		
+		default: printf("??"); break;
+	}
+}
+
+void printCode(TAC* myTac)
+{
+	TAC* aux;
+	
+	for(aux = myTac; aux != NULL; aux = aux->next)
+	{
+		printTypeTac(aux->tac_type);
+		printf(" %s %s %s\n", aux->destination, aux->source1, aux->source2);
+	}
 }
 
 TAC* generateCode(AST* ast)
@@ -183,26 +266,4 @@ TAC* args_tac(TAC** children)
 	{
 		return append(children[0], tac(TAC_ARG, newTemp(), children[1]->destination, NULL));
 	}
-}
-
-linkedList_t* newTemp()
-{
-	static int count = 0;
-	char* tempName = malloc(10 + sizeof(int) * 8 + 1);
-	
-	sprintf(tempName, "___temp%d___", count);
-	count++;
-	
-	return addSymbol(tempName, SYMBOL_IDENTIFIER);
-}
-
-linkedList_t* newLabel()
-{
-	static int count = 0;
-	char* labelName = malloc(11 + sizeof(int) * 8 + 1);
-	
-	sprintf(tempName, "___label%d___", count);
-	count++;
-	
-	return addSymbol(tempName, SYMBOL_LABEL);
 }
