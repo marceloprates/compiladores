@@ -1,4 +1,15 @@
-// UFRGS - Compiladores - Marcelo Johann - 2013/1
+word a:1;
+word b:2;
+word c:3;
+
+word main()
+{
+  a = a + b;
+  output a+1, b, c;
+}
+
+
+/*// UFRGS - Compiladores - Marcelo Johann - 2013/1
 
 word a:0ABC;
 word v[10]:0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0;
@@ -27,4 +38,4 @@ word outra () {}
 
 word maisuma ()
   {
-  }
+  }*/

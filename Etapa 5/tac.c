@@ -116,11 +116,14 @@ void printCode(TAC* myTac)
 	
 	for(aux = myTac; aux != NULL; aux = aux->next)
 	{
-		printTypeTAC(aux->tac_type);
-		printf(" %s %s %s\n",
-			aux->destination ? aux->destination->symbol.text : "NULL",
-			aux->source1 ? aux->source1->symbol.text : "NULL",
-			aux->source2 ? aux->source2->symbol.text : "NULL");
+		if(aux->tac_type != TAC_SYMBOL)
+		{
+			printTypeTAC(aux->tac_type);
+			printf(" %s %s %s\n",
+				aux->destination ? aux->destination->symbol.text : "NULL",
+				aux->source1 ? aux->source1->symbol.text : "NULL",
+				aux->source2 ? aux->source2->symbol.text : "NULL");
+		}
 	}
 }
 
@@ -217,6 +220,38 @@ TAC* args_tac(TAC** children)
 	}
 }
 
+TAC* assignment_tac(TAC* id, TAC* expression)
+{
+	// TRATAR ARRAYS
+	return append(expression, tac(TAC_MOVE, id->destination, expression->destination, NULL));
+}
+
+TAC* declaration_tac(TAC* id, TAC* literal)
+{
+	return tac(TAC_MOVE, id->destination, literal->destination, NULL);
+}
+
+/*TAC* output_tac(TAC* args)
+{
+	TAC* ptr = args;
+
+	TAC* output = NULL;
+
+	if(ptr != NULL)
+	{
+		output = tac(TAC_PRINT, ptr->destination, NULL, NULL);
+		ptr = ptr->prev;
+	}
+
+	while(ptr != NULL)
+	{
+		output = append(tac(TAC_PRINT, ptr->destination, NULL, NULL), output);
+		ptr = ptr->prev;
+	}
+
+	return append(args,output);
+}*/
+
 TAC* generateCode(AST* ast)
 {
 	if(ast == NULL)
@@ -234,6 +269,7 @@ TAC* generateCode(AST* ast)
 
 	switch(ast->node_type)
 	{
+		case LITERAL: result = tac(TAC_SYMBOL, ast->node, NULL, NULL); break;
 		case IDENTIFIER: result = tac(TAC_SYMBOL, ast->node, NULL, NULL); break;
 		
 		case ADDITION: result = binaryOp_tac(TAC_ADD, childTac); break;
@@ -258,9 +294,16 @@ TAC* generateCode(AST* ast)
 			break;
 			
 		case LOOP: result = loop_tac(childTac[0], childTac[1]); break;
+
+		case ASSIGNMENT: result = assignment_tac(childTac[0], childTac[1]); break;
 		
 		case FUNCTIONCALL: result = call_tac(childTac[0], childTac[1]); break;
 		case ARGUMENTLIST: result = args_tac(childTac); break;
+
+		case DECLARATION: result = declaration_tac(childTac[1], childTac[2]); break;
+
+		//case INPUT: result = tac(TAC_READ, childTac[0], NULL, NULL); break;
+		//case OUTPUT: result = output_tac(childTac[0]); break;
 		
 		case BLOCK:
 		case COMMANDLIST:
