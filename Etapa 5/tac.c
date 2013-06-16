@@ -211,13 +211,18 @@ TAC* args_tac(TAC** children)
 	if(children[1] == NULL)
 	// Último argumento (calculado em children[0])
 	{
-		return tac(TAC_ARG, newTemp(), children[0]->destination, NULL);
+		return tac(TAC_ARG, NULL, children[0]->destination, NULL);
 	}
 	else
 	// Mais de um argumento, argumentos anteriores empilhados em children[0] e último argumento calculado em children[1]
 	{
-		return append(children[0], tac(TAC_ARG, newTemp(), children[1]->destination, NULL));
+		return append(children[0], tac(TAC_ARG, NULL, children[1]->destination, NULL));
 	}
+}
+
+TAC* return_tac(TAC* expr)
+{
+	return tac(TAC_RET, NULL, expr->destination, NULL);
 }
 
 TAC* assignment_tac(TAC* id, TAC* expression)
@@ -299,6 +304,8 @@ TAC* generateCode(AST* ast)
 		
 		case FUNCTIONCALL: result = call_tac(childTac[0], childTac[1]); break;
 		case ARGUMENTLIST: result = args_tac(childTac); break;
+
+		case RETURN: result = return_tac(childTac[0]); break;
 
 		case DECLARATION: result = declaration_tac(childTac[1], childTac[2]); break;
 
