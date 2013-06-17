@@ -147,6 +147,7 @@ void printTypeTAC(tacType_t type)
 		case TAC_PRINT: printf("PRINT"); break;
 		case TAC_READ: printf("READ"); break;
 		case TAC_ARRAYASSIGN: printf("ARRAY_ASSIGN"); break;
+		case TAC_OUTPUT_ARG: printf("OUTPUT_ARG"); break;
 		
 		default: printf("??"); break;
 	}
@@ -166,13 +167,14 @@ void printCode(TAC* myTac)
 
 			if(aux->destination)
 			{
-				if(aux->destination->symbol.type == SYMBOL_LIT_INTEGER)
+				switch(aux->destination->symbol.type)
 				{
-					printf("%d ", aux->destination->symbol.value.intLit);
-				}
-				else
-				{
-					printf("%s ", aux->destination->symbol.text);
+					case SYMBOL_LIT_INTEGER: printf("%d ", aux->destination->symbol.value.intLit); break;
+					case SYMBOL_LIT_FALSE: printf("%d ", aux->destination->symbol.value.boolLit); break;
+					case SYMBOL_LIT_TRUE: printf("%d ", aux->destination->symbol.value.boolLit); break;
+					case SYMBOL_LIT_CHAR: printf("%c ", aux->destination->symbol.value.charLit); break;
+					case SYMBOL_LIT_STRING: printf("%c%s%c ", 34, aux->destination->symbol.value.stringLit, 34); break;
+					case SYMBOL_IDENTIFIER: printf("%s ", aux->destination->symbol.value.identifier); break;
 				}
 			}
 			else
@@ -182,13 +184,14 @@ void printCode(TAC* myTac)
 
 			if(aux->source1)
 			{
-				if(aux->source1->symbol.type == SYMBOL_LIT_INTEGER)
+				switch(aux->source1->symbol.type)
 				{
-					printf("%d ", aux->source1->symbol.value.intLit);
-				}
-				else
-				{
-					printf("%s ", aux->source1->symbol.text);
+					case SYMBOL_LIT_INTEGER: printf("%d ", aux->source1->symbol.value.intLit); break;
+					case SYMBOL_LIT_FALSE: printf("%d ", aux->source1->symbol.value.boolLit); break;
+					case SYMBOL_LIT_TRUE: printf("%d ", aux->source1->symbol.value.boolLit); break;
+					case SYMBOL_LIT_CHAR: printf("%c ", aux->source1->symbol.value.charLit); break;
+					case SYMBOL_LIT_STRING: printf("%c%s%c ", 34, aux->source1->symbol.value.stringLit, 34); break;
+					case SYMBOL_IDENTIFIER: printf("%s ", aux->source1->symbol.value.identifier); break;
 				}
 			}
 			else
@@ -198,13 +201,14 @@ void printCode(TAC* myTac)
 
 			if(aux->source2)
 			{
-				if(aux->source2->symbol.type == SYMBOL_LIT_INTEGER)
+				switch(aux->source2->symbol.type)
 				{
-					printf("%d ", aux->source2->symbol.value.intLit);
-				}
-				else
-				{
-					printf("%s ", aux->source2->symbol.text);
+					case SYMBOL_LIT_INTEGER: printf("%d ", aux->source2->symbol.value.intLit); break;
+					case SYMBOL_LIT_FALSE: printf("%d ", aux->source2->symbol.value.boolLit); break;
+					case SYMBOL_LIT_TRUE: printf("%d ", aux->source2->symbol.value.boolLit); break;
+					case SYMBOL_LIT_CHAR: printf("%c ", aux->source2->symbol.value.charLit); break;
+					case SYMBOL_LIT_STRING: printf("%c%s%c ", 34, aux->source2->symbol.value.stringLit, 34); break;
+					case SYMBOL_IDENTIFIER: printf("%s ", aux->source2->symbol.value.identifier); break;
 				}
 			}
 			else
@@ -309,8 +313,7 @@ TAC* call_tac(TAC* funcId, TAC* args)
 
 TAC* output_tac(TAC* elements)
 {
-
-	return elements;
+	return append(elements, tac(TAC_PRINT,NULL,NULL,NULL));
 }
 
 TAC* args_tac(TAC** children)
@@ -340,12 +343,12 @@ TAC* output_args_tac(TAC** children)
 	if(children[1] == NULL)
 	// Último argumento (calculado em children[0])
 	{
-		return append(children[0], append(children[1], append(children[2], append(children[3], tac(TAC_PRINT, NULL, children[0]->destination, NULL)))));
+		return append(children[0], append(children[1], append(children[2], append(children[3], tac(TAC_OUTPUT_ARG, NULL, children[0]->destination, NULL)))));
 	}
 	else
 	// Mais de um argumento, argumentos anteriores empilhados em children[0] e último argumento calculado em children[1]
 	{
-		return append(children[0], append(children[1], append(children[2], append(children[3], tac(TAC_PRINT, NULL, children[1]->destination, NULL)))));
+		return append(children[0], append(children[1], append(children[2], append(children[3], tac(TAC_OUTPUT_ARG, NULL, children[1]->destination, NULL)))));
 	}
 }
 

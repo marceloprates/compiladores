@@ -27,6 +27,7 @@ enum tacType_e
 	TAC_JUMP,
 	TAC_CALL,
 	TAC_ARG,
+	TAC_OUTPUT_ARG,
 	TAC_RET,
 	TAC_PRINT,
 	TAC_READ
