@@ -1,7 +1,11 @@
 #include <stdlib.h>
+#include <string.h>
 
 #include "hash.h"
 #include "tac.h"
+
+TAC* data_segment;
+TAC* data_segment_end;
 
 TAC* tac(tacType_t type, linkedList_t* destination, linkedList_t* source1, linkedList_t* source2)
 {
@@ -38,6 +42,25 @@ TAC* append(TAC* tac1, TAC* tac2)
 	return tac2;
 }
 
+TAC* clone(TAC* original)
+{
+	TAC* tac_clone = tac(original->tac_type, original->destination, original->source1, original->source2);
+
+	TAC* clone_ptr = tac_clone->prev;
+	TAC* original_ptr = original->prev;
+
+	while(original_ptr != NULL)
+	{
+		clone_ptr = tac(original_ptr->tac_type, original_ptr->destination, original_ptr->source1, original_ptr->source2);
+		clone_ptr->prev = original_ptr->prev;
+
+		original_ptr = original_ptr->prev;
+		clone_ptr = clone_ptr->prev;
+	}
+
+	return tac_clone;
+}
+
 linkedList_t* newTemp()
 {
 	static int count = 0;
@@ -57,6 +80,24 @@ linkedList_t* newLabel()
 	sprintf(labelName, "___label%d___", count);
 	count++;
 	
+	return addSymbol(labelName, SYMBOL_IDENTIFIER);
+}
+
+linkedList_t* function_start_label(linkedList_t* function)
+{
+	char* labelName = malloc(strlen("___") + strlen(function->symbol.text) + strlen("_start") + strlen("___") + 1);
+
+	sprintf(labelName, "___%s_start___", function->symbol.text);
+
+	return addSymbol(labelName, SYMBOL_IDENTIFIER);
+}
+
+linkedList_t* function_end_label(linkedList_t* function)
+{
+	char* labelName = malloc(strlen("___") + strlen(function->symbol.text) + strlen("_end") + strlen("___") + 1);
+
+	sprintf(labelName, "___%s_end___", function->symbol.text);
+
 	return addSymbol(labelName, SYMBOL_IDENTIFIER);
 }
 
@@ -105,6 +146,7 @@ void printTypeTAC(tacType_t type)
 		case TAC_RET: printf("RET"); break;
 		case TAC_PRINT: printf("PRINT"); break;
 		case TAC_READ: printf("READ"); break;
+		case TAC_ARRAYASSIGN: printf("ARRAY_ASSIGN"); break;
 		
 		default: printf("??"); break;
 	}
@@ -119,10 +161,63 @@ void printCode(TAC* myTac)
 		if(aux->tac_type != TAC_SYMBOL)
 		{
 			printTypeTAC(aux->tac_type);
-			printf(" %s %s %s\n",
+
+			printf(" ");
+
+			if(aux->destination)
+			{
+				if(aux->destination->symbol.type == SYMBOL_LIT_INTEGER)
+				{
+					printf("%d ", aux->destination->symbol.value.intLit);
+				}
+				else
+				{
+					printf("%s ", aux->destination->symbol.text);
+				}
+			}
+			else
+			{
+				printf("NULL ");
+			}
+
+			if(aux->source1)
+			{
+				if(aux->source1->symbol.type == SYMBOL_LIT_INTEGER)
+				{
+					printf("%d ", aux->source1->symbol.value.intLit);
+				}
+				else
+				{
+					printf("%s ", aux->source1->symbol.text);
+				}
+			}
+			else
+			{
+				printf("NULL ");
+			}
+
+			if(aux->source2)
+			{
+				if(aux->source2->symbol.type == SYMBOL_LIT_INTEGER)
+				{
+					printf("%d ", aux->source2->symbol.value.intLit);
+				}
+				else
+				{
+					printf("%s ", aux->source2->symbol.text);
+				}
+			}
+			else
+			{
+				printf("NULL ");
+			}
+
+			printf("\n");
+
+			/*printf(" %s %s %s\n",
 				aux->destination ? aux->destination->symbol.text : "NULL",
 				aux->source1 ? aux->source1->symbol.text : "NULL",
-				aux->source2 ? aux->source2->symbol.text : "NULL");
+				aux->source2 ? aux->source2->symbol.text : "NULL");*/
 		}
 	}
 }
@@ -137,6 +232,7 @@ TAC* binaryOp_tac(tacType_t type, TAC** children)
 
 TAC* unaryOp_tac(tacType_t type, TAC* op)
 {
+
 	return append(op, tac(type, newTemp(), op->destination, NULL));
 }
 
@@ -180,18 +276,26 @@ TAC* loop_tac(TAC* test, TAC* loopBlock)
 	linkedList_t* testResult = test->destination;
 	linkedList_t* loopLabel = newLabel();
 	linkedList_t* endLabel = newLabel();
+
+	TAC* new_test = clone(test);
 	
 	return
 		append(
 			append(
 				append(
 					append(
-						tac(TAC_LABEL, loopLabel, NULL, NULL),
-						tac(TAC_IFZ, endLabel, testResult, NULL)
+						test,
+						append(	
+							tac(TAC_LABEL, loopLabel, NULL, NULL),
+							tac(TAC_IFZ, endLabel, testResult, NULL)
+						)
 					),
 					loopBlock
 				),
-				tac(TAC_JUMP, loopLabel, NULL, NULL)
+				append(
+					new_test,
+					tac(TAC_JUMP, loopLabel, NULL, NULL)
+				)
 			),
 			tac(TAC_LABEL, endLabel, NULL, NULL)
 		);
@@ -199,7 +303,14 @@ TAC* loop_tac(TAC* test, TAC* loopBlock)
 
 TAC* call_tac(TAC* funcId, TAC* args)
 {
-	return append(append(args, funcId), tac(TAC_CALL, newTemp(), funcId->destination, NULL));
+
+	return append(append(args, funcId), tac(TAC_CALL, newTemp(), function_start_label(funcId->destination), NULL));
+}
+
+TAC* output_tac(TAC* elements)
+{
+
+	return elements;
 }
 
 TAC* args_tac(TAC** children)
@@ -211,51 +322,79 @@ TAC* args_tac(TAC** children)
 	if(children[1] == NULL)
 	// Último argumento (calculado em children[0])
 	{
-		return tac(TAC_ARG, NULL, children[0]->destination, NULL);
+		return append(children[0], append(children[1], append(children[2], append(children[3], tac(TAC_ARG, NULL, children[0]->destination, NULL)))));
 	}
 	else
 	// Mais de um argumento, argumentos anteriores empilhados em children[0] e último argumento calculado em children[1]
 	{
-		return append(children[0], tac(TAC_ARG, NULL, children[1]->destination, NULL));
+		return append(children[0], append(children[1], append(children[2], append(children[3], tac(TAC_ARG, NULL, children[1]->destination, NULL)))));
+	}
+}
+
+TAC* output_args_tac(TAC** children)
+{
+	if(children[0] == NULL)
+	// A função não recebe argumentos
+		return NULL;
+	
+	if(children[1] == NULL)
+	// Último argumento (calculado em children[0])
+	{
+		return append(children[0], append(children[1], append(children[2], append(children[3], tac(TAC_PRINT, NULL, children[0]->destination, NULL)))));
+	}
+	else
+	// Mais de um argumento, argumentos anteriores empilhados em children[0] e último argumento calculado em children[1]
+	{
+		return append(children[0], append(children[1], append(children[2], append(children[3], tac(TAC_PRINT, NULL, children[1]->destination, NULL)))));
 	}
 }
 
 TAC* return_tac(TAC* expr)
 {
+
 	return tac(TAC_RET, NULL, expr->destination, NULL);
 }
 
-TAC* assignment_tac(TAC* id, TAC* expression)
+TAC* assignment_tac(TAC* variable, TAC* expression)
 {
-	// TRATAR ARRAYS
-	return append(expression, tac(TAC_MOVE, id->destination, expression->destination, NULL));
+	switch(variable->tac_type)
+	{
+		case TAC_SYMBOL: return append(expression, tac(TAC_MOVE, variable->destination, expression->destination, NULL)); break;
+		case TAC_ARRAYACCESS: return append(expression, tac(TAC_ARRAYASSIGN, variable->destination, variable->source1, expression->destination)); break;
+	}
 }
 
 TAC* declaration_tac(TAC* id, TAC* literal)
 {
+
 	return tac(TAC_MOVE, id->destination, literal->destination, NULL);
 }
 
-/*TAC* output_tac(TAC* args)
+TAC* array_declaration_tac(TAC* id, AST* literal_list)
 {
-	TAC* ptr = args;
+	if(literal_list == NULL)
+		return NULL;
 
-	TAC* output = NULL;
-
-	if(ptr != NULL)
+	if(literal_list->child[0] != NULL)
 	{
-		output = tac(TAC_PRINT, ptr->destination, NULL, NULL);
-		ptr = ptr->prev;
-	}
+		if(literal_list->child[0]->child[1] == NULL)
+			return NULL;
 
-	while(ptr != NULL)
+		return append(array_declaration_tac(id,literal_list->child[0]), tac(TAC_ARRAYASSIGN, id->destination, literal_list->child[0]->child[1]->node, NULL));
+	}
+	else
 	{
-		output = append(tac(TAC_PRINT, ptr->destination, NULL, NULL), output);
-		ptr = ptr->prev;
+		return append(array_declaration_tac(id,literal_list->child[0]), tac(TAC_ARRAYASSIGN, id->destination, literal_list->child[1]->node, NULL));
 	}
+}
 
-	return append(args,output);
-}*/
+TAC* fun_def_tac(linkedList_t* node, TAC* header, TAC* local_defs, TAC* block)
+{
+	linkedList_t* start_label = function_start_label(node);
+	linkedList_t* end_label = function_end_label(node); 
+
+	return append(tac(TAC_JUMP,end_label,NULL,NULL),append(tac(TAC_LABEL,start_label,NULL,NULL),append(header,append(local_defs,append(block,tac(TAC_LABEL,end_label,NULL,NULL))))));
+}
 
 TAC* generateCode(AST* ast)
 {
@@ -291,7 +430,7 @@ TAC* generateCode(AST* ast)
 		case OR: result = binaryOp_tac(TAC_OR, childTac); break;
 		
 		case REF: result = unaryOp_tac(TAC_REF, childTac[0]); break;
-		case DEREF: result = unaryOp_tac(TAC_REF, childTac[0]); break;
+		case DEREF: result = unaryOp_tac(TAC_DEREF, childTac[0]); break;
 		
 		case IFTHEN:
 		case IFTHENELSE:
@@ -300,17 +439,26 @@ TAC* generateCode(AST* ast)
 			
 		case LOOP: result = loop_tac(childTac[0], childTac[1]); break;
 
+		case ARRAYACCESS: result = tac(TAC_ARRAYACCESS, childTac[0]->destination, childTac[1]->destination, NULL); break;
+
 		case ASSIGNMENT: result = assignment_tac(childTac[0], childTac[1]); break;
 		
 		case FUNCTIONCALL: result = call_tac(childTac[0], childTac[1]); break;
+
 		case ARGUMENTLIST: result = args_tac(childTac); break;
+
+		case ELEMENTLIST: result = output_args_tac(childTac); break;
 
 		case RETURN: result = return_tac(childTac[0]); break;
 
 		case DECLARATION: result = declaration_tac(childTac[1], childTac[2]); break;
+		case ARRAYDECLARATION: result = array_declaration_tac(childTac[1], ast->child[3]); break;
+		//case POINTERDECLARATION: result = pointer_declaration_tac(childTac[1],childTac[2]); break;
 
-		//case INPUT: result = tac(TAC_READ, childTac[0], NULL, NULL); break;
-		//case OUTPUT: result = output_tac(childTac[0]); break;
+		case INPUT: result = tac(TAC_READ, NULL, childTac[0]->destination, NULL); break;
+		case OUTPUT: result = output_tac(childTac[0]); break;
+
+		case FUNCTIONDEFINITION: result = fun_def_tac(ast->child[0]->child[1]->node, childTac[0], childTac[1], childTac[2]); break;
 		
 		case BLOCK:
 		case COMMANDLIST:
@@ -322,3 +470,11 @@ TAC* generateCode(AST* ast)
 	
 	return result;
 }
+
+void init_data_segment()
+{
+
+	data_segment = tac(TAC_SYMBOL, newLabel(), NULL, NULL);
+}
+
+

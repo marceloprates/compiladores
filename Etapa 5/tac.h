@@ -4,6 +4,8 @@ enum tacType_e
 {
 	TAC_SYMBOL,
 	TAC_MOVE,
+	TAC_ARRAYACCESS,
+	TAC_ARRAYASSIGN,
 	TAC_ADD,
 	TAC_SUB,
 	TAC_MUL,
@@ -49,3 +51,4 @@ typedef enum tacType_e tacType_t;
 TAC* reverse(TAC* myTac);
 void printCode(TAC* myTac);
 TAC* generateCode(AST* ast);
+void init_data_segment();
