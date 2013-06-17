@@ -169,8 +169,6 @@ void first_pass(AST* ast)
 				}
 				else
 				{
-					fprintf(stderr,"TO NO POINTER\n");
-
 					variable_entry->marked = TRUE;
 					variable_entry->declaration = ast;
 					variable_entry->nature = SCALAR;

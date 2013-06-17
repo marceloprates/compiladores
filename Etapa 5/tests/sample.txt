@@ -55,11 +55,17 @@ word a:0ABC;
 word v[10]: 2 3 5 7 11 13 17 19 23 29 31 33 37 41 43 47;
 word w[10];
 word mat[1000];
+bool meubool: TRUE;
+word $meuponteiro: 42;
+word $meuoutroponteiro: 45;
 
 word main()
   word i:0;
   bool b: FALSE;
   {
+
+  meuponteiro = &i;
+
   output "Digite um numero: ";
   loop (i<10+1)
     {

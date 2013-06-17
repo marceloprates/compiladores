@@ -122,6 +122,7 @@ void printTypeTAC(tacType_t type)
 	{
 		case TAC_SYMBOL: printf("SYMBOL"); break;
 		case TAC_MOVE: printf("MOVE"); break;
+		case TAC_MOVE_I: printf("MOVE_I"); break;
 		case TAC_ADD: printf("ADD"); break;
 		case TAC_SUB: printf("SUB"); break;
 		case TAC_MUL: printf("MUL"); break;
@@ -364,6 +365,7 @@ TAC* assignment_tac(TAC* variable, TAC* expression)
 	{
 		case TAC_SYMBOL: return append(expression, tac(TAC_MOVE, variable->destination, expression->destination, NULL)); break;
 		case TAC_ARRAYACCESS: return append(expression, tac(TAC_ARRAYASSIGN, variable->destination, variable->source1, expression->destination)); break;
+		//case TAC_DEREF: return append(expression, append(variable, tac(TAC_MOVE_I, variable->destination, expression->destination, NULL))); break;
 	}
 }
 
@@ -389,6 +391,13 @@ TAC* array_declaration_tac(TAC* id, AST* literal_list)
 	{
 		return append(array_declaration_tac(id,literal_list->child[0]), tac(TAC_ARRAYASSIGN, id->destination, literal_list->child[1]->node, NULL));
 	}
+}
+
+TAC* pointer_declaration_tac(TAC* id, TAC* literal)
+{
+	linkedList_t* temp = newTemp();
+
+	return append(tac(TAC_DEREF,temp,id->destination,NULL),tac(TAC_MOVE_I,temp,literal->destination,NULL));
 }
 
 TAC* fun_def_tac(linkedList_t* node, TAC* header, TAC* local_defs, TAC* block)
@@ -432,8 +441,8 @@ TAC* generateCode(AST* ast)
 		case AND: result = binaryOp_tac(TAC_AND, childTac); break;
 		case OR: result = binaryOp_tac(TAC_OR, childTac); break;
 		
-		case REF: result = unaryOp_tac(TAC_REF, childTac[0]); break;
-		case DEREF: result = unaryOp_tac(TAC_DEREF, childTac[0]); break;
+		case REF: result = tac(TAC_REF, newTemp(), childTac[0]->destination, NULL); break;
+		case DEREF: result = tac(TAC_DEREF, newTemp(), childTac[0]->destination, NULL); break;
 		
 		case IFTHEN:
 		case IFTHENELSE:
@@ -456,7 +465,7 @@ TAC* generateCode(AST* ast)
 
 		case DECLARATION: result = declaration_tac(childTac[1], childTac[2]); break;
 		case ARRAYDECLARATION: result = array_declaration_tac(childTac[1], ast->child[3]); break;
-		//case POINTERDECLARATION: result = pointer_declaration_tac(childTac[1],childTac[2]); break;
+		case POINTERDECLARATION: result = pointer_declaration_tac(childTac[1],childTac[2]); break;
 
 		case INPUT: result = tac(TAC_READ, NULL, childTac[0]->destination, NULL); break;
 		case OUTPUT: result = output_tac(childTac[0]); break;
