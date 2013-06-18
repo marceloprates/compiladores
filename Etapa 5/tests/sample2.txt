@@ -11,12 +11,12 @@ word main()
   {
   output "digite um numero";
   input i;
-  loop (i+10)
+  loop (TRUE)
     {
-    a = incn();
+    //a = incn();
     i = i + 1;
     };
-  if (x)
+  if (TRUE)
   then a = 5
   else a = 7;
   output "A resposta eh",i,a,2f,"\n";

@@ -468,7 +468,7 @@ int check_parameters(AST* parameters, AST* arguments, int* expected, int* given)
 	
 	while(1)
 	{
-		if(parameter->node_type != PARAMETERLIST || argument->node_type != ARGUMENTLIST) //if(parameter->child[0] == NULL || argument->child[0] == NULL)
+		if(parameter->node_type != PARAMETERLIST || parameter->child[0] == NULL || argument->node_type != ARGUMENTLIST || argument->child[0] == NULL) //if(parameter->child[0] == NULL || argument->child[0] == NULL)
 			break;
 			
 		if(!same_types(parameter, argument))
@@ -482,7 +482,7 @@ int check_parameters(AST* parameters, AST* arguments, int* expected, int* given)
 		parameter = parameter->child[0]; argument = argument->child[0];
 	}
 	
-	if(parameter->node_type == PARAMETERLIST) //if(parameter->child[0] != NULL)
+	if(parameter->node_type == PARAMETERLIST && parameter->child[0] != NULL) //if(parameter->child[0] != NULL)
 	{
 		while(parameter->node_type == PARAMETERLIST) //while(parameter->child[0] != NULL)
 		{
@@ -490,7 +490,7 @@ int check_parameters(AST* parameters, AST* arguments, int* expected, int* given)
 		}
 	}
 	
-	if(argument->node_type == ARGUMENTLIST) //if(argument->child[0] != NULL)
+	if(argument->node_type == ARGUMENTLIST && argument->child[0] != NULL) //if(argument->child[0] != NULL)
 	{
 		while(argument->node_type == ARGUMENTLIST) //while(argument->child[0] != NULL)
 		{

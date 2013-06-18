@@ -4,9 +4,6 @@
 #include "hash.h"
 #include "tac.h"
 
-TAC* data_segment;
-TAC* data_segment_end;
-
 TAC* tac(tacType_t type, linkedList_t* destination, linkedList_t* source1, linkedList_t* source2)
 {
 	TAC* myTac = malloc(sizeof(TAC));
@@ -460,8 +457,6 @@ TAC* generateCode(AST* ast)
 	childTac[3] = generateCode(ast->child[3]);
 	
 	TAC* result;
-	
-	fprintf(stderr, "%s\n", NodeTypetoString(ast->node_type));
 
 	switch(ast->node_type)
 	{
@@ -521,14 +516,6 @@ TAC* generateCode(AST* ast)
 			result = append(append(append(childTac[0], childTac[1]), childTac[2]), childTac[3]);
 			break;
 	}
-printTypeTAC(result->tac_type);
 	return result;
 }
-
-void init_data_segment()
-{
-
-	data_segment = tac(TAC_SYMBOL, newLabel(), NULL, NULL);
-}
-
 

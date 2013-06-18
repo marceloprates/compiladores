@@ -13,7 +13,7 @@ word main()
   pt = &a;
   a = pt;
   a = *pt;
-  if (x)
+  if (TRUE)
   then if (a<2*5) 
     then a = 5
     else a = 2 + 'x'

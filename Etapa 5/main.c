@@ -36,7 +36,6 @@ int main(int argc, char** argv)
 		exit(3);
 	}
 
-	init_data_segment();
 	printCode(reverse(generateCode(root)));
 
 	close_input();
