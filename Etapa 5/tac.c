@@ -149,6 +149,7 @@ void printTypeTAC(tacType_t type)
 		case TAC_READ: printf("READ"); break;
 		case TAC_ARRAYASSIGN: printf("ARRAY_ASSIGN"); break;
 		case TAC_OUTPUT_ARG: printf("OUTPUT_ARG"); break;
+		case TAC_PARAMS: printf("PARAMS"); break;
 		
 		default: printf("??"); break;
 	}
