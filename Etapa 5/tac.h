@@ -31,7 +31,8 @@ enum tacType_e
 	TAC_OUTPUT_ARG,
 	TAC_RET,
 	TAC_PRINT,
-	TAC_READ
+	TAC_READ,
+	TAC_PARAMS
 };
 
 struct TAC_s
