@@ -306,7 +306,7 @@ TAC* loop_tac(TAC* test, TAC* loopBlock)
 
 TAC* call_tac(TAC* funcId, TAC* args)
 {
-	return append(append(args, funcId), tac(TAC_CALL, newTemp(), function_start_label(funcId->destination), NULL));
+	return append(append(args, funcId), tac(TAC_CALL, newTemp(), funcId->destination, NULL));
 }
 
 TAC* output_tac(TAC* elements)
@@ -394,7 +394,7 @@ TAC* pointer_declaration_tac(TAC* id, TAC* literal)
 {
 	linkedList_t* temp = newTemp();
 
-	return append(tac(TAC_DEREF,temp,id->destination,NULL),tac(TAC_MOVE_I,temp,literal->destination,NULL));
+	return tac(TAC_MOVE_I,temp,literal->destination,NULL);
 }
 
 TAC* fun_def_tac(linkedList_t* node, TAC* header, TAC* local_defs, TAC* block)
