@@ -120,38 +120,38 @@ void printTypeTAC(tacType_t type)
 {
 	switch(type)
 	{
-		case TAC_SYMBOL: printf("SYMBOL"); break;
-		case TAC_MOVE: printf("MOVE"); break;
-		case TAC_MOVE_I: printf("MOVE_I"); break;
-		case TAC_ADD: printf("ADD"); break;
-		case TAC_SUB: printf("SUB"); break;
-		case TAC_MUL: printf("MUL"); break;
-		case TAC_DIV: printf("DIV"); break;
-		case TAC_LESS: printf("LESS"); break;
-		case TAC_LESS_EQUAL: printf("LESS_EQUAL"); break;
-		case TAC_GREATER: printf("GREATER"); break;
-		case TAC_GREATER_EQUAL: printf("GREATER_EQUAL"); break;
-		case TAC_EQUAL: printf("EQUAL"); break;
-		case TAC_NOT_EQUAL: printf("NOT_EQUAL"); break;
-		case TAC_AND: printf("AND"); break;
-		case TAC_OR: printf("OR"); break;
-		case TAC_REF: printf("REF"); break;
-		case TAC_DEREF: printf("DEREF"); break;
-		case TAC_LABEL: printf("LABEL"); break;
-		case TAC_BEGINFUN: printf("BEGINFUN"); break;
-		case TAC_ENDFUN: printf("ENDFUN"); break;
-		case TAC_IFZ: printf("IFZ"); break;
-		case TAC_JUMP: printf("JUMP"); break;
-		case TAC_CALL: printf("CALL"); break;
-		case TAC_ARG: printf("ARG"); break;
-		case TAC_RET: printf("RET"); break;
-		case TAC_PRINT: printf("PRINT"); break;
-		case TAC_READ: printf("READ"); break;
-		case TAC_ARRAYASSIGN: printf("ARRAY_ASSIGN"); break;
-		case TAC_OUTPUT_ARG: printf("OUTPUT_ARG"); break;
-		case TAC_PARAM: printf("PARAMS"); break;
+		case TAC_SYMBOL: fprintf(stderr, "SYMBOL"); break;
+		case TAC_MOVE: fprintf(stderr, "MOVE"); break;
+		case TAC_MOVE_I: fprintf(stderr, "MOVE_I"); break;
+		case TAC_ADD: fprintf(stderr, "ADD"); break;
+		case TAC_SUB: fprintf(stderr, "SUB"); break;
+		case TAC_MUL: fprintf(stderr, "MUL"); break;
+		case TAC_DIV: fprintf(stderr, "DIV"); break;
+		case TAC_LESS: fprintf(stderr, "LESS"); break;
+		case TAC_LESS_EQUAL: fprintf(stderr, "LESS_EQUAL"); break;
+		case TAC_GREATER: fprintf(stderr, "GREATER"); break;
+		case TAC_GREATER_EQUAL: fprintf(stderr, "GREATER_EQUAL"); break;
+		case TAC_EQUAL: fprintf(stderr, "EQUAL"); break;
+		case TAC_NOT_EQUAL: fprintf(stderr, "NOT_EQUAL"); break;
+		case TAC_AND: fprintf(stderr, "AND"); break;
+		case TAC_OR: fprintf(stderr, "OR"); break;
+		case TAC_REF: fprintf(stderr, "REF"); break;
+		case TAC_DEREF: fprintf(stderr, "DEREF"); break;
+		case TAC_LABEL: fprintf(stderr, "LABEL"); break;
+		case TAC_BEGINFUN: fprintf(stderr, "BEGINFUN"); break;
+		case TAC_ENDFUN: fprintf(stderr, "ENDFUN"); break;
+		case TAC_IFZ: fprintf(stderr, "IFZ"); break;
+		case TAC_JUMP: fprintf(stderr, "JUMP"); break;
+		case TAC_CALL: fprintf(stderr, "CALL"); break;
+		case TAC_ARG: fprintf(stderr, "ARG"); break;
+		case TAC_RET: fprintf(stderr, "RET"); break;
+		case TAC_PRINT: fprintf(stderr, "PRINT"); break;
+		case TAC_READ: fprintf(stderr, "READ"); break;
+		case TAC_ARRAYASSIGN: fprintf(stderr, "ARRAY_ASSIGN"); break;
+		case TAC_OUTPUT_ARG: fprintf(stderr, "OUTPUT_ARG"); break;
+		case TAC_GET_ARG: fprintf(stderr, "GET_ARG"); break;
 		
-		default: printf("??"); break;
+		default: fprintf(stderr, "??"); break;
 	}
 }
 
@@ -165,60 +165,60 @@ void printCode(TAC* myTac)
 		{
 			printTypeTAC(aux->tac_type);
 
-			printf(" ");
+			fprintf(stderr, " ");
 
 			if(aux->destination)
 			{
 				switch(aux->destination->symbol.type)
 				{
-					case SYMBOL_LIT_INTEGER: printf("%d ", aux->destination->symbol.value.intLit); break;
-					case SYMBOL_LIT_FALSE: printf("%d ", aux->destination->symbol.value.boolLit); break;
-					case SYMBOL_LIT_TRUE: printf("%d ", aux->destination->symbol.value.boolLit); break;
-					case SYMBOL_LIT_CHAR: printf("%c ", aux->destination->symbol.value.charLit); break;
-					case SYMBOL_LIT_STRING: printf("%c%s%c ", 34, aux->destination->symbol.value.stringLit, 34); break;
-					case SYMBOL_IDENTIFIER: printf("%s ", aux->destination->symbol.value.identifier); break;
+					case SYMBOL_LIT_INTEGER: fprintf(stderr, "%d ", aux->destination->symbol.value.intLit); break;
+					case SYMBOL_LIT_FALSE: fprintf(stderr, "%d ", aux->destination->symbol.value.boolLit); break;
+					case SYMBOL_LIT_TRUE: fprintf(stderr, "%d ", aux->destination->symbol.value.boolLit); break;
+					case SYMBOL_LIT_CHAR: fprintf(stderr, "%c ", aux->destination->symbol.value.charLit); break;
+					case SYMBOL_LIT_STRING: fprintf(stderr, "%c%s%c ", 34, aux->destination->symbol.value.stringLit, 34); break;
+					case SYMBOL_IDENTIFIER: fprintf(stderr, "%s ", aux->destination->symbol.value.identifier); break;
 				}
 			}
 			else
 			{
-				printf("NULL ");
+				fprintf(stderr, "NULL ");
 			}
 
 			if(aux->source1)
 			{
 				switch(aux->source1->symbol.type)
 				{
-					case SYMBOL_LIT_INTEGER: printf("%d ", aux->source1->symbol.value.intLit); break;
-					case SYMBOL_LIT_FALSE: printf("%d ", aux->source1->symbol.value.boolLit); break;
-					case SYMBOL_LIT_TRUE: printf("%d ", aux->source1->symbol.value.boolLit); break;
-					case SYMBOL_LIT_CHAR: printf("%c ", aux->source1->symbol.value.charLit); break;
-					case SYMBOL_LIT_STRING: printf("%c%s%c ", 34, aux->source1->symbol.value.stringLit, 34); break;
-					case SYMBOL_IDENTIFIER: printf("%s ", aux->source1->symbol.value.identifier); break;
+					case SYMBOL_LIT_INTEGER: fprintf(stderr, "%d ", aux->source1->symbol.value.intLit); break;
+					case SYMBOL_LIT_FALSE: fprintf(stderr, "%d ", aux->source1->symbol.value.boolLit); break;
+					case SYMBOL_LIT_TRUE: fprintf(stderr, "%d ", aux->source1->symbol.value.boolLit); break;
+					case SYMBOL_LIT_CHAR: fprintf(stderr, "%c ", aux->source1->symbol.value.charLit); break;
+					case SYMBOL_LIT_STRING: fprintf(stderr, "%c%s%c ", 34, aux->source1->symbol.value.stringLit, 34); break;
+					case SYMBOL_IDENTIFIER: fprintf(stderr, "%s ", aux->source1->symbol.value.identifier); break;
 				}
 			}
 			else
 			{
-				printf("NULL ");
+				fprintf(stderr, "NULL ");
 			}
 
 			if(aux->source2)
 			{
 				switch(aux->source2->symbol.type)
 				{
-					case SYMBOL_LIT_INTEGER: printf("%d ", aux->source2->symbol.value.intLit); break;
-					case SYMBOL_LIT_FALSE: printf("%d ", aux->source2->symbol.value.boolLit); break;
-					case SYMBOL_LIT_TRUE: printf("%d ", aux->source2->symbol.value.boolLit); break;
-					case SYMBOL_LIT_CHAR: printf("%c ", aux->source2->symbol.value.charLit); break;
-					case SYMBOL_LIT_STRING: printf("%c%s%c ", 34, aux->source2->symbol.value.stringLit, 34); break;
-					case SYMBOL_IDENTIFIER: printf("%s ", aux->source2->symbol.value.identifier); break;
+					case SYMBOL_LIT_INTEGER: fprintf(stderr, "%d ", aux->source2->symbol.value.intLit); break;
+					case SYMBOL_LIT_FALSE: fprintf(stderr, "%d ", aux->source2->symbol.value.boolLit); break;
+					case SYMBOL_LIT_TRUE: fprintf(stderr, "%d ", aux->source2->symbol.value.boolLit); break;
+					case SYMBOL_LIT_CHAR: fprintf(stderr, "%c ", aux->source2->symbol.value.charLit); break;
+					case SYMBOL_LIT_STRING: fprintf(stderr, "%c%s%c ", 34, aux->source2->symbol.value.stringLit, 34); break;
+					case SYMBOL_IDENTIFIER: fprintf(stderr, "%s ", aux->source2->symbol.value.identifier); break;
 				}
 			}
 			else
 			{
-				printf("NULL ");
+				fprintf(stderr, "NULL ");
 			}
 
-			printf("\n");
+			fprintf(stderr, "\n");
 
 			/*printf(" %s %s %s\n",
 				aux->destination ? aux->destination->symbol.text : "NULL",
@@ -309,7 +309,6 @@ TAC* loop_tac(TAC* test, TAC* loopBlock)
 
 TAC* call_tac(TAC* funcId, TAC* args)
 {
-
 	return append(append(args, funcId), tac(TAC_CALL, newTemp(), function_start_label(funcId->destination), NULL));
 }
 
@@ -327,12 +326,12 @@ TAC* args_tac(TAC** children)
 	if(children[1] == NULL)
 	// Último argumento (calculado em children[0])
 	{
-		return append(children[0], append(children[1], append(children[2], append(children[3], tac(TAC_ARG, NULL, children[0]->destination, NULL)))));
+		return append(children[0], tac(TAC_ARG, NULL, children[0]->destination, NULL));
 	}
 	else
 	// Mais de um argumento, argumentos anteriores empilhados em children[0] e último argumento calculado em children[1]
 	{
-		return append(children[0], append(children[1], append(children[2], append(children[3], tac(TAC_ARG, NULL, children[1]->destination, NULL)))));
+		return append(children[0], append(children[1], tac(TAC_ARG, NULL, children[1]->destination, NULL)));
 	}
 }
 
@@ -357,7 +356,7 @@ TAC* output_args_tac(TAC** children)
 TAC* return_tac(TAC* expr)
 {
 
-	return tac(TAC_RET, NULL, expr->destination, NULL);
+	return append(expr, tac(TAC_RET, NULL, expr->destination, NULL));
 }
 
 TAC* assignment_tac(TAC* variable, TAC* expression)
@@ -431,21 +430,21 @@ TAC* fun_def_tac(linkedList_t* node, TAC* header, TAC* local_defs, TAC* block)
 		);
 }
 
-TAC* params_tac(TAC** children)
+TAC* get_args_tac(TAC** children)
 {
-	if(children[0] == NULL)
+	if(children[0] == NULL && children[1] == NULL)
 	// A função não recebe argumentos
 		return NULL;
 	
 	if(children[2] == NULL)
 	// Último parâmetro (calculado em children[1])
 	{
-		return append(children[0], append(children[1], append(children[2], append(children[3], tac(TAC_PARAM, NULL, children[1]->destination, NULL)))));
+		return append(children[1], tac(TAC_GET_ARG, children[1]->destination, NULL, NULL));
 	}
 	else
 	// Mais de um parâmetro, parâmetros anteriores desempilhados em children[0] e último parâmetro calculado em children[2]
 	{
-		return append(tac(TAC_PARAM, NULL, children[2]->destination, NULL), append(children[0], append(children[1], append(children[2], children[3]))));
+		return append(tac(TAC_GET_ARG, children[2]->destination, NULL, NULL), append(children[0], children[2]));
 	}
 }
 
@@ -462,7 +461,7 @@ TAC* generateCode(AST* ast)
 	
 	TAC* result;
 	
-	//fprintf(stderr, "%s\n", NodeTypetoString(ast->node_type));
+	fprintf(stderr, "%s\n", NodeTypetoString(ast->node_type));
 
 	switch(ast->node_type)
 	{
@@ -513,7 +512,7 @@ TAC* generateCode(AST* ast)
 
 		case FUNCTIONDEFINITION: result = fun_def_tac(ast->child[0]->child[1]->node, childTac[0], childTac[1], childTac[2]); break;
 		
-		case PARAMETERLIST: result = params_tac(childTac); break;
+		case PARAMETERLIST: result = get_args_tac(childTac); break;
 		
 		case BLOCK:
 		case COMMANDLIST:
@@ -522,7 +521,7 @@ TAC* generateCode(AST* ast)
 			result = append(append(append(childTac[0], childTac[1]), childTac[2]), childTac[3]);
 			break;
 	}
-	
+printTypeTAC(result->tac_type);
 	return result;
 }
 
