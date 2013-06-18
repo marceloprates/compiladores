@@ -403,9 +403,49 @@ TAC* pointer_declaration_tac(TAC* id, TAC* literal)
 TAC* fun_def_tac(linkedList_t* node, TAC* header, TAC* local_defs, TAC* block)
 {
 	linkedList_t* start_label = function_start_label(node);
-	linkedList_t* end_label = function_end_label(node); 
+	linkedList_t* end_label = function_end_label(node);
 
-	return append(tac(TAC_JUMP,end_label,NULL,NULL),append(tac(TAC_LABEL,start_label,NULL,NULL),append(header,append(local_defs,append(block,tac(TAC_LABEL,end_label,NULL,NULL))))));
+	return
+		append(
+			append(
+				append(
+					append(
+						append(
+							append(
+								append(
+									tac(TAC_JUMP,end_label,NULL,NULL),
+									tac(TAC_LABEL,start_label,NULL,NULL)
+								),
+								tac(TAC_BEGINFUN, node, NULL, NULL)
+							),
+							header
+						),
+						local_defs
+					),
+					block
+				),
+				tac(TAC_ENDFUN, node, NULL, NULL)
+			),
+			tac(TAC_LABEL,end_label,NULL,NULL)
+		);
+}
+
+TAC* params_tac(TAC** children)
+{
+	if(children[0] == NULL)
+	// A função não recebe argumentos
+		return NULL;
+	
+	if(children[2] == NULL)
+	// Último parâmetro (calculado em children[1])
+	{
+		return append(children[0], append(children[1], append(children[2], append(children[3], tac(TAC_PARAM, NULL, children[1]->destination, NULL)))));
+	}
+	else
+	// Mais de um parâmetro, parâmetros anteriores desempilhados em children[0] e último parâmetro calculado em children[2]
+	{
+		return append(tac(TAC_PARAM, NULL, children[2]->destination, NULL), append(children[0], append(children[1], append(children[2], children[3]))));
+	}
 }
 
 TAC* generateCode(AST* ast)
@@ -471,6 +511,8 @@ TAC* generateCode(AST* ast)
 		case OUTPUT: result = output_tac(childTac[0]); break;
 
 		case FUNCTIONDEFINITION: result = fun_def_tac(ast->child[0]->child[1]->node, childTac[0], childTac[1], childTac[2]); break;
+		
+		case PARAMETERLIST: result = params_tac(childTac); break;
 		
 		case BLOCK:
 		case COMMANDLIST:
