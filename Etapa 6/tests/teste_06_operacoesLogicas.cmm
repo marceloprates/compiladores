@@ -1,0 +1,18 @@
+
+word main()
+	bool a: TRUE;
+	bool b: TRUE;
+	word c: 1;
+	word d: 1;	
+{
+	// devem funcionar
+	output a && b;
+	output a || b;
+
+	// não devem funcionar
+	output c && d;
+	output c || d;
+
+	return 1;
+}
+

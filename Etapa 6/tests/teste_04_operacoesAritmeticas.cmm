@@ -1,0 +1,24 @@
+
+word main()
+	word a: 1;
+	word b: 1;
+	bool c: TRUE;
+	bool $d: TRUE;
+{
+	// devem funcionar
+	output a * b;
+	output a / b;
+	output a - b;
+	output a + b;
+
+	// não devem funcionar
+	output a * c;
+	output a / c;
+	output a - c;
+	output a + c;
+
+	output d/1;
+
+	return 1;
+}
+

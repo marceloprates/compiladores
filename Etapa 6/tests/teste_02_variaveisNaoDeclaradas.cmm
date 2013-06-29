@@ -1,0 +1,21 @@
+
+word a: 1;
+word b: 1;
+
+word main() 
+{
+	// deve funcionar
+	output a;
+	a = 6;
+
+	// deve funcionar
+	output b;
+	b = 7;
+
+	// não deve funcionar
+	output c;
+	c = 42;
+
+	return 1;
+}
+
