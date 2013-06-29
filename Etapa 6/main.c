@@ -8,6 +8,7 @@
 #include "y.tab.h"
 #include "semantic.h"
 #include "tac.h"
+#include "assembly.h"
 
 extern AST* root;
 
@@ -36,7 +37,11 @@ int main(int argc, char** argv)
 		exit(3);
 	}
 
-	printCode(reverse(generateCode(root)));
+	TAC* tacs = reverse(generateCode(root));
+
+	printCode(tacs);
+
+	generateAssembly(tacs, "EITASSEMBLY.s");
 
 	close_input();
 

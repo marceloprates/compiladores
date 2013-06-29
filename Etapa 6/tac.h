@@ -1,3 +1,6 @@
+#ifndef TAC_H
+#define TAC_H
+
 #include "hash.h"
 
 enum tacType_e
@@ -55,3 +58,5 @@ TAC* reverse(TAC* myTac);
 void printCode(TAC* myTac);
 TAC* generateCode(AST* ast);
 void init_data_segment();
+
+#endif

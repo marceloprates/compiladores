@@ -1,0 +1,20 @@
+movl $1 a(%rip)
+movl $2 b(%rip)
+movl $3 c(%rip)
+movl b(%rip) ___temp0___(%rip)
+addl a(%rip) ___temp0___(%rip)
+movl ___temp0___(%rip) a(%rip)
+movl a(%rip) ___temp1___(%rip)
+subl b(%rip) ___temp1___(%rip)
+movl ___temp1___(%rip) a(%rip)
+movl b(%rip) ___temp2___(%rip)
+imull a(%rip) ___temp2___(%rip)
+movl ___temp2___(%rip) a(%rip)
+movl a(%rip) %eax
+movl b(%rip) %edx
+movl %edx -4(%rbp)
+movl %eax %edx
+sarl $31 %edx
+idivl -4(%rbp)
+movl %eax ___temp3___(%rip)
+movl ___temp3___(%rip) a(%rip)

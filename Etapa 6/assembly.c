@@ -1,8 +1,8 @@
 #include <stdio.h>
-#include <stlib.h>
+#include <stdlib.h>
 #include <string.h>
-#include <file.h>
-#include "tac.h"
+
+#include "assembly.h"
 
 FILE* file;
 
@@ -21,7 +21,7 @@ char* rvalue(linkedList_t* node)
 	if(node->symbol.type == SYMBOL_IDENTIFIER)
 	{
 		string = malloc(strlen(node->symbol.text) + 6 + 1);
-		sprintf(string, "%s(%rip)", node->symbol.text);
+		sprintf(string, "%s(%%rip)", node->symbol.text);
 	}
 	else
 	{
@@ -91,13 +91,13 @@ void generateAssembly_div(linkedList_t* destination, linkedList_t* source1, link
 	char* source1String = rvalue(source1);
 	char* source2String = rvalue(source2);
 
-	movl	x(%rip), %eax
-	movl	y(%rip), %edx
-	movl	%edx, -4(%rbp)
-	movl	%eax, %edx
-	sarl	$31, %edx
-	idivl	-4(%rbp)
-	movl	%eax, z(%rip)
+	//movl	x(%rip), %eax
+	//movl	y(%rip), %edx
+	//movl	%edx, -4(%rbp)
+	//movl	%eax, %edx
+	//sarl	$31, %edx
+	//idivl	-4(%rbp)
+	//movl	%eax, z(%rip)
 
 	fprintf(file, "movl %s %%eax\n", source1String);
 	fprintf(file, "movl %s %%edx\n", source2String);
@@ -116,37 +116,37 @@ void generateAssemblyOf(TAC* tac)
 {
 	switch(tac->tac_type)
 	{
-		case TAC_SYMBOL = break;
-		case TAC_MOVE = generateAssembly_move(tac->destination, tac->source1); break;
-		case TAC_MOVE_I = break;//TODO
-		case TAC_ARRAYACCESS = break;//TODO
-		case TAC_ARRAYASSIGN = break;//TODO
-		case TAC_ADD = generateAssembly_add(tac->destination, tac->source1, tac->source2); break;
-		case TAC_SUB = generateAssembly_sub(tac->destination, tac->source1, tac->source2); break;
-		case TAC_MUL = generateAssembly_mul(tac->destination, tac->source1, tac->source2); break;
-		case TAC_DIV = generateAssembly_div(tac->destination, tac->source1, tac->source2); break;
-		case TAC_LESS,
-		case TAC_LESS_EQUAL,
-		case TAC_GREATER,
-		case TAC_GREATER_EQUAL,
-		case TAC_EQUAL,
-		case TAC_NOT_EQUAL,
-		case TAC_AND,
-		case TAC_OR,
-		case TAC_REF,
-		case TAC_DEREF,
-		case TAC_LABEL,
-		case TAC_BEGINFUN,
-		case TAC_ENDFUN,
-		case TAC_IFZ,
-		case TAC_JUMP,
-		case TAC_CALL,
-		case TAC_ARG,
-		case TAC_OUTPUT_ARG,
-		case TAC_RET,
-		case TAC_PRINT,
-		case TAC_READ,
-		case TAC_GET_ARG
+		case TAC_SYMBOL: break;
+		case TAC_MOVE: generateAssembly_move(tac->destination, tac->source1); break;
+		case TAC_MOVE_I: break;//TODO
+		case TAC_ARRAYACCESS: break;//TODO
+		case TAC_ARRAYASSIGN: break;//TODO
+		case TAC_ADD: generateAssembly_add(tac->destination, tac->source1, tac->source2); break;
+		case TAC_SUB: generateAssembly_sub(tac->destination, tac->source1, tac->source2); break;
+		case TAC_MUL: generateAssembly_mul(tac->destination, tac->source1, tac->source2); break;
+		case TAC_DIV: generateAssembly_div(tac->destination, tac->source1, tac->source2); break;
+		case TAC_LESS: break;//TODO
+		case TAC_LESS_EQUAL: break;//TODO
+		case TAC_GREATER: break;//TODO
+		case TAC_GREATER_EQUAL: break;//TODO
+		case TAC_EQUAL: break;//TODO
+		case TAC_NOT_EQUAL: break;//TODO
+		case TAC_AND: break;//TODO
+		case TAC_OR: break;//TODO
+		case TAC_REF: break;//TODO
+		case TAC_DEREF: break;//TODO
+		case TAC_LABEL: break;//TODO
+		case TAC_BEGINFUN: break;//TODO
+		case TAC_ENDFUN: break;//TODO
+		case TAC_IFZ: break;//TODO
+		case TAC_JUMP: break;//TODO
+		case TAC_CALL: break;//TODO
+		case TAC_ARG: break;//TODO
+		case TAC_OUTPUT_ARG: break;//TODO
+		case TAC_RET: break;//TODO
+		case TAC_PRINT: break;//TODO
+		case TAC_READ: break;//TODO
+		case TAC_GET_ARG: break;//TODO
 	}
 }
 
@@ -157,6 +157,6 @@ void generateAssembly(TAC* tacs, const char* filename)
 
 	for(aux = tacs; aux != NULL; aux = aux->next)
 	{
-		generateAssemblyOf(aux, file);
+		generateAssemblyOf(aux);
 	}
 }

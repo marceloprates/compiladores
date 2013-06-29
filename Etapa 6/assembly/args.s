@@ -10,7 +10,6 @@ foo:
 	.cfi_offset 6, -16
 	movq	%rsp, %rbp
 	.cfi_def_cfa_register 6
-
 	movl	%edi, -4(%rbp)
 	movl	%esi, -8(%rbp)
 	movl	%edx, -12(%rbp)
@@ -36,7 +35,6 @@ foo:
 	addl	%eax, %edx
 	movl	40(%rbp), %eax
 	addl	%edx, %eax
-
 	popq	%rbp
 	.cfi_def_cfa 7, 8
 	ret
@@ -53,7 +51,6 @@ bar:
 	.cfi_offset 6, -16
 	movq	%rsp, %rbp
 	.cfi_def_cfa_register 6
-
 	subq	$32, %rsp
 	movl	$9, 24(%rsp)
 	movl	$8, 16(%rsp)
@@ -66,7 +63,6 @@ bar:
 	movl	$1, %esi
 	movl	$0, %edi
 	call	foo
-
 	leave
 	.cfi_def_cfa 7, 8
 	ret

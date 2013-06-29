@@ -1,0 +1,11 @@
+word a: 1;
+word b: 2;
+word c: 3;
+
+word main()
+{
+	a = a + b;
+	a = a - b;
+	a = a * b;
+	a = a / b;
+}
