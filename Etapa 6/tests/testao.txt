@@ -2,10 +2,24 @@ word a: 1;
 word b: 2;
 word c: 3;
 
+bool x: TRUE;
+bool y: TRUE;
+bool z: FALSE;
+
 word main()
 {
-	a = a + b;
-	a = a - b;
-	a = a * b;
-	a = a / b;
+	c = a + b;
+	c = a - b;
+	c = a * b;
+	c = a / b;
+
+	z = a < b;
+	z = a <= b;
+	z = a > b;
+	z = a >= b;
+	z = a == b;
+	z = a != b;
+
+	z = x && y;
+	z = x || y;
 }
