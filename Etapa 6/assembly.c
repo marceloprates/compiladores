@@ -6,6 +6,8 @@
 
 FILE* file;
 
+int functions_count = 0;
+
 char* lvalue(linkedList_t* node)
 {
 	char* string = malloc(strlen(node->symbol.text) + 6 + 1);
@@ -350,22 +352,53 @@ void generateAssembly_jump(linkedList_t* destination)
 {
 	fprintf(file, "; STARTING JUMP\n");
 	fprintf(file, "\tjmp %s\n", destination->symbol.text);
-	fprintf(file, "; ENDING JUMP\n");
+	fprintf(file, "; ENDING JUMP\n\n");
 }
 
 void generateAssembly_ret(linkedList_t* source)
 {
 	char* sourceString = rvalue(source);
 
-	fprintf(file, "; STARTING JUMP\n");
+	fprintf(file, "; STARTING RET\n");
 	fprintf(file, "\tmovl %s, %%eax\n", sourceString);
 	fprintf(file, "; popq %%rbp\n");
 	fprintf(file, "; .cfi_def_cfa 7, 8\n");
 	fprintf(file, "; ret\n");
 	fprintf(file, "; .cfi_endproc\n");
-	fprintf(file, "; ENDING JUMP\n");
+	fprintf(file, "; ENDING RET\n\n");
 
 	free(sourceString);
+}
+
+void generateAssembly_begin_fun(linkedList_t* node)
+{
+	fprintf(file, "\t.globl	%s\n", node->symbol.text);
+	fprintf(file, "\t.type	%s, @function\n", node->symbol.text);
+
+	fprintf(file, "%s:\n", node->symbol.text);
+	fprintf(file, ".LFB%d:\n", functions_count);
+	fprintf(file, "\t.cfi_startproc\n");
+	fprintf(file, "\tpushq	%%rbp\n");
+	fprintf(file, "\t.cfi_def_cfa_offset 16\n");
+	fprintf(file, "\t.cfi_offset 6, -16\n");
+	fprintf(file, "\tmovq	%%rsp, %%rbp");
+	fprintf(file, "\t.cfi_def_cfa_register 6\n");
+}
+
+void generateAssembly_end_fun(linkedList_t* node)
+{
+	fprintf(file, ".LFE%d:\n", functions_count);
+	fprintf(file, "\t.size	%s, .-%s\n", node->symbol.text, node->symbol.text);
+
+	functions_count++;
+}
+
+void generateAssembly_call(linkedList_t* node, linkedList_t* destination)
+{
+	fprintf(file, "; STARTING CALL\n");
+	fprintf(file, "\tcall	%s\n", node->symbol.text);
+	fprintf(file, "\tmovl	%%eax, %s\n", destination->symbol.text);
+	fprintf(file, "; ENDING CALL\n\n");
 }
 
 void generateAssemblyOf(TAC* tac)
@@ -373,33 +406,33 @@ void generateAssemblyOf(TAC* tac)
 	switch(tac->tac_type)
 	{
 		case TAC_SYMBOL: break;
-		case TAC_MOVE: generateAssembly_move(tac->destination, tac->source1); break;
+		case TAC_MOVE: 			generateAssembly_move(tac->destination, tac->source1); break;
 		case TAC_MOVE_I: break;//TODO
-		case TAC_ARRAYACCESS: generateAssembly_arrayAccess(tac->destination, tac->source1, tac->source2); break;
-		case TAC_ARRAYASSIGN: generateAssembly_arrayAssign(tac->destination, tac->source1, tac->source2); break;
-		case TAC_ADD: generateAssembly_add(tac->destination, tac->source1, tac->source2); break;
-		case TAC_SUB: generateAssembly_sub(tac->destination, tac->source1, tac->source2); break;
-		case TAC_MUL: generateAssembly_mul(tac->destination, tac->source1, tac->source2); break;
-		case TAC_DIV: generateAssembly_div(tac->destination, tac->source1, tac->source2); break;
-		case TAC_LESS: generateAssembly_less(tac->destination, tac->source1, tac->source2); break;
-		case TAC_LESS_EQUAL: generateAssembly_less_equal(tac->destination, tac->source1, tac->source2); break;
-		case TAC_GREATER: generateAssembly_greater(tac->destination, tac->source1, tac->source2); break;
+		case TAC_ARRAYACCESS: 	generateAssembly_arrayAccess(tac->destination, tac->source1, tac->source2); break;
+		case TAC_ARRAYASSIGN: 	generateAssembly_arrayAssign(tac->destination, tac->source1, tac->source2); break;
+		case TAC_ADD: 			generateAssembly_add(tac->destination, tac->source1, tac->source2); break;
+		case TAC_SUB: 			generateAssembly_sub(tac->destination, tac->source1, tac->source2); break;
+		case TAC_MUL: 			generateAssembly_mul(tac->destination, tac->source1, tac->source2); break;
+		case TAC_DIV: 			generateAssembly_div(tac->destination, tac->source1, tac->source2); break;
+		case TAC_LESS: 			generateAssembly_less(tac->destination, tac->source1, tac->source2); break;
+		case TAC_LESS_EQUAL: 	generateAssembly_less_equal(tac->destination, tac->source1, tac->source2); break;
+		case TAC_GREATER: 		generateAssembly_greater(tac->destination, tac->source1, tac->source2); break;
 		case TAC_GREATER_EQUAL: generateAssembly_greater_equal(tac->destination, tac->source1, tac->source2); break;
-		case TAC_EQUAL: generateAssembly_equal(tac->destination, tac->source1, tac->source2); break;
-		case TAC_NOT_EQUAL: generateAssembly_not_equal(tac->destination, tac->source1, tac->source2); break;
-		case TAC_AND: generateAssembly_and(tac->destination, tac->source1, tac->source2); break;
-		case TAC_OR: generateAssembly_or(tac->destination, tac->source1, tac->source2); break;
-		case TAC_REF: generateAssembly_ref(tac->destination, tac->source1); break;
-		case TAC_DEREF: generateAssembly_deref(tac->destination, tac->source1); break;
-		case TAC_LABEL: generateAssembly_label(tac->destination); break;
-		case TAC_BEGINFUN: break;//TODO
-		case TAC_ENDFUN: break;//TODO
-		case TAC_IFZ: generateAssembly_ifz(tac->destination, tac->source1); break;
-		case TAC_JUMP: generateAssembly_jump(tac->destination); break;
-		case TAC_CALL: break;//TODO
+		case TAC_EQUAL: 		generateAssembly_equal(tac->destination, tac->source1, tac->source2); break;
+		case TAC_NOT_EQUAL: 	generateAssembly_not_equal(tac->destination, tac->source1, tac->source2); break;
+		case TAC_AND: 			generateAssembly_and(tac->destination, tac->source1, tac->source2); break;
+		case TAC_OR: 			generateAssembly_or(tac->destination, tac->source1, tac->source2); break;
+		case TAC_REF: 			generateAssembly_ref(tac->destination, tac->source1); break;
+		case TAC_DEREF: 		generateAssembly_deref(tac->destination, tac->source1); break;
+		case TAC_LABEL: 		generateAssembly_label(tac->destination); break;
+		case TAC_BEGINFUN:		generateAssembly_begin_fun(tac->destination); break;
+		case TAC_ENDFUN:		generateAssembly_end_fun(tac->destination); break;
+		case TAC_IFZ: 			generateAssembly_ifz(tac->destination, tac->source1); break;
+		case TAC_JUMP: 			generateAssembly_jump(tac->destination); break;
+		case TAC_CALL:			generateAssembly_call(tac->source1, tac->destination); break;
 		case TAC_ARG: break;//TODO
 		case TAC_OUTPUT_ARG: break;//TODO
-		case TAC_RET: generateAssembly_ret(tac->source1); break;
+		case TAC_RET: 			generateAssembly_ret(tac->source1); break;
 		case TAC_PRINT: break;//TODO
 		case TAC_READ: break;//TODO
 		case TAC_GET_ARG: break;//TODO

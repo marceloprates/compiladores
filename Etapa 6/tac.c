@@ -402,29 +402,7 @@ TAC* fun_def_tac(linkedList_t* node, TAC* header, TAC* local_defs, TAC* block)
 	linkedList_t* start_label = function_start_label(node);
 	linkedList_t* end_label = function_end_label(node);
 
-	return
-		append(
-			append(
-				append(
-					append(
-						append(
-							append(
-								append(
-									tac(TAC_JUMP,end_label,NULL,NULL),
-									tac(TAC_LABEL,start_label,NULL,NULL)
-								),
-								tac(TAC_BEGINFUN, node, NULL, NULL)
-							),
-							header
-						),
-						local_defs
-					),
-					block
-				),
-				tac(TAC_ENDFUN, node, NULL, NULL)
-			),
-			tac(TAC_LABEL,end_label,NULL,NULL)
-		);
+	return append(tac(TAC_BEGINFUN, node, NULL, NULL),append(header,append(local_defs,append(block,tac(TAC_ENDFUN, node, NULL, NULL)))));
 }
 
 TAC* get_args_tac(TAC** children)
