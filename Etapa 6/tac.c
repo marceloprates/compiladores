@@ -361,7 +361,7 @@ TAC* assignment_tac(TAC* variable, TAC* expression)
 	switch(variable->tac_type)
 	{
 		case TAC_SYMBOL: return append(expression, tac(TAC_MOVE, variable->destination, expression->destination, NULL)); break;
-		case TAC_ARRAYACCESS: return append(expression, tac(TAC_ARRAYASSIGN, variable->destination, variable->source1, expression->destination)); break;
+		case TAC_ARRAYACCESS: return append(expression, tac(TAC_ARRAYASSIGN, variable->source1, variable->source2, expression->destination)); break;
 		//case TAC_DEREF: return append(expression, append(variable, tac(TAC_MOVE_I, variable->destination, expression->destination, NULL))); break;
 	}
 }
@@ -486,7 +486,7 @@ TAC* generateCode(AST* ast)
 			
 		case LOOP: result = loop_tac(childTac[0], childTac[1]); break;
 
-		case ARRAYACCESS: result = tac(TAC_ARRAYACCESS, childTac[0]->destination, childTac[1]->destination, NULL); break;
+		case ARRAYACCESS: result = tac(TAC_ARRAYACCESS, newTemp(), childTac[0]->destination, childTac[1]->destination); break;
 
 		case ASSIGNMENT: result = assignment_tac(childTac[0], childTac[1]); break;
 		

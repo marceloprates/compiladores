@@ -1,4 +1,11 @@
 	.file	"return.c"
+	.globl	x
+	.data
+	.align 4
+	.type	x, @object
+	.size	x, 4
+x:
+	.long	42
 	.text
 	.globl	answer
 	.type	answer, @function
@@ -11,7 +18,7 @@ answer:
 	movq	%rsp, %rbp
 	.cfi_def_cfa_register 6
 
-	movl	$42, %eax
+	movl	x(%rip), %eax
 
 	popq	%rbp
 	.cfi_def_cfa 7, 8

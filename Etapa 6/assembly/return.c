@@ -1,4 +1,6 @@
+int x = 42;
+
 int answer()
 {
-	return 42;
+	return x;
 }

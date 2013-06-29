@@ -1,6 +1,7 @@
 	.file	"array.c"
 	.comm	a,20,16
 	.comm	x,4,4
+	.comm	i,4,4
 	.text
 	.globl	main
 	.type	main, @function
@@ -13,9 +14,14 @@ main:
 	movq	%rsp, %rbp
 	.cfi_def_cfa_register 6
 
-	movl	$0, a+16(%rip)
+	movl	i(%rip), %eax
+	movl	x(%rip), %edx
+	cltq
+	movl	%edx, a(,%rax,4)
 
-	movl	a+8(%rip), %eax
+	movl	i(%rip), %eax
+	cltq
+	movl	a(,%rax,4), %eax
 	movl	%eax, x(%rip)
 
 	popq	%rbp

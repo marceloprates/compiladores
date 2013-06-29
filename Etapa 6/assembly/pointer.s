@@ -26,6 +26,7 @@ foo:
 	.cfi_def_cfa_register 6
 
 	movq	$n, p(%rip)
+
 	movq	p(%rip), %rax
 	movl	(%rax), %eax
 	movl	%eax, n(%rip)
