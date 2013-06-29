@@ -38,7 +38,7 @@ void generateAssembly_move(linkedList_t* destination, linkedList_t* source)
 	char* sourceString = rvalue(source);
 
 	fprintf(file, "# STARTING MOVE\n");
-	fprintf(file, "\tmovl %s %s\n", sourceString, destinationString);
+	fprintf(file, "\tmovl %s, %s\n", sourceString, destinationString);
 	fprintf(file, "# ENDING MOVE\n\n");
 
 	free(destinationString);
@@ -52,8 +52,8 @@ void generateAssembly_add(linkedList_t* destination, linkedList_t* source1, link
 	char* source2String = rvalue(source2);
 
 	fprintf(file, "# STARTING ADD\n");
-	fprintf(file, "\tmovl %s %s\n", source2String, destinationString);
-	fprintf(file, "\taddl %s %s\n", source1String, destinationString);
+	fprintf(file, "\tmovl %s, %s\n", source2String, destinationString);
+	fprintf(file, "\taddl %s, %s\n", source1String, destinationString);
 	fprintf(file, "# ENDING ADD\n\n");
 
 	free(destinationString);
@@ -68,8 +68,8 @@ void generateAssembly_sub(linkedList_t* destination, linkedList_t* source1, link
 	char* source2String = rvalue(source2);
 
 	fprintf(file, "# STARTING SUB\n");
-	fprintf(file, "\tmovl %s %s\n", source1String, destinationString);
-	fprintf(file, "\tsubl %s %s\n", source2String, destinationString);
+	fprintf(file, "\tmovl %s, %s\n", source1String, destinationString);
+	fprintf(file, "\tsubl %s, %s\n", source2String, destinationString);
 	fprintf(file, "# ENDING SUB\n\n");
 
 	free(destinationString);
@@ -84,8 +84,8 @@ void generateAssembly_mul(linkedList_t* destination, linkedList_t* source1, link
 	char* source2String = rvalue(source2);
 
 	fprintf(file, "# STARTING MUL\n");
-	fprintf(file, "\tmovl %s %s\n", source2String, destinationString);
-	fprintf(file, "\timull %s %s\n", source1String, destinationString);
+	fprintf(file, "\tmovl %s, %s\n", source2String, destinationString);
+	fprintf(file, "\timull %s, %s\n", source1String, destinationString);
 	fprintf(file, "# ENDING MUL\n\n");
 
 	free(destinationString);
@@ -108,13 +108,13 @@ void generateAssembly_div(linkedList_t* destination, linkedList_t* source1, link
 	//movl	%eax, z(%rip)
 
 	fprintf(file, "# STARTING DIV\n");
-	fprintf(file, "\tmovl %s %%eax\n", source1String);
-	fprintf(file, "\tmovl %s %%edx\n", source2String);
-	fprintf(file, "\tmovl %%edx -4(%%rbp)\n");
-	fprintf(file, "\tmovl %%eax %%edx\n");
-	fprintf(file, "\tsarl $31 %%edx\n");
+	fprintf(file, "\tmovl %s, %%eax\n", source1String);
+	fprintf(file, "\tmovl %s, %%edx\n", source2String);
+	fprintf(file, "\tmovl %%edx, -4(%%rbp)\n");
+	fprintf(file, "\tmovl %%eax, %%edx\n");
+	fprintf(file, "\tsarl $31, %%edx\n");
 	fprintf(file, "\tidivl -4(%%rbp)\n");
-	fprintf(file, "\tmovl %%eax %s\n", destinationString);
+	fprintf(file, "\tmovl %%eax, %s\n", destinationString);
 	fprintf(file, "# ENDING DIV\n\n");
 
 	free(destinationString);
@@ -175,7 +175,7 @@ void generateAssembly_greater(linkedList_t* destination, linkedList_t* source1, 
 	fprintf(file, "\tsetg %%al\n");
 	fprintf(file, "\tmovzbl %%al, %%eax\n");
 	fprintf(file, "\tmovl %%eax, %s\n", destinationString);
-	fprintf(file, "# ENDING GREATER EQUAL\n\n");
+	fprintf(file, "# ENDING GREATER\n\n");
 
 	free(destinationString);
 	free(source1String);

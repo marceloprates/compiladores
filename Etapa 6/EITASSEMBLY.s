@@ -1,66 +1,66 @@
 # STARTING MOVE
-	movl $1 a(%rip)
+	movl $1, a(%rip)
 # ENDING MOVE
 
 # STARTING MOVE
-	movl $2 b(%rip)
+	movl $2, b(%rip)
 # ENDING MOVE
 
 # STARTING MOVE
-	movl $3 c(%rip)
+	movl $3, c(%rip)
 # ENDING MOVE
 
 # STARTING MOVE
-	movl $TRUE x(%rip)
+	movl $TRUE, x(%rip)
 # ENDING MOVE
 
 # STARTING MOVE
-	movl $TRUE y(%rip)
+	movl $TRUE, y(%rip)
 # ENDING MOVE
 
 # STARTING MOVE
-	movl $FALSE z(%rip)
+	movl $FALSE, z(%rip)
 # ENDING MOVE
 
 # STARTING ADD
-	movl b(%rip) ___temp0___(%rip)
-	addl a(%rip) ___temp0___(%rip)
+	movl b(%rip), ___temp0___(%rip)
+	addl a(%rip), ___temp0___(%rip)
 # ENDING ADD
 
 # STARTING MOVE
-	movl ___temp0___(%rip) c(%rip)
+	movl ___temp0___(%rip), c(%rip)
 # ENDING MOVE
 
 # STARTING SUB
-	movl a(%rip) ___temp1___(%rip)
-	subl b(%rip) ___temp1___(%rip)
+	movl a(%rip), ___temp1___(%rip)
+	subl b(%rip), ___temp1___(%rip)
 # ENDING SUB
 
 # STARTING MOVE
-	movl ___temp1___(%rip) c(%rip)
+	movl ___temp1___(%rip), c(%rip)
 # ENDING MOVE
 
 # STARTING MUL
-	movl b(%rip) ___temp2___(%rip)
-	imull a(%rip) ___temp2___(%rip)
+	movl b(%rip), ___temp2___(%rip)
+	imull a(%rip), ___temp2___(%rip)
 # ENDING MUL
 
 # STARTING MOVE
-	movl ___temp2___(%rip) c(%rip)
+	movl ___temp2___(%rip), c(%rip)
 # ENDING MOVE
 
 # STARTING DIV
-	movl a(%rip) %eax
-	movl b(%rip) %edx
-	movl %edx -4(%rbp)
-	movl %eax %edx
-	sarl $31 %edx
+	movl a(%rip), %eax
+	movl b(%rip), %edx
+	movl %edx, -4(%rbp)
+	movl %eax, %edx
+	sarl $31, %edx
 	idivl -4(%rbp)
-	movl %eax ___temp3___(%rip)
+	movl %eax, ___temp3___(%rip)
 # ENDING DIV
 
 # STARTING MOVE
-	movl ___temp3___(%rip) c(%rip)
+	movl ___temp3___(%rip), c(%rip)
 # ENDING MOVE
 
 # STARTING LESS
@@ -73,7 +73,7 @@
 # ENDING LESS
 
 # STARTING MOVE
-	movl ___temp4___(%rip) z(%rip)
+	movl ___temp4___(%rip), z(%rip)
 # ENDING MOVE
 
 # STARTING LESS EQUAL
@@ -86,7 +86,7 @@
 # ENDING LESS EQUAL
 
 # STARTING MOVE
-	movl ___temp5___(%rip) z(%rip)
+	movl ___temp5___(%rip), z(%rip)
 # ENDING MOVE
 
 # STARTING GREATER
@@ -96,10 +96,10 @@
 	setg %al
 	movzbl %al, %eax
 	movl %eax, ___temp6___(%rip)
-# ENDING GREATER EQUAL
+# ENDING GREATER
 
 # STARTING MOVE
-	movl ___temp6___(%rip) z(%rip)
+	movl ___temp6___(%rip), z(%rip)
 # ENDING MOVE
 
 # STARTING GREATER EQUAL
@@ -112,7 +112,7 @@
 # ENDING GREATER EQUAL
 
 # STARTING MOVE
-	movl ___temp7___(%rip) z(%rip)
+	movl ___temp7___(%rip), z(%rip)
 # ENDING MOVE
 
 # STARTING EQUAL
@@ -125,7 +125,7 @@
 # ENDING EQUAL
 
 # STARTING MOVE
-	movl ___temp8___(%rip) z(%rip)
+	movl ___temp8___(%rip), z(%rip)
 # ENDING MOVE
 
 # STARTING NOT EQUAL
@@ -138,7 +138,7 @@
 # ENDING NOT EQUAL
 
 # STARTING MOVE
-	movl ___temp9___(%rip) z(%rip)
+	movl ___temp9___(%rip), z(%rip)
 # ENDING MOVE
 
 # STARTING AND
@@ -149,7 +149,7 @@
 # ENDING AND
 
 # STARTING MOVE
-	movl ___temp10___(%rip) z(%rip)
+	movl ___temp10___(%rip), z(%rip)
 # ENDING MOVE
 
 # STARTING OR
@@ -160,6 +160,6 @@
 # ENDING OR
 
 # STARTING MOVE
-	movl ___temp11___(%rip) z(%rip)
+	movl ___temp11___(%rip), z(%rip)
 # ENDING MOVE
 
