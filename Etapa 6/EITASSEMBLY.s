@@ -1,15 +1,30 @@
-; STARTING MOVE
-	movl $1, a(%rip)
-; ENDING MOVE
-
-; STARTING MOVE
-	movl $2, b(%rip)
-; ENDING MOVE
-
-; STARTING MOVE
-	movl $3, c(%rip)
-; ENDING MOVE
-
+; STARTING DECL
+	.globl a
+	.data
+	.align 4
+	.type a, @object
+	.size a, 4
+	a:
+	.long 1
+; ENDING DECL
+; STARTING DECL
+	.globl b
+	.data
+	.align 4
+	.type b, @object
+	.size b, 4
+	b:
+	.long 1
+; ENDING DECL
+; STARTING DECL
+	.globl c
+	.data
+	.align 4
+	.type c, @object
+	.size c, 4
+	c:
+	.long 1
+; ENDING DECL
 	.globl	main
 	.type	main, @function
 main:

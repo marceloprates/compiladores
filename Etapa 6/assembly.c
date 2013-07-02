@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "hash.h"
+#include "y.tab.h"
 #include "assembly.h"
 
 FILE* file;
@@ -401,7 +403,48 @@ void generateAssembly_call(linkedList_t* node, linkedList_t* destination)
 	fprintf(file, "; ENDING CALL\n\n");
 }
 
+int value(symbol_t symbol)
+{
+	switch(symbol.type)
+	{
+		case LIT_FALSE:
+		case LIT_TRUE: return symbol.value.boolLit; break;
+		case LIT_INTEGER: return symbol.value.intLit; break;
+		case LIT_CHAR: return symbol.value.charLit; break;
+	}
+}
 
+void generateAssembly_decl(linkedList_t* destination, linkedList_t* source)
+{
+	fprintf(file, "; STARTING DECL\n");
+	fprintf(file, "\t.globl %s\n", destination->symbol.text);
+	fprintf(file, "\t.data\n");
+	fprintf(file, "\t.align 4\n");
+	fprintf(file, "\t.type %s, @object\n", destination->symbol.text);
+	fprintf(file, "\t.size %s, 4\n", destination->symbol.text);
+	fprintf(file, "%s:\n", destination->symbol.text);
+	fprintf(file, "\t.long %d\n", value(source->symbol));
+	fprintf(file, "; ENDING DECL\n");
+}
+
+void generateAssembly_arrayDecl(linkedList_t* id, linkedList_t* size)
+{
+	fprintf(file, "; STARTING ARRAY_DECL\n");
+	fprintf(file, "\t.globl %s\n", id->symbol.text);
+	fprintf(file, "\t.data\n");
+	fprintf(file, "\t.align 4\n");
+	fprintf(file, "\t.type %s, @object\n", id->symbol.text);
+	fprintf(file, "\t.size %s, %d\n", id->symbol.text, 4 * size->symbol.value.intLit);
+	fprintf(file, "%s:\n", id->symbol.text);
+	fprintf(file, "; ENDING ARRAY_DECL\n");
+}
+
+void generateAssembly_elemDecl(linkedList_t* source)
+{
+	fprintf(file, "; STARTING ELEM_DECL\n");
+	fprintf(file, "\t.long %d\n", value(source->symbol));
+	fprintf(file, "; ENDING ELEM_DECL\n");
+}
 
 void generateAssemblyOf(TAC* tac)
 {
@@ -438,6 +481,9 @@ void generateAssemblyOf(TAC* tac)
 		case TAC_PRINT: break;//TODO
 		case TAC_READ: break;//TODO
 		case TAC_GET_ARG: break;//TODO
+		case TAC_DECL: generateAssembly_decl(tac->destination, tac->source1); break;
+		case TAC_ARRAY_DECL: generateAssembly_arrayDecl(tac->destination, tac->source1); break;
+		case TAC_ELEM_DECL: generateAssembly_elemDecl(tac->source1); break;
 	}
 }
 

@@ -147,6 +147,9 @@ void printTypeTAC(tacType_t type)
 		case TAC_ARRAYASSIGN: fprintf(stderr, "ARRAY_ASSIGN"); break;
 		case TAC_OUTPUT_ARG: fprintf(stderr, "OUTPUT_ARG"); break;
 		case TAC_GET_ARG: fprintf(stderr, "GET_ARG"); break;
+		case TAC_DECL: fprintf(stderr, "DECL"); break;
+		case TAC_ARRAY_DECL: fprintf(stderr, "ARRAY_DECL"); break;
+		case TAC_ELEM_DECL: fprintf(stderr, "ELEM_DECL"); break;
 		
 		default: fprintf(stderr, "??"); break;
 	}
@@ -368,11 +371,10 @@ TAC* assignment_tac(TAC* variable, TAC* expression)
 
 TAC* declaration_tac(TAC* id, TAC* literal)
 {
-
-	return tac(TAC_MOVE, id->destination, literal->destination, NULL);
+	return tac(TAC_DECL, id->destination, literal->destination, NULL);
 }
 
-TAC* array_declaration_tac(TAC* id, AST* literal_list)
+TAC* array_declaration_tac(TAC* id, TAC* size, AST* literal_list)
 {
 	if(literal_list == NULL)
 		return NULL;
@@ -380,21 +382,19 @@ TAC* array_declaration_tac(TAC* id, AST* literal_list)
 	if(literal_list->child[0] != NULL)
 	{
 		if(literal_list->child[0]->child[1] == NULL)
-			return NULL;
+			return tac(TAC_ARRAY_DECL, id->destination, size->destination, NULL);
 
-		return append(array_declaration_tac(id,literal_list->child[0]), tac(TAC_ARRAYASSIGN, id->destination, literal_list->child[0]->child[1]->node, NULL));
+		return append(array_declaration_tac(id,size,literal_list->child[0]), tac(TAC_ELEM_DECL, NULL, literal_list->child[0]->child[1]->node, NULL));
 	}
 	else
 	{
-		return append(array_declaration_tac(id,literal_list->child[0]), tac(TAC_ARRAYASSIGN, id->destination, literal_list->child[1]->node, NULL));
+		return append(array_declaration_tac(id,size,literal_list->child[0]), tac(TAC_ELEM_DECL, NULL, literal_list->child[1]->node, NULL));
 	}
 }
 
 TAC* pointer_declaration_tac(TAC* id, TAC* literal)
 {
-	linkedList_t* temp = newTemp();
-
-	return tac(TAC_MOVE_I,temp,literal->destination,NULL);
+	return tac(TAC_DECL,id->destination,literal->destination,NULL);
 }
 
 TAC* fun_def_tac(linkedList_t* node, TAC* header, TAC* local_defs, TAC* block)
@@ -477,7 +477,7 @@ TAC* generateCode(AST* ast)
 		case RETURN: result = return_tac(childTac[0]); break;
 
 		case DECLARATION: result = declaration_tac(childTac[1], childTac[2]); break;
-		case ARRAYDECLARATION: result = array_declaration_tac(childTac[1], ast->child[3]); break;
+		case ARRAYDECLARATION: result = array_declaration_tac(childTac[1], childTac[2], ast->child[3]); break;
 		case POINTERDECLARATION: result = pointer_declaration_tac(childTac[1],childTac[2]); break;
 
 		case INPUT: result = tac(TAC_READ, NULL, childTac[0]->destination, NULL); break;
@@ -496,4 +496,3 @@ TAC* generateCode(AST* ast)
 	}
 	return result;
 }
-

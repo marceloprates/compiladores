@@ -6,6 +6,8 @@ word c: 3;
 //bool y: TRUE;
 //bool z: FALSE;
 
+word arr[10];
+
 word main()
 {
 	c = a + b;
