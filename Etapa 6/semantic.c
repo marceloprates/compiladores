@@ -34,7 +34,6 @@ void first_pass(AST* ast)
 					variable_entry->marked = TRUE;
 					variable_entry->declaration = ast;
 					variable_entry->nature = SCALAR;
-					variable_entry->scope = &globalScope;
 
 					switch(ast->child[0]->node_type)
 					{
@@ -86,7 +85,6 @@ void first_pass(AST* ast)
 					variable_entry->marked = TRUE;
 					variable_entry->declaration = ast;
 					variable_entry->nature = ARRAY;
-					variable_entry->scope = &globalScope;
 
 					switch(ast->child[0]->node_type)
 					{
@@ -172,7 +170,6 @@ void first_pass(AST* ast)
 					variable_entry->marked = TRUE;
 					variable_entry->declaration = ast;
 					variable_entry->nature = SCALAR;
-					variable_entry->scope = &globalScope;
 
 					switch(ast->child[0]->node_type)
 					{
@@ -227,7 +224,6 @@ void first_pass(AST* ast)
 					function_entry->dataType = FUNCTION_TYPE;
 					function_entry-> declaration = ast;
 					function_entry->nature = FUNCTION;
-					function_entry->scope = &globalScope;
 
 					AST* returnTypeAST = headerAST->child[0];
 					
@@ -312,7 +308,6 @@ int local_declarations(AST* fun_def)
 		{
 			variable_entry->marked = TRUE;
 			variable_entry->nature = SCALAR;
-			variable_entry->scope = &(fun_def->child[0]->child[1]->node->symbol);
 
 			switch(type->node_type)
 			{
@@ -356,7 +351,6 @@ int local_declarations(AST* fun_def)
 		literal_entry = &(literal->node->symbol);
 
 		variable_entry->marked = TRUE;
-		variable_entry->scope = &(fun_def->child[0]->child[1]->node->symbol);
 
 		if(local_decs->child[1]->node_type != POINTERDECLARATION)
 		{

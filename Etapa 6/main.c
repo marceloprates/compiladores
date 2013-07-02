@@ -40,7 +40,7 @@ int main(int argc, char** argv)
 	TAC* tacs = reverse(generateCode(root));
 
 	printCode(tacs);
-
+	
 	generateAssembly(tacs, "EITASSEMBLY.s");
 
 	close_input();

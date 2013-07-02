@@ -77,25 +77,7 @@ linkedList_t* newLabel()
 	sprintf(labelName, "___label%d___", count);
 	count++;
 	
-	return addSymbol(labelName, SYMBOL_IDENTIFIER);
-}
-
-linkedList_t* function_start_label(linkedList_t* function)
-{
-	char* labelName = malloc(strlen("___") + strlen(function->symbol.text) + strlen("_start") + strlen("___") + 1);
-
-	sprintf(labelName, "___%s_start___", function->symbol.text);
-
-	return addSymbol(labelName, SYMBOL_IDENTIFIER);
-}
-
-linkedList_t* function_end_label(linkedList_t* function)
-{
-	char* labelName = malloc(strlen("___") + strlen(function->symbol.text) + strlen("_end") + strlen("___") + 1);
-
-	sprintf(labelName, "___%s_end___", function->symbol.text);
-
-	return addSymbol(labelName, SYMBOL_IDENTIFIER);
+	return addSymbol(labelName, SYMBOL_LABEL);
 }
 
 TAC* reverse(TAC* myTac)
@@ -177,6 +159,7 @@ void printCode(TAC* myTac)
 					case SYMBOL_LIT_CHAR: fprintf(stderr, "%c ", aux->destination->symbol.value.charLit); break;
 					case SYMBOL_LIT_STRING: fprintf(stderr, "%c%s%c ", 34, aux->destination->symbol.value.stringLit, 34); break;
 					case SYMBOL_IDENTIFIER: fprintf(stderr, "%s ", aux->destination->symbol.value.identifier); break;
+					case SYMBOL_LABEL: fprintf(stderr, "%s ", aux->destination->symbol.value.identifier); break;
 				}
 			}
 			else
@@ -194,6 +177,7 @@ void printCode(TAC* myTac)
 					case SYMBOL_LIT_CHAR: fprintf(stderr, "%c ", aux->source1->symbol.value.charLit); break;
 					case SYMBOL_LIT_STRING: fprintf(stderr, "%c%s%c ", 34, aux->source1->symbol.value.stringLit, 34); break;
 					case SYMBOL_IDENTIFIER: fprintf(stderr, "%s ", aux->source1->symbol.value.identifier); break;
+					case SYMBOL_LABEL: fprintf(stderr, "%s ", aux->source1->symbol.value.identifier); break;
 				}
 			}
 			else
@@ -211,6 +195,7 @@ void printCode(TAC* myTac)
 					case SYMBOL_LIT_CHAR: fprintf(stderr, "%c ", aux->source2->symbol.value.charLit); break;
 					case SYMBOL_LIT_STRING: fprintf(stderr, "%c%s%c ", 34, aux->source2->symbol.value.stringLit, 34); break;
 					case SYMBOL_IDENTIFIER: fprintf(stderr, "%s ", aux->source2->symbol.value.identifier); break;
+					case SYMBOL_LABEL: fprintf(stderr, "%s ", aux->source2->symbol.value.identifier); break;
 				}
 			}
 			else
@@ -399,9 +384,6 @@ TAC* pointer_declaration_tac(TAC* id, TAC* literal)
 
 TAC* fun_def_tac(linkedList_t* node, TAC* header, TAC* local_defs, TAC* block)
 {
-	linkedList_t* start_label = function_start_label(node);
-	linkedList_t* end_label = function_end_label(node);
-
 	return append(tac(TAC_BEGINFUN, node, NULL, NULL),append(header,append(local_defs,append(block,tac(TAC_ENDFUN, node, NULL, NULL)))));
 }
 

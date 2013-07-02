@@ -258,6 +258,13 @@ linkedList_t* addSymbol(char* text, type_t type)
 
 			break;
 		}
+		case SYMBOL_LABEL:
+		{
+			symbol.value.identifier = (char*) calloc(strlen(text) + 1, sizeof(char));
+			strcpy(symbol.value.identifier, text);
+
+			break;
+		}
 	}
 
 	return addToTable(symbol, symbolTable, SYMBOL_TABLE_SIZE);

@@ -97,7 +97,7 @@
 
 	global_dec:
 		local_dec	|
-		type identifier '[' LIT_INTEGER ']' array_init	{ $$ = CreateAST4(ARRAYDECLARATION, NULL, $1, $2, CreateAST0(LITERAL, $4), $6); }
+		type identifier '[' LIT_INTEGER ']' array_init	{ $2->node->symbol.size = $4->symbol.value.intLit; $$ = CreateAST4(ARRAYDECLARATION, NULL, $1, $2, CreateAST0(LITERAL, $4), $6); }
 		;
 
 	scalar_init:
@@ -110,8 +110,8 @@
 		;
 
 	local_dec:
-		type identifier scalar_init		{ $$ = CreateAST3(DECLARATION, NULL, $1, $2, $3); }			|
-		type '$' identifier scalar_init	{ $$ = CreateAST3(POINTERDECLARATION, NULL, $1, $3, $4); }
+		type identifier scalar_init		{ $2->node->symbol.initial_value = $3->node->symbol.value; $$ = CreateAST3(DECLARATION, NULL, $1, $2, $3); }			|
+		type '$' identifier scalar_init	{ $3->node->symbol.initial_value = $4->node->symbol.value; $$ = CreateAST3(POINTERDECLARATION, NULL, $1, $3, $4); }
 		;
 
 	type:

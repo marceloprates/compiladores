@@ -51,7 +51,7 @@
 \'[^']\'						{ yylval.symbol = addSymbol(yytext, SYMBOL_LIT_CHAR   );		return LIT_CHAR;		}
 \"[^"]*\"						{ yylval.symbol = addSymbol(yytext, SYMBOL_LIT_STRING );		return LIT_STRING;		}
 	
-[a-zA-Z][a-zA-Z0-9_]*			{ /*char destination[800]; generate_st_entry(destination,yytext);*/ yylval.symbol = addSymbol(yytext, SYMBOL_IDENTIFIER);			return TK_IDENTIFIER;	}
+[a-zA-Z][a-zA-Z0-9_]*			{ yylval.symbol = addSymbol(yytext, SYMBOL_IDENTIFIER);			return TK_IDENTIFIER;	}
 							
 "\n"							{ line_number++; 																		}
 " "|"	"						{ 																						}

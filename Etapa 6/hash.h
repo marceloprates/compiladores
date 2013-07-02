@@ -13,6 +13,7 @@
 #define SYMBOL_LIT_CHAR 5
 #define SYMBOL_LIT_STRING 6
 #define SYMBOL_IDENTIFIER 7
+#define SYMBOL_LABEL 8
 
 #define FALSE 0
 #define TRUE 1
@@ -61,7 +62,9 @@ struct symbol_s
 	dataType_t returnType;
 	int marked;
 	AST* declaration;
-	struct symbol_s* scope;
+
+	union value_s initial_value;
+	int size;
 };
 
 struct linkedList_s
