@@ -118,6 +118,7 @@
 		movl b(%rip), 8(%rsp)
 	; ENDING ARG
 	; STARTING CALL
+		subq	$16, %rsp
 		call	f1
 		movl	%eax, ___temp1___
 	; ENDING CALL
