@@ -65,6 +65,8 @@ struct symbol_s
 
 	union value_s initial_value;
 	int size;
+
+	int strings_count;
 };
 
 struct linkedList_s

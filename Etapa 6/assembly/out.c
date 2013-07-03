@@ -2,9 +2,11 @@
 
 int main()
 {
-	printf("Hello, world!");
+	printf("%d",1);
 
-	printf("%s", "Hello, world!");
+	//printf("Hello, world!");
 
-	printf("%s%s%s%s%s", "Hello", ",", " ", "world", "!");
+	//printf("%s", "Hello, world!");
+
+	//printf("%s%s%s%s%s", "Hello", ",", " ", "world", "!");
 }

@@ -10,6 +10,7 @@ FILE* file;
 
 int functions_count = 0;
 int argCount = 0;
+int strings_count = 0;
 
 char* lvalue(linkedList_t* node)
 {
@@ -411,7 +412,7 @@ void generateAssembly_arg(linkedList_t* source)
 
 	fprintf(file,"\t; STARTING ARG\n");
 	fprintf(file,"\t\tmovl %s, %d(%%rsp)\n", sourceString, argCount * 8);
-	fprintf(file,"\t; ENDING ARG\n");
+	fprintf(file,"\t; ENDING ARG\n\n");
 
 	free(sourceString);
 }
@@ -422,7 +423,7 @@ void generateAssembly_getarg(linkedList_t* destination)
 
 	fprintf(file,"\t; STARTING GET_ARG\n");
 	fprintf(file,"\t\tmovl %d(%%rsp), %s\n", argCount * 8, destinationString);
-	fprintf(file,"\t; ENDING GET_ARG\n");
+	fprintf(file,"\t; ENDING GET_ARG\n\n");
 
 	free(destinationString);
 }
@@ -481,42 +482,73 @@ void generate_data_section(hashTable_ref symbol_table)
 
 	fprintf(file,"; DATA SECTION\n\n");
 
+	fprintf(file,"\tLC%d:\n", strings_count);
+	fprintf(file, "\t\t.string %c%%s%c\n", 34, 34);
+	strings_count++;
+
+	fprintf(file,"\tLC%d:\n", strings_count);
+	fprintf(file, "\t\t.string %c%%d%c\n", 34, 34);
+	strings_count++;
+
+	fprintf(file,"\tLC%d:\n", strings_count);
+	fprintf(file, "\t\t.string %c%%c%c\n", 34, 34);
+	strings_count++;
+
+	fprintf(file, "\n");
+
 	for(i = 0; i < SYMBOL_TABLE_SIZE; i++)
 	{
 		aux = symbol_table[i];
 
 		while( !isEmpty( aux ) )
 		{
-			if(aux->symbol.type == SYMBOL_IDENTIFIER)
+			switch(aux->symbol.type)
 			{
-				switch(aux->symbol.nature)
+				case SYMBOL_IDENTIFIER:
 				{
-					case SCALAR:
+					switch(aux->symbol.nature)
 					{
-						fprintf(file,"\t.globl %s\n", aux->symbol.text);
-						fprintf(file,"\t.data\n");
-						fprintf(file,"\t.align 4\n");
-						fprintf(file,"\t.type %s, @object\n", aux->symbol.text);
-						fprintf(file,"\t.size %s, 4\n", aux->symbol.text);
-						fprintf(file,"\t%s:\n", aux->symbol.text);
-						fprintf(file,"\t.long %d\n", aux->symbol.initial_value.intLit);
-						fprintf(file,"\n");
-
-						break;
+						case SCALAR:
+						{
+							fprintf(file,"\t\t.globl %s\n", aux->symbol.text);
+							fprintf(file,"\t\t.data\n");
+							fprintf(file,"\t\t.align 4\n");
+							fprintf(file,"\t\t.type %s, @object\n", aux->symbol.text);
+							fprintf(file,"\t\t.size %s, 4\n", aux->symbol.text);
+							fprintf(file,"\t\t%s:\n", aux->symbol.text);
+							fprintf(file,"\t\t.long %d\n", aux->symbol.initial_value.intLit);
+							fprintf(file,"\n");
+	
+							break;
+						}
+						case ARRAY:
+						{
+							fprintf(file,"\t\t.globl %s\n", aux->symbol.text);
+							fprintf(file,"\t\t.data\n");
+							fprintf(file,"\t\t.align 4\n");
+							fprintf(file,"\t\t.type %s, @object\n", aux->symbol.text);
+							fprintf(file,"\t\t.size %s, %d\n", aux->symbol.text, 4 * aux->symbol.size);
+							fprintf(file,"\t%s:\n", aux->symbol.text);
+							fprintf(file,"\n");
+	
+							break;
+						}
 					}
-					case ARRAY:
-					{
-						fprintf(file,"\t\t.globl %s\n", aux->symbol.text);
-						fprintf(file,"\t\t.data\n");
-						fprintf(file,"\t\t.align 4\n");
-						fprintf(file,"\t\t.type %s, @object\n", aux->symbol.text);
-						fprintf(file,"\t\t.size %s, %d\n", aux->symbol.text, 4 * aux->symbol.size);
-						fprintf(file,"\t%s:\n", aux->symbol.text);
-						fprintf(file,"\n");
 
-						break;
-					}
+					break;
 				}
+				case SYMBOL_LIT_STRING:
+				{
+					fprintf(file,"\tLC%d:\n", strings_count);
+					fprintf(file, "\t\t.string %c%s%c\n", 34, aux->symbol.value.stringLit, 34);
+
+					aux->symbol.strings_count = strings_count;
+
+					strings_count++;
+
+					break;
+				}
+				
 			}
 
 			aux = aux->tail;
@@ -524,6 +556,59 @@ void generate_data_section(hashTable_ref symbol_table)
 	}
 
 	fprintf(file,"\t\n");
+}
+
+void generateAssembly_output_arg(linkedList_t* source)
+{
+	switch(source->symbol.type)
+	{
+		case SYMBOL_LIT_STRING:
+		{
+			fprintf(file, "\t; STARTING OUTPUT ARG\n");
+			fprintf(file, "\t\tmovl	$.LC0, %%esi\n");
+			fprintf(file, "\t\tmovl	$.LC%d, %%edi\n", source->symbol.strings_count);
+			fprintf(file, "\t\tmovl	$0, %%eax\n");
+			fprintf(file, "\t\tcall	printf\n");
+			fprintf(file, "\t; ENDING OUTPUT ARG\n\n");
+
+			break;
+		}
+		case SYMBOL_LIT_INTEGER:
+		{
+			fprintf(file, "\t; STARTING OUTPUT ARG\n");
+			fprintf(file, "\t\tmovl	$%d, %%esi\n", source->symbol.value.intLit);
+			fprintf(file, "\t\tmovl	$.LC1, %%edi\n");
+			fprintf(file, "\t\tmovl	$0, %%eax\n");
+			fprintf(file, "\t\tcall	printf\n");
+			fprintf(file, "\t; ENDING OUTPUT ARG\n\n");
+
+			break;
+		}
+		case SYMBOL_LIT_CHAR:
+		{
+			fprintf(file, "\t; STARTING OUTPUT ARG\n");
+			fprintf(file, "\t\tmovl	$%d, %%esi\n", source->symbol.value.charLit);
+			fprintf(file, "\t\tmovl	$.LC2, %%edi\n");
+			fprintf(file, "\t\tmovl	$0, %%eax\n");
+			fprintf(file, "\t\tcall	printf\n");
+			fprintf(file, "\t; ENDING OUTPUT ARG\n\n");
+
+			break;
+		}
+		case SYMBOL_IDENTIFIER:
+		{
+			char* s = rvalue(source);
+
+			fprintf(file, "\t; STARTING OUTPUT ARG\n");
+			fprintf(file, "\t\tmovl	%s, %%esi\n", s);
+			fprintf(file, "\t\tmovl	$.LC1, %%edi\n");
+			fprintf(file, "\t\tmovl	$0, %%eax\n");
+			fprintf(file, "\t\tcall	printf\n");
+			fprintf(file, "\t; ENDING OUTPUT ARG\n\n");
+
+			break;
+		}
+	}
 }
 
 void generateAssemblyOf(TAC* tac)
@@ -556,7 +641,7 @@ void generateAssemblyOf(TAC* tac)
 		case TAC_JUMP: 			generateAssembly_jump(tac->destination); break;
 		case TAC_CALL:			generateAssembly_call(tac->source1, tac->destination); argCount = 0; break;
 		case TAC_ARG: 			generateAssembly_arg(tac->source1); argCount++; break;
-		case TAC_OUTPUT_ARG: 	break;//TODO
+		case TAC_OUTPUT_ARG: 	generateAssembly_output_arg(tac->source1); break;//TODO
 		case TAC_RET: 			generateAssembly_ret(tac->source1); break;
 		case TAC_PRINT: 		break;//TODO
 		case TAC_READ: 			break;//TODO
