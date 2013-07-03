@@ -66,7 +66,12 @@ linkedList_t* newTemp()
 	sprintf(tempName, "___temp%d___", count);
 	count++;
 	
-	return addSymbol(tempName, SYMBOL_IDENTIFIER);
+	linkedList_t* temp = addSymbol(tempName, SYMBOL_IDENTIFIER);
+
+	temp->symbol.nature = SCALAR;
+	temp->symbol.initial_value.intLit = 0;
+
+	return temp;
 }
 
 linkedList_t* newLabel()
@@ -127,6 +132,7 @@ void printTypeTAC(tacType_t type)
 		case TAC_PRINT: fprintf(stderr, "PRINT"); break;
 		case TAC_READ: fprintf(stderr, "READ"); break;
 		case TAC_ARRAYASSIGN: fprintf(stderr, "ARRAY_ASSIGN"); break;
+		case TAC_ARRAYACCESS: fprintf(stderr, "ARRAY_ACCESS"); break;
 		case TAC_OUTPUT_ARG: fprintf(stderr, "OUTPUT_ARG"); break;
 		case TAC_GET_ARG: fprintf(stderr, "GET_ARG"); break;
 		case TAC_DECL: fprintf(stderr, "DECL"); break;
@@ -294,11 +300,13 @@ TAC* loop_tac(TAC* test, TAC* loopBlock)
 
 TAC* call_tac(TAC* funcId, TAC* args)
 {
+
 	return append(append(args, funcId), tac(TAC_CALL, newTemp(), funcId->destination, NULL));
 }
 
 TAC* output_tac(TAC* elements)
 {
+
 	return append(elements, tac(TAC_PRINT,NULL,NULL,NULL));
 }
 
@@ -348,7 +356,20 @@ TAC* output_args_tac(TAC** children)
 	if(children[1] == NULL)
 	// Último argumento (calculado em children[0])
 	{
-		return append(children[0], append(children[1], append(children[2], append(children[3], tac(TAC_OUTPUT_ARG, NULL, children[0]->destination, NULL)))));
+		return 
+		append(
+			children[0], 
+			append(
+				children[1], 
+				append(
+					children[2], 
+					append(
+						children[3],
+						tac(TAC_OUTPUT_ARG, NULL, children[0]->destination, NULL)
+						)
+					)
+				)
+			);
 	}
 	else
 	// Mais de um argumento, argumentos anteriores empilhados em children[0] e último argumento calculado em children[1]
@@ -375,6 +396,7 @@ TAC* assignment_tac(TAC* variable, TAC* expression)
 
 TAC* declaration_tac(TAC* id, TAC* literal)
 {
+	
 	return tac(TAC_DECL, id->destination, literal->destination, NULL);
 }
 
@@ -398,11 +420,13 @@ TAC* array_declaration_tac(TAC* id, TAC* size, AST* literal_list)
 
 TAC* pointer_declaration_tac(TAC* id, TAC* literal)
 {
+
 	return tac(TAC_DECL,id->destination,literal->destination,NULL);
 }
 
 TAC* fun_def_tac(linkedList_t* node, TAC* header, TAC* local_defs, TAC* block)
 {
+
 	return append(tac(TAC_BEGINFUN, node, NULL, NULL),append(header,append(local_defs,append(block,tac(TAC_ENDFUN, node, NULL, NULL)))));
 }
 

@@ -43,9 +43,9 @@ foo:
 	.cfi_endproc
 .LFE0:
 	.size	foo, .-foo
-	.globl	bar
-	.type	bar, @function
-bar:
+	.globl	main
+	.type	main, @function
+main:
 .LFB1:
 	.cfi_startproc
 	pushq	%rbp
@@ -71,6 +71,6 @@ bar:
 	ret
 	.cfi_endproc
 .LFE1:
-	.size	bar, .-bar
+	.size	main, .-main
 	.ident	"GCC: (Ubuntu/Linaro 4.7.2-2ubuntu1) 4.7.2"
 	.section	.note.GNU-stack,"",@progbits

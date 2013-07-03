@@ -14,11 +14,19 @@ extern AST* root;
 
 int main(int argc, char** argv)
 {
-	if(argc < 2) // insuficient arguments
+	if(argc < 3) // insuficient arguments
+	{
+		fprintf(stderr,"Expected 2 arguments. Exiting...\n");
+
 		exit(1);
+	}
 
 	if(!open_input(argv[1])) // couldn't open input file
+	{
+		fprintf(stderr,"Couldn't open input file. Exiting...\n");
+
 		exit(1);
+	}
 
 	initMe();
 
@@ -41,7 +49,7 @@ int main(int argc, char** argv)
 
 	printCode(tacs);
 	
-	generateAssembly(tacs, "EITASSEMBLY.s");
+	generateAssembly(tacs, argv[2]);
 
 	close_input();
 

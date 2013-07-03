@@ -1,36 +1,23 @@
-word a: 1;
-word b: 2;
-word c: 3;
+word a: 0;
+word b: 1;
+word c: 42;
 
-bool x: TRUE;
-bool y: TRUE;
-bool z: FALSE;
-
-word arr[10];
+word array[10];
 
 word main()
 {
-	//c = a + b;
-	//c = a - b;
-	//c = a * b;
-	//c = a / b;
-	//
-	//z = a < b;
-	//z = a <= b;
-	//z = a > b;
-	//z = a >= b;
-	//z = a == b;
-	//z = a != b;
-	//
-	//z = x && y;
-	//z = x || y;
+	a = 0;
 
-	//return f1(a, b);
+	loop(a < 1000)
+	{
+		array[a] = a;
 
-	output "banana", 42, "macaco", 342, "chupa cabra", 'c', c;
-}
+		output array[a];
 
-word f1(word g, word h)
-{
+		a = a + 1;
+	};
+
+	output "fim";
+
 	return 1;
 }
