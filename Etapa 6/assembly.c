@@ -9,6 +9,7 @@
 FILE* file;
 
 int functions_count = 0;
+int argCount = 0;
 
 char* lvalue(linkedList_t* node)
 {
@@ -403,6 +404,28 @@ void generateAssembly_call(linkedList_t* node, linkedList_t* destination)
 	fprintf(file,"\t; ENDING CALL\n\n");
 }
 
+void generateAssembly_arg(linkedList_t* source, int argCount)
+{
+	char* sourceString = rvalue(source);
+
+	fprintf(file,"\t; STARTING ARG\n");
+	fprintf(file,"\t\tmovl %s, %d(%%rsp)\n", sourceString, argCount * 8);
+	fprintf(file,"\t; ENDING ARG\n");
+
+	free(sourceString);
+}
+
+void generateAssembly_getarg(linkedList_t* destination, int argCount)
+{
+	char* destinationString = lvalue(destination);
+
+	fprintf(file,"\t; STARTING GET_ARG\n");
+	fprintf(file,"\t\tmovl %d(%%rsp), %s\n", argCount * 8, destinationString);
+	fprintf(file,"\t; ENDING GET_ARG\n");
+
+	free(destinationString);
+}
+
 int value(symbol_t symbol)
 {
 	switch(symbol.type)
@@ -526,17 +549,17 @@ void generateAssemblyOf(TAC* tac)
 		case TAC_REF: 			generateAssembly_ref(tac->destination, tac->source1); break;
 		case TAC_DEREF: 		generateAssembly_deref(tac->destination, tac->source1); break;
 		case TAC_LABEL: 		generateAssembly_label(tac->destination); break;
-		case TAC_BEGINFUN:		generateAssembly_begin_fun(tac->destination); break;
+		case TAC_BEGINFUN:		argCount = 0; generateAssembly_begin_fun(tac->destination); break;
 		case TAC_ENDFUN:		generateAssembly_end_fun(tac->destination); break;
 		case TAC_IFZ: 			generateAssembly_ifz(tac->destination, tac->source1); break;
 		case TAC_JUMP: 			generateAssembly_jump(tac->destination); break;
-		case TAC_CALL:			generateAssembly_call(tac->source1, tac->destination); break;
-		case TAC_ARG: 			break;//TODO
+		case TAC_CALL:			argCount = 0; generateAssembly_call(tac->source1, tac->destination); break;
+		case TAC_ARG: 			generateAssembly_arg(tac->source1, argCount); argCount++; break;
 		case TAC_OUTPUT_ARG: 	break;//TODO
 		case TAC_RET: 			generateAssembly_ret(tac->source1); break;
 		case TAC_PRINT: 		break;//TODO
 		case TAC_READ: 			break;//TODO
-		case TAC_GET_ARG: 		break;//TODO
+		case TAC_GET_ARG: 		generateAssembly_getarg(tac->destination, argCount); argCount++; break;
 		//case TAC_DECL: 			generateAssembly_decl(tac->destination, tac->source1); break;//generateAssembly_decl(tac->destination, tac->source1); break;
 		//case TAC_ARRAY_DECL: 	generateAssembly_arrayDecl(tac->destination, tac->source1); break;
 		//case TAC_ELEM_DECL: 	generateAssembly_elemDecl(tac->source1); break;

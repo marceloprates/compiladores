@@ -32,6 +32,14 @@
 	g:
 	.long 0
 
+	.globl h
+	.data
+	.align 4
+	.type h, @object
+	.size h, 4
+	h:
+	.long 0
+
 	.globl x
 	.data
 	.align 4
@@ -103,6 +111,12 @@
 	; ENDING MOVE
 
 		___label0___:
+	; STARTING ARG
+		movl a(%rip), 0(%rsp)
+	; ENDING ARG
+	; STARTING ARG
+		movl b(%rip), 8(%rsp)
+	; ENDING ARG
 	; STARTING CALL
 		call	f1
 		movl	%eax, ___temp1___
@@ -127,6 +141,12 @@
 		.cfi_def_cfa_offset 16
 		.cfi_offset 6, -16
 		movq	%rsp, %rbp		.cfi_def_cfa_register 6
+	; STARTING GET_ARG
+		movl 0(%rsp), g(%rip)
+	; ENDING GET_ARG
+	; STARTING GET_ARG
+		movl 8(%rsp), h(%rip)
+	; ENDING GET_ARG
 	; STARTING RET
 		movl $1, %eax
 	; popq %rbp

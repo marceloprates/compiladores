@@ -320,6 +320,25 @@ TAC* args_tac(TAC** children)
 	}
 }
 
+TAC* get_args_tac(TAC** children)
+{
+	if(children[0] == NULL && children[1] == NULL)
+	// A função não recebe argumentos
+		return NULL;
+	
+	if(children[2] == NULL)
+	// Último parâmetro (calculado em children[1])
+	{
+		return append(children[1], tac(TAC_GET_ARG, children[1]->destination, NULL, NULL));
+	}
+	else
+	// Mais de um parâmetro, parâmetros anteriores desempilhados em children[0] e último parâmetro calculado em children[2]
+	{
+		//return append(tac(TAC_GET_ARG, children[2]->destination, NULL, NULL), append(children[0], children[2]));
+		return append(children[0], append(children[2], tac(TAC_GET_ARG, children[2]->destination, NULL, NULL)));
+	}
+}
+
 TAC* output_args_tac(TAC** children)
 {
 	if(children[0] == NULL)
@@ -385,24 +404,6 @@ TAC* pointer_declaration_tac(TAC* id, TAC* literal)
 TAC* fun_def_tac(linkedList_t* node, TAC* header, TAC* local_defs, TAC* block)
 {
 	return append(tac(TAC_BEGINFUN, node, NULL, NULL),append(header,append(local_defs,append(block,tac(TAC_ENDFUN, node, NULL, NULL)))));
-}
-
-TAC* get_args_tac(TAC** children)
-{
-	if(children[0] == NULL && children[1] == NULL)
-	// A função não recebe argumentos
-		return NULL;
-	
-	if(children[2] == NULL)
-	// Último parâmetro (calculado em children[1])
-	{
-		return append(children[1], tac(TAC_GET_ARG, children[1]->destination, NULL, NULL));
-	}
-	else
-	// Mais de um parâmetro, parâmetros anteriores desempilhados em children[0] e último parâmetro calculado em children[2]
-	{
-		return append(tac(TAC_GET_ARG, children[2]->destination, NULL, NULL), append(children[0], children[2]));
-	}
 }
 
 TAC* generateCode(AST* ast)
