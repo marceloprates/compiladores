@@ -342,8 +342,8 @@ TAC* get_args_tac(TAC** children)
 	else
 	// Mais de um parâmetro, parâmetros anteriores desempilhados em children[0] e último parâmetro calculado em children[2]
 	{
-		//return append(tac(TAC_GET_ARG, children[2]->destination, NULL, NULL), append(children[0], children[2]));
-		return append(children[0], append(children[2], tac(TAC_GET_ARG, children[2]->destination, NULL, NULL)));
+		return append(tac(TAC_GET_ARG, children[2]->destination, NULL, NULL), append(children[0], children[2]));
+		//return append(children[0], append(children[2], tac(TAC_GET_ARG, children[2]->destination, NULL, NULL)));
 	}
 }
 
@@ -487,7 +487,7 @@ TAC* generateCode(AST* ast)
 		case ARRAYDECLARATION: result = array_declaration_tac(childTac[1], childTac[2], ast->child[3]); break;
 		case POINTERDECLARATION: result = pointer_declaration_tac(childTac[1],childTac[2]); break;
 
-		case INPUT: result = tac(TAC_READ, NULL, childTac[0]->destination, NULL); break;
+		case INPUT: result = tac(TAC_READ, childTac[0]->destination, NULL, NULL); break;
 		case OUTPUT: result = output_tac(childTac[0]); break;
 
 		case FUNCTIONDEFINITION: result = fun_def_tac(ast->child[0]->child[1]->node, childTac[0], childTac[1], childTac[2]); break;

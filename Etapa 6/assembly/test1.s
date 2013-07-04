@@ -51,6 +51,7 @@ foo:
 	addl	%eax, %edx
 	movl	56(%rbp), %eax
 	addl	%eax, %edx
+	movl	%edx, %eax
 	popq	%rbp
 	.cfi_def_cfa 7, 8
 	ret

@@ -7,19 +7,19 @@
 	.type	foo, @function
 foo:
 .LFB0:
-	.cfi_startproc
+	#.cfi_startproc
 	pushq	%rbp
-	.cfi_def_cfa_offset 16
-	.cfi_offset 6, -16
+	#.cfi_def_cfa_offset 16
+	#.cfi_offset 6, -16
 	movq	%rsp, %rbp
-	.cfi_def_cfa_register 6
-	;subq	$48, %rsp
-	;movl	%edi, -20(%rbp)
-	;movl	%esi, -24(%rbp)
-	;movl	%edx, -28(%rbp)
-	;movl	%ecx, -32(%rbp)
-	;movl	%r8d, -36(%rbp)
-	;movl	%r9d, -40(%rbp)
+	#.cfi_def_cfa_register 6
+	subq	$12, %rsp
+	#movl	%edi, -20(%rbp)
+	#movl	%esi, -24(%rbp)
+	#movl	%edx, -28(%rbp)
+	#movl	%ecx, -32(%rbp)
+	#movl	%r8d, -36(%rbp)
+	#movl	%r9d, -40(%rbp)
 
 	movl	16(%rbp), %eax
 	movl	%eax, %esi
@@ -69,10 +69,10 @@ foo:
 	movl	$0, %eax
 	call	printf
 	movl	-4(%rbp), %eax
-	leave
-	.cfi_def_cfa 7, 8
+	leave	#popq 	%rbp	
+	#.cfi_def_cfa 7, 8
 	ret
-	.cfi_endproc
+	#.cfi_endproc
 .LFE0:
 	.size	foo, .-foo
 	.globl	bar

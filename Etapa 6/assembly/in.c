@@ -1,8 +1,13 @@
 #include <stdio.h>
 
 int x;
+int y;
+int z;
 
 int main()
 {
-	scanf("%d", &x);
+	scanf("%x", &x);
+	scanf("%x", &y);
+	scanf("%x", &z);
+	printf("%x", x + y + z);
 }

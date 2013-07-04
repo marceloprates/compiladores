@@ -4,11 +4,18 @@ word c: 42;
 
 word array[10];
 
+word foo(word x, word y, word z)
+{
+	output x, y, z;
+
+	return x - y - z;
+}
+
 word main()
 {
 	a = 0;
 
-	loop(a < 1000)
+	loop(a < 50)
 	{
 		array[a] = a;
 
@@ -16,6 +23,12 @@ word main()
 
 		a = a + 1;
 	};
+
+	input a;
+	input b;
+	input c;
+
+	output foo(a, b, c);
 
 	output "fim";
 

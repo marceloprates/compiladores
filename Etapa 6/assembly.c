@@ -447,7 +447,7 @@ void generateAssembly_end_fun(linkedList_t* node)
 void generateAssembly_call(linkedList_t* node, linkedList_t* destination)
 {
 	fprintf(file,"\t\t# STARTING CALL\n");
-	fprintf(file,"\t\t\tsubq	$%d, %%rsp\n", argCount * 8);
+	//fprintf(file,"\t\t\tsubq	$%d, %%rsp\n", argCount * 8);
 	fprintf(file,"\t\t\tcall	%s\n", node->symbol.text);
 	fprintf(file,"\t\t\tmovl	%%eax, %s\n", destination->symbol.text);
 	fprintf(file,"\t\t# ENDING CALL\n\n");
@@ -458,8 +458,9 @@ void generateAssembly_arg(linkedList_t* source)
 	char* sourceString = rvalue(source);
 
 	fprintf(file,"\t\t# STARTING ARG\n");
+	fprintf(file,"\t\t\tsubq	$8, %%rsp\n");
 	fprintf(file,"\t\t\tmovl %s, %%edx\n", sourceString);
-	fprintf(file,"\t\t\tmovl %%edx, %d(%%rsp)\n", argCount * 8);
+	fprintf(file,"\t\t\tmovl %%edx, (%%rsp)\n"/*, argCount * 8*/);
 	fprintf(file,"\t\t# ENDING ARG\n\n");
 
 	free(sourceString);
@@ -470,7 +471,7 @@ void generateAssembly_getarg(linkedList_t* destination)
 	char* destinationString = lvalue(destination);
 
 	fprintf(file,"\t\t# STARTING GET_ARG\n");
-	fprintf(file,"\t\t\tmovl	%d(%%rsp), %%edx\n", argCount * 8);
+	fprintf(file,"\t\t\tmovl	%d(%%rsp), %%edx\n", (argCount + 2) * 8);
 	fprintf(file,"\t\t\tmovl	%%edx, %s\n", destinationString);
 	fprintf(file,"\t\t# ENDING GET_ARG\n\n");
 
@@ -498,7 +499,7 @@ void generate_data_section(hashTable_ref symbol_table)
 	strings_count++;
 
 	fprintf(file,"\t.LC%d:\n", strings_count);
-	fprintf(file, "\t\t.string %c%%d %c\n", 34, 34);
+	fprintf(file, "\t\t.string %c%%x %c\n", 34, 34);
 	strings_count++;
 
 	fprintf(file,"\t.LC%d:\n", strings_count);
@@ -625,6 +626,8 @@ void generateAssembly_output_arg(linkedList_t* source)
 			fprintf(file, "\t\t\tcall	printf\n");
 			fprintf(file, "\t\t# ENDING OUTPUT ARG\n\n");
 
+			free(s);
+
 			break;
 		}
 	}
@@ -635,6 +638,16 @@ void generateAssembly_print()
 	fprintf(file, "\t\t\tmovl	$.LC3, %%edi\n");
 	fprintf(file, "\t\t\tmovl	$0, %%eax\n");
 	fprintf(file, "\t\t\tcall	printf\n");
+}
+
+void generateAssembly_read(linkedList_t* destination)
+{
+	fprintf(file, "\t\t# STARTING READ\n");
+	fprintf(file, "\t\t\tmovl	$%s, %%esi\n", destination->symbol.value.identifier);
+	fprintf(file, "\t\t\tmovl	$.LC1, %%edi\n");
+	fprintf(file, "\t\t\tmovl	$0, %%eax\n");
+	fprintf(file, "\t\t\tcall	__isoc99_scanf\n");
+	fprintf(file, "\t\t# ENDING READ\n\n");
 }
 
 void generateAssemblyOf(TAC* tac)
@@ -670,7 +683,7 @@ void generateAssemblyOf(TAC* tac)
 		case TAC_OUTPUT_ARG: 	generateAssembly_output_arg(tac->source1); break;
 		case TAC_RET: 			generateAssembly_ret(tac->source1); break;
 		case TAC_PRINT: 		generateAssembly_print(); break;
-		case TAC_READ: 			break;//TODO
+		case TAC_READ: 			generateAssembly_read(tac->destination); break;
 		case TAC_GET_ARG: 		generateAssembly_getarg(tac->destination); argCount++; break;
 		//case TAC_DECL: 			generateAssembly_decl(tac->destination, tac->source1); break;//generateAssembly_decl(tac->destination, tac->source1); break;
 		//case TAC_ARRAY_DECL: 	generateAssembly_arrayDecl(tac->destination, tac->source1); break;
